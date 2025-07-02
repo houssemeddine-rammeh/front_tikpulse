@@ -11,6 +11,7 @@ import {
   createTheme,
   ThemeProvider as MuiThemeProvider,
 } from "@mui/material/styles";
+import { connectSocket } from "./api/socketInstance";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
@@ -41,6 +42,7 @@ import StandingPage from "./pages/StandingPage";
 import BonusRulesPage from "./pages/BonusRulesPage";
 import ContactPage from "./pages/ContactPage";
 import LoadingScreen from "./components/LoadingScreen";
+import Profile from "./pages/profile";
 import { useSelector } from "react-redux";
 import ManagerDashboardPageRedux from "./pages/ManagerDashboardPageRedux";
 // TikTok Theme Colors
@@ -152,6 +154,13 @@ function App() {
     SUPER_ADMIN: "super_admin",
   };
 
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      connectSocket(token);
+    }
+  }, []);
+
   return (
     <Provider store={store}>
       <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
@@ -190,6 +199,14 @@ function App() {
                       element={
                         <ProtectedRoute allowedRoles={["creator"]}>
                           <CreatorDashboardPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/creator/profile/:id"
+                      element={
+                        <ProtectedRoute allowedRoles={["creator", "manager"]}>
+                          <Profile />
                         </ProtectedRoute>
                       }
                     />

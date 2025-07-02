@@ -13,7 +13,6 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
-  FormHelperText,
   Divider,
   List,
   ListItem,
@@ -49,14 +48,19 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { UserRole } from "../types";
-import { ticketsAPI } from "../services/api";
 import RealTimeChat from "../components/messaging/RealTimeChat";
 import Layout from "../components/layout/Layout";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  createTicket,
+  fetchTickets,
+  fetchTicket,
+} from "../features/ticketsSlice";
 
 // Ticket status types and colors
 const ticketStatusColors = {
   open: "#2196f3", // Blue
-  in_progress: "#ff9800", // Orange
+  inProgress: "#ff9800", // Orange
   resolved: "#4caf50", // Green
   closed: "#9e9e9e", // Gray
 };
@@ -83,15 +87,15 @@ const ContactPage = () => {
   });
 
   // Tickets state
-  const [tickets, setTickets] = useState([]);
+  const tickets = useSelector((state) => state.tickets.tickets);
+  const { ticket: selectedTicket } = useSelector((state) => state.tickets);
   const [filteredTickets, setFilteredTickets] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
 
-  const [selectedTicket, setSelectedTicket] = useState(null);
-
+  const dispatch = useDispatch();
   // Chat state
   const [currentChatTicketId, setCurrentChatTicketId] = useState(null);
   const [showNewTicketForm, setShowNewTicketForm] = useState(false);
@@ -104,39 +108,8 @@ const ContactPage = () => {
 
   // Load tickets and manager info on component mount
   useEffect(() => {
-    fetchTickets();
-    if (user?.role === "creator") {
-      fetchManagerInfo();
-    }
-  }, [user]);
-
-  const fetchTickets = async () => {
-    try {
-      // const response = await ticketsAPI.getSupportTickets();
-      const tickets = [];
-      setTickets(tickets);
-      setFilteredTickets(tickets);
-    } catch (error) {
-      console.error("Failed to fetch tickets:", error);
-      setTickets([]);
-      setFilteredTickets([]);
-    }
-  };
-
-  const fetchManagerInfo = async () => {
-    try {
-      const response = await ticketsAPI.getAssignedManager(user.id);
-      setManagerInfo(response.manager);
-    } catch (error) {
-      console.warn("Failed to fetch manager info:", error);
-      setManagerInfo({
-        id: "default-manager",
-        name: "Support Manager",
-        email: "support@tikplus.com",
-        avatar: null,
-      });
-    }
-  };
+    dispatch(fetchTickets());
+  }, [dispatch]);
 
   // Filter tickets when search or filter criteria change
   useEffect(() => {
@@ -183,8 +156,8 @@ const ContactPage = () => {
   };
 
   const handleTicketClick = (ticket) => {
-    setSelectedTicket(ticket);
-    setCurrentChatTicketId(ticket.id);
+    dispatch(fetchTicket(ticket?._id)); // Ensure tickets are up-to-date
+    setCurrentChatTicketId(ticket._id);
   };
 
   const handleNewTicketOpen = () => {
@@ -201,49 +174,28 @@ const ContactPage = () => {
     });
   };
 
-  const handleNewTicketSubmit = () => {
+  const handleNewTicketSubmit = async () => {
     if (!newTicketData.subject || !newTicketData.description) {
       return;
     }
 
-    const newTicket = {
-      id: Date.now().toString(),
-      title: newTicketData.subject,
-      subject: newTicketData.subject,
-      description: newTicketData.description,
-      category: newTicketData.category,
-      status: "open",
-      priority: newTicketData.priority,
-      creator_id: user?.id || "creator-1",
-      creator_name: user?.username || "Creator User",
-      manager_id: "manager-1",
-      manager_name: "John Manager",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      creatorId: user?.id || "creator-1",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      messages: [
-        {
-          id: `msg-${Date.now()}`,
-          ticket_id: Date.now().toString(),
-          user_id: user?.id || "creator-1",
-          username: user?.username || "Creator User",
-          role: user?.role?.toString() || UserRole.CREATOR.toString(),
-          message: newTicketData.description,
-          created_at: new Date().toISOString(),
-          ticketId: Date.now().toString(),
-          userId: user?.id || "creator-1",
-          userRole: user?.role || UserRole.CREATOR,
-          createdAt: new Date(),
-        },
-      ],
-    };
+    try {
+      const newTicketPayload = {
+        title: newTicketData.subject,
+        description: newTicketData.description,
+        category: newTicketData.category,
+        priority: newTicketData.priority,
+      };
 
-    setTickets((prev) => [newTicket, ...prev]);
-    handleNewTicketClose();
+      // Call the backend API to create a new ticket
+      await dispatch(createTicket(newTicketPayload));
+      // Add the newly created ticket to the state
+      handleNewTicketClose();
+    } catch (error) {
+      console.error("Failed to create ticket:", error);
+      // Optionally, show an error message to the user
+    }
   };
-
   const handleEmailManager = () => {
     setManagerDialogOpen(true);
   };
@@ -252,24 +204,6 @@ const ContactPage = () => {
     setManagerDialogOpen(false);
     setManagerMessage("");
     setManagerSubject("");
-  };
-
-  const handleSendManagerEmail = async () => {
-    try {
-      await ticketsAPI.sendManagerMessage({
-        managerId: managerInfo?.id,
-        subject: managerSubject,
-        message: managerMessage,
-        fromUserId: user.id,
-      });
-
-      handleManagerDialogClose();
-      // Show success message
-    } catch (error) {
-      console.error("Failed to send message to manager:", error);
-      // Still close dialog but show error
-      handleManagerDialogClose();
-    }
   };
 
   const formatDate = (date) => {
@@ -290,11 +224,11 @@ const ContactPage = () => {
         return (
           <Schedule fontSize="small" sx={{ color: ticketStatusColors.open }} />
         );
-      case "in_progress":
+      case "inProgress":
         return (
           <Person
             fontSize="small"
-            sx={{ color: ticketStatusColors.in_progress }}
+            sx={{ color: ticketStatusColors.inProgress }}
           />
         );
       case "resolved":
@@ -320,7 +254,7 @@ const ContactPage = () => {
     switch (status) {
       case "open":
         return "Open";
-      case "in_progress":
+      case "inProgress":
         return "In Progress";
       case "resolved":
         return "Resolved";
@@ -450,7 +384,7 @@ const ContactPage = () => {
                   </Button>
                 )}
                 {/* Hide New Ticket button for admins - they can only view */}
-                {user?.role !== UserRole.ADMIN && (
+                {user?.role === "creator" && (
                   <Button
                     variant="contained"
                     startIcon={<Add />}
@@ -513,7 +447,7 @@ const ContactPage = () => {
                         >
                           <MenuItem value="all">All Statuses</MenuItem>
                           <MenuItem value="open">Open</MenuItem>
-                          <MenuItem value="in_progress">In Progress</MenuItem>
+                          <MenuItem value="inProgress">In Progress</MenuItem>
                           <MenuItem value="resolved">Resolved</MenuItem>
                           <MenuItem value="closed">Closed</MenuItem>
                         </Select>
@@ -578,7 +512,7 @@ const ContactPage = () => {
                             sx={{
                               py: 2,
                               bgcolor:
-                                selectedTicket?.id === ticket.id
+                                selectedTicket?._id === ticket._id
                                   ? "rgba(98, 0, 234, 0.05)"
                                   : "transparent",
                               "&:hover": {
@@ -615,6 +549,40 @@ const ContactPage = () => {
                                   >
                                     {ticket.title || ticket.subject}
                                   </Typography>
+                                  {ticket.priority && (
+                                    <Chip
+                                      label={ticket.priority}
+                                      size="small"
+                                      sx={{
+                                        bgcolor: `${
+                                          ticket.priority === "urgent"
+                                            ? "#f44336" // Red
+                                            : ticket.priority === "high"
+                                            ? "#ff9800" // Orange
+                                            : ticket.priority === "medium"
+                                            ? "#2196f3" // Blue
+                                            : ticket.priority === "low"
+                                            ? "#4caf50" // Green
+                                            : "#9e9e9e" // Default Gray
+                                        }20`,
+                                        color:
+                                          ticket.priority === "urgent"
+                                            ? "#f44336"
+                                            : ticket.priority === "high"
+                                            ? "#ff9800"
+                                            : ticket.priority === "medium"
+                                            ? "#2196f3"
+                                            : ticket.priority === "low"
+                                            ? "#4caf50"
+                                            : "#9e9e9e",
+                                        fontWeight: 500,
+                                      }}
+                                      icon={
+                                        <ConfirmationNumber fontSize="small" />
+                                      }
+                                    />
+                                  )}
+                                  {/* Chat icon */}
                                   <Chat
                                     fontSize="small"
                                     sx={{ color: "#6200ea" }}
@@ -760,16 +728,12 @@ const ContactPage = () => {
                         {selectedTicket.title || selectedTicket.subject}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {selectedTicket.description}
+                        {selectedTicket?.description}
                       </Typography>
                     </Box>
 
                     {/* Real-time chat component */}
-                    <RealTimeChat
-                      ticketId={selectedTicket.id}
-                      currentUser={user}
-                      isReadOnly={user?.role === UserRole.ADMIN}
-                    />
+                    <RealTimeChat ticket={selectedTicket} currentUser={user} />
                   </Paper>
                 ) : (
                   <Paper
@@ -934,7 +898,7 @@ const ContactPage = () => {
           <DialogActions>
             <Button onClick={handleManagerDialogClose}>Cancel</Button>
             <Button
-              onClick={handleSendManagerEmail}
+              onClick={() => console.log("Send message to manager")}
               variant="contained"
               disabled={!managerSubject || !managerMessage}
               sx={{ bgcolor: "#6200ea", "&:hover": { bgcolor: "#3700b3" } }}

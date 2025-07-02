@@ -33,7 +33,11 @@ import EventForm from "../components/EventForm/EventForm";
 import EventCalendar from "../components/calendar/EventCalendar";
 import Layout from "../components/layout/Layout";
 import { useSelector, useDispatch } from "react-redux";
-import { createEvent, getEvents } from "../features/eventsSlice";
+import {
+  createEvent,
+  getEvents,
+  getUsersEvents,
+} from "../features/eventsSlice";
 import moment from "moment";
 
 const EventsPage = () => {
@@ -42,14 +46,18 @@ const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState("calendar");
+  const user = useSelector((state) => state.auth.user); // Get user from auth state
   const [error, setError] = useState(null); // Define error state
 
   const dispatch = useDispatch();
-  const { events, loading } = useSelector((state) => state.events);
+  const { events, loading, partcipants } = useSelector((state) => state.events);
 
   const fetchEvents = async () => {
     try {
       await dispatch(getEvents());
+      if (user?.role === "manager") {
+        await dispatch(getUsersEvents()); // Fetch user's events if needed
+      }
     } catch (err) {
       console.error("❌ Error fetching events:", err);
       setError("Failed to fetch events. Please try again later."); // Set error message
@@ -102,11 +110,13 @@ const EventsPage = () => {
       setSelectedEvent(existingEvent);
       setOpenEventDialog(true);
     } else {
-      setSelectedEvent({
-        start: slotInfo.start,
-        end: slotInfo.end,
-      });
-      setOpenCreateDialog(true);
+      if (user?.role === "manager") {
+        setSelectedEvent({
+          start: slotInfo.start,
+          end: slotInfo.end,
+        });
+        setOpenCreateDialog(true);
+      }
     }
   };
 
@@ -151,6 +161,31 @@ const EventsPage = () => {
         return <EventIcon />;
       default:
         return <EventIcon />;
+    }
+  };
+
+  const getEventTypeColor = (type) => {
+    switch (type?.toLowerCase()) {
+      case "live stream":
+        return "#FF6347"; // Tomato
+      case "workshop":
+        return "#8A2BE2"; // BlueViolet
+      case "meet & greet":
+        return "#FF69B4"; // HotPink
+      case "training":
+        return "#00CED1"; // DarkTurquoise
+      case "contest":
+        return "#FFD700"; // Gold
+      case "tournament":
+        return "#FFD700"; // Gold
+      case "challenge":
+        return "#FF4500"; // OrangeRed
+      case "meeting":
+        return "#1E90FF"; // DodgerBlue
+      case "match":
+        return "#32CD32"; // LimeGreen
+      default:
+        return "#1976d2"; // Default Blue
     }
   };
 
@@ -221,14 +256,16 @@ const EventsPage = () => {
             >
               <RefreshIcon />
             </IconButton>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setOpenCreateDialog(true)}
-              size="large"
-            >
-              Create Event
-            </Button>
+            {user?.role === "manager" && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setOpenCreateDialog(true)}
+                size="large"
+              >
+                Create Event
+              </Button>
+            )}
           </Box>
         </Box>
 
@@ -256,13 +293,15 @@ const EventsPage = () => {
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
               Create your first event to get started
             </Typography>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setOpenCreateDialog(true)}
-            >
-              Create First Event
-            </Button>
+            {user?.role === "manager" && (
+              <Button
+                variant="contained"
+                startIcon={<AddIcon />}
+                onClick={() => setOpenCreateDialog(true)}
+              >
+                Create First Event
+              </Button>
+            )}
           </Box>
         ) : (
           <Grid container spacing={3}>
@@ -302,7 +341,7 @@ const EventsPage = () => {
                         label={event.type}
                         size="small"
                         sx={{
-                          backgroundColor: event.color || "#1976d2",
+                          backgroundColor: getEventTypeColor(event.type),
                           color: "white",
                         }}
                       />
@@ -334,6 +373,16 @@ const EventsPage = () => {
                         />
                         <Typography variant="body2" color="text.secondary">
                           {event.location}
+                        </Typography>
+                      </Box>
+                    )}
+                    {event?.participants?.length > 0 && (
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", mb: 2 }}
+                      >
+                        <Typography variant="body2" color="text.secondary">
+                          Participants:{" "}
+                          {event.participants.map((p) => p.username).join(", ")}
                         </Typography>
                       </Box>
                     )}
@@ -384,7 +433,7 @@ const EventsPage = () => {
                   label={selectedEvent.type}
                   size="small"
                   sx={{
-                    backgroundColor: selectedEvent.color || "#1976d2",
+                    backgroundColor: getEventTypeColor(selectedEvent.type),
                     color: "white",
                   }}
                 />
@@ -399,9 +448,8 @@ const EventsPage = () => {
                     📅 Date & Time
                   </Typography>
                   <Typography variant="body2">
-                    {formatDate(selectedEvent.date)}
-                    {selectedEvent.endDate &&
-                      ` - ${formatDate(selectedEvent.endDate)}`}
+                    {formatDate(selectedEvent.start)}
+                    {selectedEvent.end && ` - ${formatDate(selectedEvent.end)}`}
                   </Typography>
                 </Box>
 
@@ -426,17 +474,16 @@ const EventsPage = () => {
                     </Typography>
                   </Box>
                 )}
-
-                {selectedEvent.maxParticipants &&
-                  selectedEvent.maxParticipants > 0 && (
+                {selectedEvent.participants &&
+                  selectedEvent.participants.length > 0 && (
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="subtitle2" gutterBottom>
                         👥 Participants
                       </Typography>
                       <Typography variant="body2">
-                        Max: {selectedEvent.maxParticipants}
-                        {selectedEvent.currentParticipants &&
-                          ` | Current: ${selectedEvent.currentParticipants}`}
+                        {selectedEvent.participants
+                          .map((p) => p.username)
+                          .join(", ")}
                       </Typography>
                     </Box>
                   )}
@@ -479,6 +526,8 @@ const EventsPage = () => {
             <EventForm
               onEventCreated={handleEventCreated}
               selectedEvent={selectedEvent}
+              participantsList={partcipants}
+              loading={loading}
             />
           </DialogContent>
           <DialogActions>

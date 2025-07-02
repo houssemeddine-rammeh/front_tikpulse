@@ -50,6 +50,7 @@ import { useNotifications } from "../contexts/NotificationContext";
 import Layout from "../components/layout/Layout";
 import { useDispatch, useSelector } from "react-redux";
 import { getCreatorProfile } from "../features/creatorDashboardSlice";
+import Profile from "./profile";
 import moment from "moment";
 
 // Agency bonus calculation rules
@@ -95,41 +96,11 @@ const calculateAgencyBonus = (creator) => {
   };
 };
 
-const importantMessages = [
-  {
-    id: "1",
-    title: "New Match Opportunity",
-    content: "There's a new match opportunity for you next weekend!",
-  },
-  {
-    id: "2",
-    title: "Bonus Achieved",
-    content: "Congratulations! You reached your monthly diamond goal.",
-  },
-  {
-    id: "3",
-    title: "Contract Update",
-    content: "Your contract has been reviewed. Check the updated terms.",
-  },
-];
 
-// Agency details structure
-const agencyDetails = {
-  name: "TikPulse Digital Agency",
-  id: "TDA-001",
-  managerName: "Sarah Johnson",
-  joinDate: new Date(2023, 0, 15),
-  region: "Europe",
-  supportEmail: "support@tikpulse.agency",
-  description:
-    "Leading digital talent agency specializing in TikTok creators and brand partnerships",
-};
 
 const CreatorDashboardPage = () => {
   const { user } = useAuth();
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const isTablet = useMediaQuery(theme.breakpoints.down("lg"));
   const dispatch = useDispatch();
   const [sponsorships, setSponsorships] = useState([]);
   const [agencyBonus, setAgencyBonus] = useState(null);
@@ -291,151 +262,10 @@ const CreatorDashboardPage = () => {
           </Box>
 
           {/* Creator Info Card */}
-          <Card
-            sx={{
-              mb: 4,
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
-            }}
-          >
-            <CardContent sx={{ p: 4 }}>
-              <Grid container spacing={3} alignItems="center">
-                <Grid item xs={12} md={3}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                    <Avatar
-                      sx={{
-                        width: 80,
-                        height: 80,
-                        bgcolor: "rgba(255,255,255,0.2)",
-                      }}
-                    >
-                      <Person sx={{ fontSize: 40 }} />
-                    </Avatar>
-                    <Box>
-                      <Typography variant="h5" sx={{ fontWeight: "bold" }}>
-                        {creator?.username}
-                      </Typography>
-                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        {creator?.tikTokId}
-                      </Typography>
-                      <Chip
-                        label={creator?.profile?.graduationStatus || undefined}
-                        size="small"
-                        sx={{
-                          mt: 1,
-                          bgcolor: "rgba(255,255,255,0.2)",
-                          color: "white",
-                        }}
-                      />
-                    </Box>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} md={9}>
-                  <Grid container spacing={2}>
-                    <Grid item xs={6} sm={3}>
-                      <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                        Followers
-                      </Typography>
-                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        {creator?.profile?.followers ?? 0}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                      <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                        Videos
-                      </Typography>
-                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        {creator?.profile?.videos ?? 0}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                      <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                        Total Views
-                      </Typography>
-                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        {creator?.profile?.views}
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={6} sm={3}>
-                      <Typography variant="body2" sx={{ opacity: 0.8 }}>
-                        Days Active
-                      </Typography>
-                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        {creator?.profile?.daysSinceJoining ?? 0}
-                      </Typography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
 
           {/* Performance Metrics */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ height: "100%", bgcolor: "#e3f2fd" }}>
-                <CardContent sx={{ textAlign: "center", p: 3 }}>
-                  <Diamond sx={{ fontSize: 40, color: "#1976d2", mb: 1 }} />
-                  <Typography
-                    variant="h4"
-                    sx={{ color: "#1976d2", fontWeight: "bold" }}
-                  >
-                    {creator?.profile?.diamonds}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Diamonds
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ height: "100%", bgcolor: "#f3e5f5" }}>
-                <CardContent sx={{ textAlign: "center", p: 3 }}>
-                  <Videocam sx={{ fontSize: 40, color: "#9c27b0", mb: 1 }} />
-                  <Typography
-                    variant="h4"
-                    sx={{ color: "#9c27b0", fontWeight: "bold" }}
-                  >
-                    {creator?.profile?.validLiveDays}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Valid Live Days
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ height: "100%", bgcolor: "#e8f5e8" }}>
-                <CardContent sx={{ textAlign: "center", p: 3 }}>
-                  <Today sx={{ fontSize: 40, color: "#4caf50", mb: 1 }} />
-                  <Typography
-                    variant="h4"
-                    sx={{ color: "#4caf50", fontWeight: "bold" }}
-                  >
-                    {creator?.profile?.liveDuration}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Live Duration
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card sx={{ height: "100%", bgcolor: "#fff3e0" }}>
-                <CardContent sx={{ textAlign: "center", p: 3 }}>
-                  <AttachMoney sx={{ fontSize: 40, color: "#ff9800", mb: 1 }} />
-                  <Typography
-                    variant="h4"
-                    sx={{ color: "#ff9800", fontWeight: "bold" }}
-                  >
-                    €{agencyBonus?.amount ?? 0}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Total Bonus
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+          <Grid xs={12} spacing={4} mb={4}>
+            <Profile creator={creator} />
           </Grid>
 
           {/* Agency Bonus Details */}
@@ -624,9 +454,7 @@ const CreatorDashboardPage = () => {
                     <CalendarToday sx={{ mr: 1, color: "#1976d2" }} />
                     <Typography variant="body1">
                       Joined{" "}
-                      {moment(creator?.joinedDate).format(
-                        "MMM D, YYYY h:mm A"
-                      )}
+                      {moment(creator?.joinedDate).format("MMM D, YYYY h:mm A")}
                     </Typography>
                   </Box>
                 </Grid>
@@ -637,19 +465,20 @@ const CreatorDashboardPage = () => {
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                     <Business sx={{ mr: 1, color: "#1976d2" }} />
                     <Typography variant="body1">
-                      {agencyDetails.name}
+                    {creator?.manager?.agency?.name}
+
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                     <Person sx={{ mr: 1, color: "#1976d2" }} />
                     <Typography variant="body1">
-                      Manager: {agencyDetails.managerName}
+                      Manager: {creator?.manager?.username}
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <Email sx={{ mr: 1, color: "#1976d2" }} />
                     <Typography variant="body1">
-                      {agencyDetails.supportEmail}
+                      {creator?.manager?.email}
                     </Typography>
                   </Box>
                 </Grid>

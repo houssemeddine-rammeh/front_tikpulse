@@ -33,6 +33,22 @@ export const createEvent = createAsyncThunk(
     }
   }
 );
+
+export const getUsersEvents = createAsyncThunk(
+  "events/getUsersEvents",
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/events/participants`);
+      return response?.data?.users;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to fetch user's events"
+      );
+    }
+  }
+);
 // Async thunk for updating an event
 export const updateEvent = createAsyncThunk(
   "events/updateEvent",
@@ -74,9 +90,7 @@ export const joinEvent = createAsyncThunk(
       return { eventId, ...response.data };
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message ||
-          error.message ||
-          "Failed to join event"
+        error.response?.data?.message || error.message || "Failed to join event"
       );
     }
   }
@@ -118,120 +132,128 @@ export const getEventDetails = createAsyncThunk(
 // create the slice
 
 const eventsSlice = createSlice({
-    name: "events",
-    initialState: {
-        events: [],
-        eventDetails: null,
-        loading: false,
-        error: null,
-    },
-    reducers: {},
-    extraReducers: (builder) => {
-        builder
-        .addCase(getEvents.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(getEvents.fulfilled, (state, action) => {
-            state.loading = false;
-            state.events = action.payload;
-        })
-        .addCase(getEvents.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
-        .addCase(createEvent.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(createEvent.fulfilled, (state, action) => {
-            state.loading = false;
-            state.events.push(action.payload);
-        })
-        .addCase(createEvent.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
-        .addCase(updateEvent.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(updateEvent.fulfilled, (state, action) => {
-            state.loading = false;
-            const index = state.events.findIndex(
-            (event) => event.id === action.payload.id
-            );
-            if (index !== -1) {
-            state.events[index] = action.payload;
-            }
-        })
-        .addCase(updateEvent.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
-        .addCase(deleteEvent.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(deleteEvent.fulfilled, (state, action) => {
-            state.loading = false;
-            state.events = state.events.filter(
-            (event) => event.id !== action.payload
-            );
-        })
-        .addCase(deleteEvent.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
-        .addCase(joinEvent.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(joinEvent.fulfilled, (state, action) => {
-            state.loading = false;
-            const event = state.events.find(
-                (e) => e.id === action.payload.eventId
-            );
-            if (event) {
-                event.joined = true; // Assuming the event object has a 'joined' property
-            }
-            state.eventDetails = action.payload; // Update event details with the response
+  name: "events",
+  initialState: {
+    events: [],
+    eventDetails: null,
+    loading: false,
+    partcipants: [],
+    error: null,
+  },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(getEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events = action.payload;
+      })
+      .addCase(getEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(createEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events.push(action.payload);
+      })
+      .addCase(createEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.events.findIndex(
+          (event) => event.id === action.payload.id
+        );
+        if (index !== -1) {
+          state.events[index] = action.payload;
         }
-        )
-        .addCase(joinEvent.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
-        .addCase(leaveEvent.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(leaveEvent.fulfilled, (state, action) => {
-            state.loading = false;
-            const event = state.events.find(
-                (e) => e.id === action.payload
-            );
-            if (event) {
-                event.joined = false; // Assuming the event object has a 'joined' property
-            }
-        })
-        .addCase(leaveEvent.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
-        .addCase(getEventDetails.pending, (state) => {
-            state.loading = true;
-            state.error = null;
-        })
-        .addCase(getEventDetails.fulfilled, (state, action) => {
-            state.loading = false;
-            state.eventDetails = action.payload;
-        })
-        .addCase(getEventDetails.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        });
-    }
+      })
+      .addCase(updateEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        state.events = state.events.filter(
+          (event) => event.id !== action.payload
+        );
+      })
+      .addCase(deleteEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(joinEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(joinEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        const event = state.events.find((e) => e.id === action.payload.eventId);
+        if (event) {
+          event.joined = true; // Assuming the event object has a 'joined' property
+        }
+        state.eventDetails = action.payload; // Update event details with the response
+      })
+      .addCase(joinEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(leaveEvent.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(leaveEvent.fulfilled, (state, action) => {
+        state.loading = false;
+        const event = state.events.find((e) => e.id === action.payload);
+        if (event) {
+          event.joined = false; // Assuming the event object has a 'joined' property
+        }
+      })
+      .addCase(leaveEvent.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getEventDetails.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getEventDetails.fulfilled, (state, action) => {
+        state.loading = false;
+        state.eventDetails = action.payload;
+      })
+      .addCase(getEventDetails.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(getUsersEvents.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getUsersEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.partcipants = action.payload; // Assuming the payload contains the participants list
+      })
+      .addCase(getUsersEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+  },
 });
 export const { actions, reducer } = eventsSlice;
 export default reducer;

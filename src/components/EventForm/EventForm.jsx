@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import "./EventForm.css";
+import { Autocomplete, CircularProgress, TextField } from "@mui/material";
 
-const EventForm = ({ onEventCreated, selectedEvent = {} }) => {
+const EventForm = ({
+  onEventCreated,
+  selectedEvent = {},
+  participantsList = [],
+  loading = false,
+}) => {
   const [formData, setFormData] = useState({
     title: selectedEvent?.title || "",
     description: selectedEvent?.description || "",
@@ -11,7 +17,7 @@ const EventForm = ({ onEventCreated, selectedEvent = {} }) => {
     type: selectedEvent?.type || "",
     status: selectedEvent?.status || "upcoming",
     color: selectedEvent?.color || "#1976d2",
-    _id : selectedEvent?._id || null,
+    _id: selectedEvent?._id || null,
   });
 
   const [errors, setErrors] = useState({});
@@ -185,6 +191,65 @@ const EventForm = ({ onEventCreated, selectedEvent = {} }) => {
             </div>
           </div>
 
+          <div>
+            <Autocomplete
+              multiple
+              id="participants"
+              options={Array.isArray(participantsList) ? participantsList : []}
+              getOptionLabel={(option) => option?.username || ""}
+              isOptionEqualToValue={(option, value) =>
+                option?._id === value?._id
+              }
+              value={
+                Array.isArray(participantsList) &&
+                Array.isArray(formData.participants)
+                  ? participantsList.filter((user) =>
+                      formData.participants.includes(user._id)
+                    )
+                  : []
+              }
+              onChange={(event, newValue) => {
+                setFormData((prev) => ({
+                  ...prev,
+                  participants: newValue.map((user) => user?._id),
+                }));
+              }}
+              loading={loading}
+              disabled={
+                !Array.isArray(participantsList) ||
+                participantsList.length === 0
+              }
+              noOptionsText={
+                loading ? "Loading participants..." : "No participants found"
+              }
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  variant="outlined"
+                  label="Participants"
+                  placeholder="Search participants"
+                  helperText={
+                    (!Array.isArray(participantsList) ||
+                      participantsList.length === 0) &&
+                    !loading
+                      ? "No participants available to select"
+                      : ""
+                  }
+                  InputProps={{
+                    ...params.InputProps,
+                    endAdornment: (
+                      <>
+                        {loading ? (
+                          <CircularProgress color="inherit" size={20} />
+                        ) : null}
+                        {params.InputProps.endAdornment}
+                      </>
+                    ),
+                  }}
+                />
+              )}
+            />
+          </div>
           <div className="form-group">
             <label htmlFor="location">Location</label>
             <input

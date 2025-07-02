@@ -1,8 +1,9 @@
 import axios from "axios";
-import { getToken } from "../utils/tokenManager";
+import { getToken , removeToken } from "../utils/tokenManager";
 
 // Use environment variable for API base URL or fallback to local development
-const baseURL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
+const baseURL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
 
 const axiosInstance = axios.create({
   baseURL,
@@ -22,7 +23,7 @@ axiosInstance.interceptors.request.use(
     }
 
     // Log the request for debugging
-    
+
     return config;
   },
   (error) => {
@@ -37,7 +38,7 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     // Log the error for debugging
-    console.error('API Error:', {
+    console.error("API Error:", {
       message: error.message,
       code: error.code,
       url: error.config?.url,
@@ -47,24 +48,35 @@ axiosInstance.interceptors.response.use(
     });
 
     // Handle specific error cases
-    if (error.code === 'ECONNABORTED') {
-      console.warn('API request timeout');
-      error.message = 'Request timeout - please try again';
-    } else if (error.code === 'ERR_NETWORK') {
-      console.warn('Network error - backend may not be available');
-      error.message = 'Network error - please check your connection';
+    if (error.code === "ECONNABORTED") {
+      console.warn("API request timeout");
+      error.message = "Request timeout - please try again";
+    } else if (error.code === "ERR_NETWORK") {
+      console.warn("Network error - backend may not be available");
+      error.message = "Network error - please check your connection";
     } else if (error.response?.status === 401) {
-      console.warn('Unauthorized request');
-      error.message = 'Unauthorized - please login again';
-      // You might want to trigger a logout here
+      console.warn("Unauthorized request");
+      error.message = "Unauthorized - please login again";
+
+      // Clear token/cache
+      removeToken();
+
+      // Optional: clear more storage
+      localStorage.clear();
+      sessionStorage.clear();
+
+      // Optional: redirect to login (if in a browser context)
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
+      }
     } else if (error.response?.status === 404) {
-      error.message = 'Resource not found';
+      error.message = "Resource not found";
     } else if (error.response?.status >= 500) {
-      error.message = 'Server error - please try again later';
+      error.message = "Server error - please try again later";
     }
 
     return Promise.reject(error);
   }
 );
 
-export default axiosInstance; 
+export default axiosInstance;
