@@ -55,6 +55,23 @@ export const signUp = createAsyncThunk(
   }
 );
 
+export const subscribeToNotifications = createAsyncThunk(
+  "auth/subscribeToNotifications",
+  async (subscription, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(
+        "/auth/subscribe",
+        subscription
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Something went wrong"
+      );
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -105,6 +122,18 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(signUp.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(subscribeToNotifications.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(subscribeToNotifications.fulfilled, (state, action) => {
+        state.isLoading = false;
+        // Handle successful subscription if needed
+        state.error = null;
+      })
+      .addCase(subscribeToNotifications.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

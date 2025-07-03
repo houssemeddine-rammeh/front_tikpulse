@@ -45,6 +45,7 @@ import LoadingScreen from "./components/LoadingScreen";
 import Profile from "./pages/profile";
 import { useSelector } from "react-redux";
 import ManagerDashboardPageRedux from "./pages/ManagerDashboardPageRedux";
+import NotificationPrompt from "./notificationPrompt";
 // TikTok Theme Colors
 const theme = createTheme({
   palette: {
@@ -161,8 +162,21 @@ function App() {
     }
   }, []);
 
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('SW registered: ', registration);
+        })
+        .catch(error => {
+          console.log('SW registration failed: ', error);
+        });
+    });
+  }
+
   return (
     <Provider store={store}>
+      <NotificationPrompt></NotificationPrompt>
       <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
         <MuiThemeProvider theme={theme}>
           <CssBaseline />
