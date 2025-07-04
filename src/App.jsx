@@ -155,13 +155,6 @@ function App() {
     SUPER_ADMIN: "super_admin",
   };
 
-  React.useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      connectSocket(token);
-    }
-  }, []);
-
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js')

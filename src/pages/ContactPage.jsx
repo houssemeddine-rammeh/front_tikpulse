@@ -51,11 +51,14 @@ import { UserRole } from "../types";
 import RealTimeChat from "../components/messaging/RealTimeChat";
 import Layout from "../components/layout/Layout";
 import { useSelector, useDispatch } from "react-redux";
+import { getToken } from "../utils/tokenManager";
+
 import {
   createTicket,
   fetchTickets,
   fetchTicket,
 } from "../features/ticketsSlice";
+import { connectSocket, subscribeToTicketMessages, unsubscribeFromTicketMessages } from "../api/socketInstance";
 
 // Ticket status types and colors
 const ticketStatusColors = {
@@ -110,6 +113,22 @@ const ContactPage = () => {
   useEffect(() => {
     dispatch(fetchTickets());
   }, [dispatch]);
+
+
+  React.useEffect(() => {
+    const token = getToken();
+    const socket = connectSocket(token);
+
+    if (selectedTicket?._id && socket) {
+      subscribeToTicketMessages(selectedTicket?._id);
+    }
+
+    return () => {
+      if (selectedTicket?._id) {
+        unsubscribeFromTicketMessages(selectedTicket?._id);
+      }
+    };
+  }, [selectedTicket?._id]);
 
   // Filter tickets when search or filter criteria change
   useEffect(() => {
