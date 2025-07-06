@@ -673,7 +673,8 @@ const Header = () => {
               <Tooltip title="Creators">
                 <Button
                   color="inherit"
-                  onClick={handleCreatorsMenuOpen}
+                  component={Link}
+                  to="/creators"
                   sx={{
                     minWidth: "auto",
                     px: { md: 1.5, lg: 2 },
@@ -690,40 +691,8 @@ const Header = () => {
                     },
                   }}
                   startIcon={<GroupIcon sx={{ fontSize: "1.1rem" }} />}
-                  endIcon={<KeyboardArrowDownIcon sx={{ fontSize: "1rem" }} />}
                 >
                   {isTablet ? "" : "Creators"}
-                </Button>
-              </Tooltip>
-            )}
-
-            {/* Standing Button - Only for managers and admins */}
-            {(user.role === UserRole.MANAGER ||
-              user.role === UserRole.SUB_MANAGER ||
-              user.role === UserRole.ADMIN) && (
-              <Tooltip title="Standing">
-                <Button
-                  color="inherit"
-                  component={Link}
-                  to="/standing"
-                  sx={{
-                    minWidth: "auto",
-                    px: { md: 1.5, lg: 2 },
-                    py: 0.5,
-                    borderRadius: 1,
-                    textTransform: "none",
-                    fontSize: { md: "0.85rem", lg: "0.9rem" },
-                    bgcolor:
-                      location.pathname === "/standing"
-                        ? "rgba(255,255,255,0.1)"
-                        : "transparent",
-                    "&:hover": {
-                      bgcolor: "rgba(255,255,255,0.1)",
-                    },
-                  }}
-                  startIcon={<StandingIcon sx={{ fontSize: "1.1rem" }} />}
-                >
-                  {isTablet ? "" : "Standing"}
                 </Button>
               </Tooltip>
             )}
@@ -1202,57 +1171,7 @@ const Header = () => {
           </Box>
 
           {/* Top Creators List */}
-          {topCreators.map((creator) => (
-            <MenuItem
-              key={creator.id}
-              onClick={() => {
-                handleCreatorsMenuClose();
-                navigate(`/creator-profile/${creator.id}`);
-              }}
-              sx={{
-                py: 1.5,
-                "&:hover": {
-                  bgcolor: "rgba(0,0,0,0.04)",
-                },
-              }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 1.5,
-                  width: "100%",
-                }}
-              >
-                <Avatar sx={{ width: 36, height: 36, bgcolor: "primary.main" }}>
-                  {creator.name ? creator.name.charAt(0).toUpperCase() : "?"}
-                </Avatar>
-                <Box sx={{ flex: 1, minWidth: 0 }}>
-                  <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
-                    {creator.name}
-                  </Typography>
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={{ fontSize: "0.8rem" }}
-                  >
-                    {creator.handle}
-                  </Typography>
-                </Box>
-                <Box sx={{ textAlign: "right" }}>
-                  <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 600, color: "primary.main" }}
-                  >
-                    {creator.followers}
-                  </Typography>
-                  <Typography variant="caption" color="text.secondary">
-                    followers
-                  </Typography>
-                </Box>
-              </Box>
-            </MenuItem>
-          ))}
+     
 
           <Divider />
 

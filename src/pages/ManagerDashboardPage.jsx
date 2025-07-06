@@ -24,22 +24,26 @@ import {
   Select,
   MenuItem,
   TablePagination,
+  Divider,
 } from "@mui/material";
 import {
-  Dashboard as DashboardIcon,
-  Event as EventIcon,
-  EmojiEvents as StandingIcon,
-  Star as SponsorshipIcon,
-  Assignment as RulesIcon,
-  ContactSupport as ContactIcon,
   Diamond as DiamondIcon,
   Group as FollowersIcon,
-  Add as AddIcon,
   Person as PersonIcon,
   Campaign as CampaignIcon,
   PersonAdd as PersonAddIcon,
+  GroupOutlined as CreatorsIcon,
+  TrendingUp as TrendingUpIcon,
+  TrendingDown as TrendingDownIcon,
+  Visibility as ValidDaysIcon,
+  PlayCircle as LiveIcon,
+  Event as EventIcon,
+  Edit as EditIcon,
+  Save as SaveIcon,
+  Cancel as CancelIcon,
+  Add as AddIcon,
+  Delete as DeleteIcon,
 } from "@mui/icons-material";
-import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
   LineChart,
@@ -258,74 +262,109 @@ const ManagerDashboardPage = () => {
             </Typography>
           </Box>
 
-          {/* Action Buttons Section */}
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h5" sx={{ mb: 3, color: "#1976d2" }}>
-              Quick Actions
-            </Typography>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={4}>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  size="large"
-                  startIcon={<CampaignIcon />}
-                  onClick={() => setCampaignModalOpen(true)}
-                  sx={{
-                    bgcolor: "#4caf50",
-                    color: "white",
-                    py: 2,
-                    fontSize: "1.1rem",
-                    fontWeight: "bold",
-                    "&:hover": { bgcolor: "#45a049" },
-                    boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
-                  }}
-                >
-                  Create Campaign
-                </Button>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  size="large"
-                  startIcon={<EventIcon />}
-                  onClick={() => setEventModalOpen(true)}
-                  sx={{
-                    bgcolor: "#ff9800",
-                    color: "white",
-                    py: 2,
-                    fontSize: "1.1rem",
-                    fontWeight: "bold",
-                    "&:hover": { bgcolor: "#f57c00" },
-                    boxShadow: "0 4px 12px rgba(255, 152, 0, 0.3)",
-                  }}
-                >
-                  Create Event
-                </Button>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Button
-                  variant="contained"
-                  fullWidth
-                  size="large"
-                  startIcon={<PersonAddIcon />}
-                  onClick={() => setCreatorModalOpen(true)}
-                  sx={{
-                    bgcolor: "#9c27b0",
-                    color: "white",
-                    py: 2,
-                    fontSize: "1.1rem",
-                    fontWeight: "bold",
-                    "&:hover": { bgcolor: "#7b1fa2" },
-                    boxShadow: "0 4px 12px rgba(156, 39, 176, 0.3)",
-                  }}
-                >
-                  Add Creator
-                </Button>
-              </Grid>
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} sm={6} md={4}>
+              <Card
+                sx={{
+                  height: "100%",
+                  transition: "transform 0.2s",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
+                  },
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                    <CreatorsIcon sx={{ fontSize: 40, color: "#2e7d32" }} />
+                    <Box sx={{ ml: 2, flex: 1 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: "bold", color: "#2e7d32" }}
+                      >
+                        Total Creators
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Typography
+                    variant="h3"
+                    sx={{ fontWeight: "bold", mb: 1, color: "#333" }}
+                  >
+                    {managerCreators?.length || 0}
+                  </Typography>
+                </CardContent>
+              </Card>
             </Grid>
-          </Box>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <Card
+                sx={{
+                  height: "100%",
+                  transition: "transform 0.2s",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
+                  },
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                    <LiveIcon sx={{ fontSize: 40, color: "#d32f2f" }} />
+                    <Box sx={{ ml: 2, flex: 1 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: "bold", color: "#d32f2f" }}
+                      >
+                        Total Live duration
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Typography
+                    variant="h3"
+                    sx={{ fontWeight: "bold", mb: 1, color: "#333" }}
+                  >
+                    {stats?.liveDuration || 0}
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+
+            <Grid item xs={12} sm={6} md={4}>
+              <Card
+                sx={{
+                  height: "100%",
+                  transition: "transform 0.2s",
+                  "&:hover": {
+                    transform: "translateY(-4px)",
+                    boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
+                  },
+                }}
+              >
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+                    <ValidDaysIcon sx={{ fontSize: 40, color: "#0288d1" }} />
+                    <Box sx={{ ml: 2, flex: 1 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{ fontWeight: "bold", color: "#0288d1" }}
+                      >
+                        Valid Days ({">"}1h)
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Typography
+                    variant="h3"
+                    sx={{ fontWeight: "bold", mb: 1, color: "#333" }}
+                  >
+                    {stats?.validLiveDays || 0} Days
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
 
           {/* Main Stats */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -335,7 +374,9 @@ const ManagerDashboardPage = () => {
                   <Typography variant="h6" gutterBottom>
                     Total Diamonds
                   </Typography>
-                  <Typography variant="h4">{formatNumber(stats?.diamonds)}</Typography>
+                  <Typography variant="h4">
+                    {formatNumber(stats?.diamonds)}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -345,7 +386,9 @@ const ManagerDashboardPage = () => {
                   <Typography variant="h6" gutterBottom>
                     Total Followers
                   </Typography>
-                  <Typography variant="h4">{formatNumber(stats?.followers)}</Typography>
+                  <Typography variant="h4">
+                    {formatNumber(stats?.followers)}
+                  </Typography>
                 </CardContent>
               </Card>
             </Grid>
@@ -389,7 +432,7 @@ const ManagerDashboardPage = () => {
                     variant="h3"
                     sx={{ color: "#1976d2", fontWeight: "bold" }}
                   >
-                    {managerCreators?.length || 0}
+                    ----
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#1565c0", mt: 1 }}>
                     Active creators last month
@@ -421,7 +464,7 @@ const ManagerDashboardPage = () => {
                     variant="h3"
                     sx={{ color: "#388e3c", fontWeight: "bold" }}
                   >
-                    {(monthlyStats.followersLastMonth / 1000).toFixed(0)}K
+                    ---
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#2e7d32", mt: 1 }}>
                     Followers gained last month
@@ -461,10 +504,10 @@ const ManagerDashboardPage = () => {
                     variant="h3"
                     sx={{ color: "#f57c00", fontWeight: "bold" }}
                   >
-                    {(monthlyStats.viewsLastMonth / 1000000).toFixed(1)}M
+                    ----
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#ef6c00", mt: 1 }}>
-                    Total video views last month
+                    Total Valid days form last month
                   </Typography>
                 </CardContent>
               </Card>
@@ -485,13 +528,13 @@ const ManagerDashboardPage = () => {
                     gutterBottom
                     sx={{ color: "#e91e63", fontWeight: "bold" }}
                   >
-                    Diamonds This Month
+                   Total Diamonds from last Month
                   </Typography>
                   <Typography
                     variant="h3"
                     sx={{ color: "#c2185b", fontWeight: "bold" }}
                   >
-                    {(monthlyStats.diamondsThisMonth / 1000).toFixed(0)}K
+                    ----
                   </Typography>
                   <Typography variant="body2" sx={{ color: "#ad1457", mt: 1 }}>
                     Diamonds collected this month

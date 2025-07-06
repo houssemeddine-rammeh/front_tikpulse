@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { signIn, logout as reduxLogout } from "../features/authSlice";
 
 const UserRole = {
-  ADMIN: "agencyAdmin",
+  ADMIN: "admin",
   MANAGER: "manager",
   CREATOR: "creator",
 };
@@ -38,12 +38,8 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-
       const resultAction = await dispatch(signIn({ email, password }));
       const { payload } = resultAction;
-
-      console.log("Login result:", payload);
-
       if (!payload?.user || !payload?.token) {
         throw new Error("Invalid login response");
       }

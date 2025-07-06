@@ -32,7 +32,6 @@ import {
   EmojiNatureOutlined,
   BarChartOutlined,
   AutoAwesomeOutlined,
-  SupervisedUserCircleOutlined as ManagerIcon,
   GroupOutlined as CreatorsIcon,
   EventOutlined,
   AssignmentOutlined,
@@ -117,7 +116,7 @@ const AdminDashboardPage = () => {
       value: '24',
       fromLastMonth: '+3',
       trend: 'up',
-      icon: <ManagerIcon sx={{ fontSize: 40, color: '#1976d2' }} />,
+      icon: <DashboardOutlined sx={{ fontSize: 40, color: '#1976d2' }} />,
       color: '#1976d2'
     },
     {
@@ -444,7 +443,7 @@ const AdminDashboardPage = () => {
             <Grid item xs={12} sm={6} md={3}>
               <Card sx={{ textAlign: 'center', p: 2, '&:hover': { boxShadow: 4 } }}>
                 <CardContent>
-                  <SupervisedUserCircleOutlined sx={{ fontSize: 48, color: '#1976d2', mb: 2 }} />
+                  <DashboardOutlined sx={{ fontSize: 48, color: '#1976d2', mb: 2 }} />
                   <Typography variant="h6" gutterBottom>
                     Manager Management
                   </Typography>
@@ -463,7 +462,7 @@ const AdminDashboardPage = () => {
             <Grid item xs={12} sm={6} md={3}>
               <Card sx={{ textAlign: 'center', p: 2, '&:hover': { boxShadow: 4 } }}>
                 <CardContent>
-                  <GroupOutlined sx={{ fontSize: 48, color: '#2e7d32', mb: 2 }} />
+                  <DashboardOutlined sx={{ fontSize: 48, color: '#2e7d32', mb: 2 }} />
                   <Typography variant="h6" gutterBottom>
                     Creator Management
                   </Typography>

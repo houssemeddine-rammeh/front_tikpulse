@@ -46,6 +46,7 @@ import Profile from "./pages/profile";
 import { useSelector } from "react-redux";
 import ManagerDashboardPageRedux from "./pages/ManagerDashboardPageRedux";
 import NotificationPrompt from "./notificationPrompt";
+import DataManagementPage from "./pages/DataManagementPage";
 // TikTok Theme Colors
 const theme = createTheme({
   palette: {
@@ -332,6 +333,14 @@ function App() {
                       element={
                         <ProtectedRoute allowedRoles={["admin"]}>
                           <CompanyManagementPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                       <Route
+                      path="/admin/upload"
+                      element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                          <DataManagementPage />
                         </ProtectedRoute>
                       }
                     />
