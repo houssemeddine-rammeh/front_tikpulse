@@ -6,6 +6,7 @@ import { setToken, removeToken } from "../utils/tokenManager";
 const initialState = {
   user: null,
   token: null,
+  profile: null,
   isLoading: false,
   error: null,
 };
@@ -60,10 +61,25 @@ export const subscribeToNotifications = createAsyncThunk(
   async (subscription, { rejectWithValue }) => {
     try {
       const response = await axiosInstance.post(
-        "/auth/subscribe",
+        "/users/userSubscription",
         subscription
       );
       return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "Something went wrong"
+      );
+    }
+  }
+);
+ // "/user/profile/:tikTokId",
+
+export const getProfile = createAsyncThunk(
+  "auth/getProfile",
+  async (tikTokId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get(`/users/profile/${tikTokId}`);
+      return response.data?.data;
     } catch (error) {
       return rejectWithValue(
         error?.response?.data?.message || "Something went wrong"
@@ -134,6 +150,18 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(subscribeToNotifications.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(getProfile.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.profile = action.payload; // Store profile data
+        state.error = null;
+      })
+      .addCase(getProfile.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

@@ -1,6 +1,7 @@
+// TikTokAuthService.js
 import { v4 as uuidv4 } from "uuid";
 import Cookies from "js-cookie";
-import { TIKTOK_CLIENT_SECRET } from '../config/api';
+import { TIKTOK_CLIENT_SECRET } from "../config/api"; // ⚠️ Don't expose secrets in frontend production
 
 // TikTok OAuth Configuration
 export const TIKTOK_CONFIG = {
@@ -12,7 +13,7 @@ export const TIKTOK_CONFIG = {
 };
 
 class TikTokAuthService {
-  static instance;
+  static instance = null;
 
   static getInstance() {
     if (!TikTokAuthService.instance) {
@@ -28,8 +29,7 @@ class TikTokAuthService {
     const state = uuidv4();
     const csrfToken = uuidv4();
 
-    // Store state and CSRF token in cookies for validation
-    Cookies.set("tiktok_oauth_state", state, { expires: 1 }); // 1 day
+    Cookies.set("tiktok_oauth_state", state, { expires: 1 });
     Cookies.set("tiktok_csrf_token", csrfToken, { expires: 1 });
 
     const params = new URLSearchParams({
@@ -37,7 +37,7 @@ class TikTokAuthService {
       redirect_uri: TIKTOK_CONFIG.REDIRECT_URI,
       scope: TIKTOK_CONFIG.SCOPE,
       response_type: TIKTOK_CONFIG.RESPONSE_TYPE,
-      state: state,
+      state,
     });
 
     return `${TIKTOK_CONFIG.AUTH_URL}?${params.toString()}`;
@@ -48,23 +48,17 @@ class TikTokAuthService {
    */
   async handleCallback(code, state) {
     try {
-      // Verify state parameter
       const storedState = Cookies.get("tiktok_oauth_state");
       if (!storedState || storedState !== state) {
         throw new Error("Invalid state parameter");
       }
 
-      // Exchange code for access token
       const tokenResponse = await this.exchangeCodeForToken(code);
-
-      // Get user information
       const userInfo = await this.getUserInfo(tokenResponse.access_token);
 
-      // Clean up cookies
       Cookies.remove("tiktok_oauth_state");
       Cookies.remove("tiktok_csrf_token");
 
-      // Store tokens securely
       this.storeTokens(tokenResponse);
 
       return userInfo;
@@ -78,23 +72,20 @@ class TikTokAuthService {
    * Exchange authorization code for access token
    */
   async exchangeCodeForToken(code) {
-    const response = await fetch(
-      "https://open.tiktokapis.com/v2/oauth/token/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Cache-Control": "no-cache",
-        },
-        body: new URLSearchParams({
-          client_key: TIKTOK_CONFIG.CLIENT_KEY,
-          client_secret: TIKTOK_CLIENT_SECRET,
-          code: code,
-          grant_type: "authorization_code",
-          redirect_uri: TIKTOK_CONFIG.REDIRECT_URI,
-        }),
-      }
-    );
+    const response = await fetch("https://open.tiktokapis.com/v2/oauth/token/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Cache-Control": "no-cache",
+      },
+      body: new URLSearchParams({
+        client_key: TIKTOK_CONFIG.CLIENT_KEY,
+        client_secret: TIKTOK_CLIENT_SECRET, // ⚠️ Don't use in frontend production
+        code,
+        grant_type: "authorization_code",
+        redirect_uri: TIKTOK_CONFIG.REDIRECT_URI,
+      }),
+    });
 
     if (!response.ok) {
       throw new Error(`Token exchange failed: ${response.status}`);
@@ -103,9 +94,7 @@ class TikTokAuthService {
     const data = await response.json();
 
     if (data.error) {
-      throw new Error(
-        `TikTok API Error: ${data.error_description || data.error}`
-      );
+      throw new Error(`TikTok API Error: ${data.error_description || data.error}`);
     }
 
     return data;
@@ -133,11 +122,11 @@ class TikTokAuthService {
       throw new Error(`TikTok API Error: ${data.error.message || data.error}`);
     }
 
-    return data.data.user;
+    return data.data?.user || null;
   }
 
   /**
-   * Store tokens securely (you might want to encrypt these)
+   * Store tokens securely
    */
   storeTokens(tokens) {
     localStorage.setItem("tiktok_access_token", tokens.access_token);
@@ -155,11 +144,7 @@ class TikTokAuthService {
     const token = localStorage.getItem("tiktok_access_token");
     const expires = localStorage.getItem("tiktok_token_expires");
 
-    if (!token || !expires) {
-      return null;
-    }
-
-    if (Date.now() > parseInt(expires)) {
+    if (!token || !expires || Date.now() > parseInt(expires, 10)) {
       this.clearTokens();
       return null;
     }
@@ -184,4 +169,6 @@ class TikTokAuthService {
   }
 }
 
+// Export a singleton instance directly
+export const tiktokAuthService = TikTokAuthService.getInstance();
 export default TikTokAuthService;

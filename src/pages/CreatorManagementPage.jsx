@@ -44,6 +44,7 @@ import Header from "../components/layout/Header";
 import { Add, Edit, Delete, Person, Search } from "@mui/icons-material";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
+import { useNavigate } from "react-router-dom";
 
 // Constants
 const CATEGORIES = [
@@ -91,7 +92,7 @@ const CreatorManagementPage = () => {
     (state) => state.managerDashboard.loading || false
   );
   const error = useSelector((state) => state.managerDashboard.error || null);
-
+  const navigate = useNavigate();
   // Local state
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -568,6 +569,36 @@ const CreatorManagementPage = () => {
                           py: 2.5,
                         }}
                       >
+                        Live Duration
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 700,
+                          color: "#374151",
+                          fontSize: "0.9rem",
+                          py: 2.5,
+                        }}
+                      >
+                        Valid Live Days
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 700,
+                          color: "#374151",
+                          fontSize: "0.9rem",
+                          py: 2.5,
+                        }}
+                      >
+                        Matches
+                      </TableCell>
+                      <TableCell
+                        sx={{
+                          fontWeight: 700,
+                          color: "#374151",
+                          fontSize: "0.9rem",
+                          py: 2.5,
+                        }}
+                      >
                         Status
                       </TableCell>
                       <TableCell
@@ -613,9 +644,13 @@ const CreatorManagementPage = () => {
                                 color: "white",
                                 fontWeight: "bold",
                                 fontSize: "1.1rem",
+                                cursor: "pointer",
                                 boxShadow:
                                   "0 4px 12px rgba(102, 126, 234, 0.3)",
                               }}
+                              onClick={() =>
+                                navigate(`/profile/${creator.tikTokId}`)
+                              }
                             >
                               {creator.username?.charAt(0)?.toUpperCase() ||
                                 "U"}
@@ -624,6 +659,10 @@ const CreatorManagementPage = () => {
                               variant="body1"
                               fontWeight={600}
                               color="#374151"
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                navigate(`/profile/${creator.tikTokId}`)
+                              }
                             >
                               {creator.username}
                             </Typography>
@@ -658,6 +697,33 @@ const CreatorManagementPage = () => {
                             color="#374151"
                           >
                             {creator?.profile?.diamonds || "0"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ py: 2.5 }}>
+                          <Typography
+                            variant="body2"
+                            fontWeight={600}
+                            color="#374151"
+                          >
+                            {creator?.profile?.liveDuration || "0h 0m"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ py: 2.5 }}>
+                          <Typography
+                            variant="body2"
+                            fontWeight={600}
+                            color="#374151"
+                          >
+                            {creator?.profile?.validLiveDays || "0"}
+                          </Typography>
+                        </TableCell>
+                        <TableCell sx={{ py: 2.5 }}>
+                          <Typography
+                            variant="body2"
+                            fontWeight={600}
+                            color="#374151"
+                          >
+                            {creator?.profile?.matches || "0"}
                           </Typography>
                         </TableCell>
                         <TableCell sx={{ py: 2.5 }}>

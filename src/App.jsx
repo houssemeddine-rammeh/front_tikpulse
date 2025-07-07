@@ -156,14 +156,15 @@ function App() {
     SUPER_ADMIN: "super_admin",
   };
 
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(registration => {
-          console.log('SW registered: ', registration);
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((registration) => {
+          console.log("SW registered: ", registration);
         })
-        .catch(error => {
-          console.log('SW registration failed: ', error);
+        .catch((error) => {
+          console.log("SW registration failed: ", error);
         });
     });
   }
@@ -227,9 +228,9 @@ function App() {
                       }
                     />
                     <Route
-                      path="/creator/profile"
+                      path="/profile/:id"
                       element={
-                        <ProtectedRoute allowedRoles={["creator"]}>
+                        <ProtectedRoute allowedRoles={["creator", "manager"]}>
                           <CreatorProfilePage />
                         </ProtectedRoute>
                       }
@@ -336,7 +337,7 @@ function App() {
                         </ProtectedRoute>
                       }
                     />
-                       <Route
+                    <Route
                       path="/admin/upload"
                       element={
                         <ProtectedRoute allowedRoles={["admin"]}>

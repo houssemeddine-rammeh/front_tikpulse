@@ -18,10 +18,8 @@ const NotificationPrompt = () => {
   const user = useSelector((state) => state.auth);
   useEffect(() => {
     // Check if the Notification API is supported by the browser
-    console.log("***************s", user)
 
     if ("Notification" in window && user?.user?._id) {
-      console.log("***************s")
       if (
         Notification.permission === "default" ||
         Notification.permission === "denied"
@@ -65,7 +63,7 @@ const NotificationPrompt = () => {
           const subscription = await registration?.pushManager.subscribe({
             userVisibleOnly: true,
             applicationServerKey: urlBase64ToUint8Array(
-              "BCmbR_RBLSDogp8ICcsirbM7ogetsCAu-VmiiYisBVhGD4uS_DPS9pEcD_60SKRy8aOc-k056jf9lZWhlVfYwtY"
+              "BISJ4IiiIxkE0BVgbqgOZTYJQHN4PUSLvPYZ2KrS5R3yyW9BO3ABLsuw9AK2b4yYn9BeKhD7bke5ejq_yF0_Exs"
             ),
           });
 
@@ -76,9 +74,6 @@ const NotificationPrompt = () => {
               id: user?.user?._id,
             })
           );
-
-          console.log("User subscribed:", subscription);
-
           setShowPrompt(false);
         } else {
           console.warn("Notification permission denied.");
@@ -138,7 +133,7 @@ const NotificationPrompt = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={requestNotificationPermission}
+            onClick={() => requestNotificationPermission()}
           >
             Enable
           </Button>
