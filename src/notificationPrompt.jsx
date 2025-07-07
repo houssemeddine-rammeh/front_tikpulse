@@ -13,6 +13,7 @@ import { subscribeToNotifications } from "./features/authSlice";
 
 const NotificationPrompt = () => {
   const [showPrompt, setShowPrompt] = useState(false);
+  const [error, setError] = useState(null);
 
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth);
@@ -47,43 +48,56 @@ const NotificationPrompt = () => {
   }
 
   const requestNotificationPermission = async () => {
-    if ("Notification" in window) {
-      Notification.requestPermission().then(async (permission) => {
-        if (permission === "granted") {
-          console.log("Notification permission granted.");
-          // Wait for service worker to be ready
-          const registration = await navigator.serviceWorker.ready;
-          if (!registration.pushManager) {
-            console.warn("Push notifications not supported");
+    try {
+      if ("Notification" in window) {
+        Notification.requestPermission().then(async (permission) => {
+          if (permission === "granted") {
+            console.log("Notification permission granted.");
+            // Wait for service worker to be ready
+            const registration = await navigator.serviceWorker.ready;
+            if (!registration.pushManager) {
+              console.warn("Push notifications not supported");
+              setError("Push notifications are not supported in this browser.");
+              setShowPrompt(false);
+              return;
+            }
+
+            // Subscribe user
+            const subscription = await registration?.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(
+                "BISJ4IiiIxkE0BVgbqgOZTYJQHN4PUSLvPYZ2KrS5R3yyW9BO3ABLsuw9AK2b4yYn9BeKhD7bke5ejq_yF0_Exs"
+              ),
+            });
+
+            // Send subscription to backend
+            dispatch(
+              subscribeToNotifications({
+                subscription: JSON.stringify(subscription),
+                id: user?.user?._id,
+              })
+            );
             setShowPrompt(false);
-            return;
+          } else {
+            console.warn("Notification permission denied.");
+            setError("Notification permission denied.");
+            setShowPrompt(false);
           }
-
-          // Subscribe user
-          const subscription = await registration?.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(
-              "BISJ4IiiIxkE0BVgbqgOZTYJQHN4PUSLvPYZ2KrS5R3yyW9BO3ABLsuw9AK2b4yYn9BeKhD7bke5ejq_yF0_Exs"
-            ),
-          });
-
-          // Send subscription to backend
-          dispatch(
-            subscribeToNotifications({
-              subscription: JSON.stringify(subscription),
-              id: user?.user?._id,
-            })
-          );
-          setShowPrompt(false);
-        } else {
-          console.warn("Notification permission denied.");
-          setShowPrompt(false);
-        }
-      });
-    } else {
-      // iOS doesn't support notifications in the browser, suggest adding to home screen
-      console.warn(
-        "Notifications are not supported in this browser. Please install the app to get notifications."
+        });
+      } else {
+        // iOS doesn't support notifications in the browser, suggest adding to home screen
+        console.warn(
+          "Notifications are not supported in this browser. Please install the app to get notifications."
+        );
+        setError(
+          "Notifications are not supported in this browser. Please install the app to get notifications."
+        );
+        setShowPrompt(false);
+      }
+    } catch (error) {
+      console.error("Error requesting notification permission:", error);
+      setError(
+        error?.message || "An error occurred while requesting notification permission."
       );
       setShowPrompt(false);
     }
@@ -138,6 +152,13 @@ const NotificationPrompt = () => {
             Enable
           </Button>
         </Box>
+        <span color="red">
+          {error && (
+            <Typography variant="body2" color="error" mt={2}>
+              {error}
+            </Typography>
+          )}
+        </span>
       </Box>
     </Modal>
   );
