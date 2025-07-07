@@ -280,14 +280,28 @@ async function doBackgroundSync() {
 
 // Push notifications
 self.addEventListener('push', (event) => {
-  console.log('Service Worker: Push received', event);
-  
+  let data = {
+    title: 'TikPluse',
+    body: 'New notification from TikPluse',
+    data: { url: '/' }
+  };
+
+  try {
+    if (event.data) {
+      data = JSON.parse(event.data.text());
+    }
+  } catch (e) {
+    console.error('Push event data parsing error:', e);
+  }
+
+  console.log(data)
   const options = {
-    body: event.data ? event.data.text() : 'New notification from TikPluse',
+    body: data.body,
     icon: '/logo192.png',
     badge: '/logo192.png',
     vibrate: [100, 50, 100],
     data: {
+      url: data.data?.url || '/',
       dateOfArrival: Date.now(),
       primaryKey: 1
     },
@@ -304,11 +318,22 @@ self.addEventListener('push', (event) => {
       }
     ]
   };
-  
+
   event.waitUntil(
-    self.registration.showNotification('TikPluse', options)
+    self.registration.showNotification(data.title, options)
   );
 });
+
+// Optional: Handle notification click to open URL
+self.addEventListener('notificationclick', function(event) {
+  event.notification.close();
+  if (event.action === 'explore' || !event.action) {
+    event.waitUntil(
+      clients.openWindow(event.notification.data.url)
+    );
+  }
+});
+
 
 // Notification click handling
 self.addEventListener('notificationclick', (event) => {
@@ -322,16 +347,3 @@ self.addEventListener('notificationclick', (event) => {
     );
   }
 });
-
-// Message handling
-self.addEventListener('message', (event) => {
-  console.log('Service Worker: Message received', event.data);
-  
-  if (event.data && event.data.type === 'SKIP_WAITING') {
-    self.skipWaiting();
-  }
-  
-  if (event.data && event.data.type === 'GET_VERSION') {
-    event.ports[0].postMessage({ version: CACHE_NAME });
-  }
-}); 
