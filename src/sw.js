@@ -1,33 +1,68 @@
-// src/sw.js
+/// <reference lib="webworker" />
 
-self.__WB_MANIFEST // 👈 Required for injectManifest
+import {
+  cleanupOutdatedCaches,
+  createHandlerBoundToURL,
+  precacheAndRoute,
+} from "workbox-precaching";
+import { clientsClaim } from "workbox-core";
+import { NavigationRoute, registerRoute } from "workbox-routing";
 
-self.addEventListener('push', (event) => {
-  const data = event.data?.json() || {}
-  const title = data.title || 'New Notification'
+// self.__WB_MANIFEST is the default injection point
+precacheAndRoute(self.__WB_MANIFEST);
+
+// clean old assets
+cleanupOutdatedCaches();
+
+/** @type {RegExp[] | undefined} */
+let allowlist;
+// in dev mode, we disable precaching to avoid caching issues
+if (import.meta.env.DEV) allowlist = [/^\/$/];
+
+// to allow work offline
+registerRoute(
+  new NavigationRoute(createHandlerBoundToURL("index.html"), { allowlist })
+);
+
+self.addEventListener("push", (event) => {
+  const data = event.data ? JSON.parse(event.data.text()) : {};
+  const title = data.title || "Notification";
+  console.log("Push event received:", data.body);
   const options = {
-    body: data.body || 'You have a new message!',
-    icon: '/pwa-192x192.png',
-    badge: '/pwa-192x192.png',
-    data: { url: data.url || '/' },
-  }
+    body: data.body,
+    icon: "/icons/icon-192x192.png",
+    badge: "/icons/badge-72x72.png",
+    data: {
+      url: data.url || "/",
+    },
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  const urlToOpen = event.notification.data?.url || "/";
 
   event.waitUntil(
-    self.registration.showNotification(title, options)
-  )
-})
+    self.clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientsArr) => {
+        const matchingClient = clientsArr.find(
+          (client) =>
+            client.url === new URL(urlToOpen, self.location.origin).href
+        );
 
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close()
-  const url = event.notification.data?.url || '/'
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(windowClients => {
-      for (const client of windowClients) {
-        if (client.url === url && 'focus' in client) {
-          return client.focus()
+        if (matchingClient && "focus" in matchingClient) {
+          return matchingClient.focus();
         }
-      }
-      return clients.openWindow(url)
-    })
-  )
-})
+
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(urlToOpen);
+        }
+      })
+  );
+});
+
+self.skipWaiting();
+clientsClaim();
