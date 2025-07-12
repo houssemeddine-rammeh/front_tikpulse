@@ -13,14 +13,15 @@ import { subscribeToNotifications } from "./features/authSlice";
 
 const NotificationPrompt = () => {
   const [showPrompt, setShowPrompt] = useState(false);
-  const [error, setError] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(""); // State for error messages
 
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth);
-  useEffect(() => {
-    // Check if the Notification API is supported by the browser
+  const { _id } = useSelector((state) => state.user);
+  const PUBLIC_VAPID_KEY =
+    "BISJ4IiiIxkE0BVgbqgOZTYJQHN4PUSLvPYZ2KrS5R3yyW9BO3ABLsuw9AK2b4yYn9BeKhD7bke5ejq_yF0_Exs";
 
-    if ("Notification" in window && user?.user?._id) {
+  useEffect(() => {
+    if ("Notification" in window && _id) {
       if (
         Notification.permission === "default" ||
         Notification.permission === "denied"
@@ -28,14 +29,14 @@ const NotificationPrompt = () => {
         setShowPrompt(true);
       }
     } else {
-      setError("Notifications not supported in this browser");
+      console.warn("Notifications are not supported in this browser.");
     }
-  }, [user, user?.user?._id]);
+  }, [_id]);
 
   function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding)
-      .replace(/-/g, "+")
+      .replace(/\-/g, "+")
       .replace(/_/g, "/");
 
     const rawData = atob(base64);
@@ -47,68 +48,46 @@ const NotificationPrompt = () => {
     return outputArray;
   }
 
-  // Add this to your notification prompt component
-  const checkNotificationSupport = async () => {
-    // Check for service worker support first
-    if (!("serviceWorker" in navigator)) {
-      setError("Service workers not supported - update your browser");
-      return false;
-    }
-
-    // Check for push manager support
-    if (!("PushManager" in window)) {
-      setError("Push notifications not supported in this browser");
-      return false;
-    }
-
-    // Check for Notification permission
-    if (Notification.permission === "denied") {
-      setError(
-        "Notifications were blocked. Please enable them in browser settings."
-      );
-      return false;
-    }
-
-    return true;
-  };
-
   const requestNotificationPermission = async () => {
-    const isSupported = await checkNotificationSupport();
-    if (!isSupported) return;
+    if ("Notification" in window) {
+      Notification.requestPermission().then(async (permission) => {
+        if (permission === "granted") {
+          try {
+            const registration = await navigator.serviceWorker.ready;
+            if (!registration.pushManager) {
+              setErrorMessage("Push notifications are not supported.");
+              setShowPrompt(false);
+              return;
+            }
 
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        throw new Error("Permission not granted");
-      }
+            const subscription = await registration?.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
+            });
 
-      const registration = await navigator.serviceWorker.ready;
-      if (!registration.pushManager) {
-        throw new Error("PushManager not available");
-      }
+            await dispatch(
+              subscribeToNotifications({
+                subscription: JSON.stringify(subscription),
+                _id,
+              })
+            ).unwrap();
 
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(
-          "BISJ4IiiIxkE0BVgbqgOZTYJQHN4PUSLvPYZ2KrS5R3yyW9BO3ABLsuw9AK2b4yYn9BeKhD7bke5ejq_yF0_Exs"
-        ),
+            console.log("Subscription successfully sent to backend.");
+            setShowPrompt(false);
+          } catch (error) {
+            setErrorMessage(
+              "Failed to send subscription to backend. Please try again."
+            );
+            console.error("Error:", error);
+          }
+        } else {
+          setErrorMessage("Notification permission denied.");
+          setShowPrompt(false);
+        }
       });
-
-      // Send subscription to backend
-      dispatch(
-        subscribeToNotifications({
-          subscription: JSON.stringify(subscription),
-          id: user?.user?._id,
-        })
-      );
-
-      setShowPrompt(false);
-    } catch (error) {
-      console.error("Notification error:", error);
-      setError(
-        error.message.includes("not supported")
-          ? "Please install the app for notifications"
-          : "Failed to enable notifications"
+    } else {
+      setErrorMessage(
+        "Notifications are not supported in this browser. Please install the app to get notifications."
       );
       setShowPrompt(false);
     }
@@ -151,6 +130,16 @@ const NotificationPrompt = () => {
           Stay updated with important notifications.
         </Typography>
 
+        {errorMessage && (
+          <Typography
+            variant="body2"
+            color="error"
+            sx={{ mt: 2, fontSize: "0.85rem" }}
+          >
+            {errorMessage}
+          </Typography>
+        )}
+
         <Box display="flex" justifyContent="flex-end" mt={3} gap={2}>
           <Button variant="outlined" onClick={() => setShowPrompt(false)}>
             Not now
@@ -158,18 +147,11 @@ const NotificationPrompt = () => {
           <Button
             variant="contained"
             color="primary"
-            onClick={() => requestNotificationPermission()}
+            onClick={requestNotificationPermission}
           >
             Enable
           </Button>
         </Box>
-        <span color="red">
-          {error && (
-            <Typography variant="body2" color="error" mt={2}>
-              {error}
-            </Typography>
-          )}
-        </span>
       </Box>
     </Modal>
   );

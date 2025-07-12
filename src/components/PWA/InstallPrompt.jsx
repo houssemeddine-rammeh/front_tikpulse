@@ -30,7 +30,6 @@ const PWAInstallPrompt = () => {
     const userAgent = window.navigator.userAgent.toLowerCase();
     const iOS = /iphone|ipad|ipod/.test(userAgent);
     setIsIOS(iOS);
-
     if (checkStandalone() || isDismissed === "true") return;
 
     // Android: handle beforeinstallprompt
@@ -145,7 +144,11 @@ const PWAInstallPrompt = () => {
             Not now
           </Button>
           {!isIOS && (
-            <Button variant="contained" color="primary" onClick={handleInstallClick}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleInstallClick}
+            >
               Install
             </Button>
           )}
