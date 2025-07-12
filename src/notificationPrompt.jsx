@@ -50,57 +50,66 @@ const NotificationPrompt = () => {
 
   const requestNotificationPermission = async () => {
     try {
-      if ("Notification" in window) {
-        Notification.requestPermission().then(async (permission) => {
-          console.log(permission);
-          if (permission === "granted") {
-            try {
-              console.log("00000000000000");
-
-              const registration = await navigator.serviceWorker.ready;
-              console.log("1111111111111111111111");
-
-              if (!registration.pushManager) {
-                setErrorMessage("Push notifications are not supported.");
-                console.log("2222222222222222222222");
-
-              }
-              console.log("3333333333333333333333");
-              const subscription = await registration?.pushManager.subscribe({
-                userVisibleOnly: true,
-                applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
-              });
-              console.log("4444444444444444444444");
-
-              await dispatch(
-                subscribeToNotifications({
-                  subscription: JSON.stringify(subscription),
-                  id: user?.user?._id,
-                })
-              ).unwrap();
-
-              console.log("Subscription successfully sent to backend.");
-              setShowPrompt(false);
-            } catch (error) {
-              setErrorMessage(
-                "Failed to send subscription to backend. Please try again."
-              );
-              console.error("Error:", error);
-            }
-          } else {
-            setErrorMessage("Notification permission denied.");
-            setShowPrompt(false);
-          }
-        });
-      } else {
-        setErrorMessage(
-          "Notifications are not supported in this browser. Please install the app to get notifications."
-        );
+      if (!("Notification" in window)) {
+        setErrorMessage("Notifications are not supported in this browser.");
         setShowPrompt(false);
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      console.log("Permission:", permission);
+
+      if (permission !== "granted") {
+        setErrorMessage("Notification permission denied.");
+        setShowPrompt(false);
+        return;
+      }
+
+      console.log("00000000000000");
+
+      // Check if service workers are supported
+      if (!("serviceWorker" in navigator)) {
+        setErrorMessage("Service workers are not supported.");
+        return;
+      }
+
+      // Get the service worker registration
+      const registration = await navigator.serviceWorker.ready;
+      console.log("Service Worker Registration:", registration);
+
+      if (!registration.pushManager) {
+        setErrorMessage("Push notifications are not supported.");
+        console.log("Push Manager not available");
+        return;
+      }
+
+      console.log("3333333333333333333333");
+
+      try {
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
+        });
+        console.log("Push Subscription:", subscription);
+
+        await dispatch(
+          subscribeToNotifications({
+            subscription: JSON.stringify(subscription),
+            id: user?.user?._id,
+          })
+        ).unwrap();
+
+        console.log("Subscription successfully sent to backend.");
+        setShowPrompt(false);
+      } catch (error) {
+        console.error("Push subscription error:", error);
+        setErrorMessage(
+          "Failed to subscribe to push notifications. Please try again."
+        );
       }
     } catch (error) {
-      setErrorMessage("An unexpected error occurred. Please try again.");
       console.error("Error requesting notification permission:", error);
+      setErrorMessage("An unexpected error occurred. Please try again.");
     }
   };
 
