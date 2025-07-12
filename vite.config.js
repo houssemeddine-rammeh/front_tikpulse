@@ -12,7 +12,7 @@ export default defineConfig({
       filename: "sw.js",
       registerType: "autoUpdate",
       injectRegister: false,
-      
+      maximumFileSizeToCacheInBytes: 5000000,
       manifest: {
         name: 'Tik Pulse',
         short_name: 'Tik Pulse App',
