@@ -10,6 +10,16 @@ precacheAndRoute(self.__WB_MANIFEST)
 // clean old assets
 cleanupOutdatedCaches()
 
+
+
+self.addEventListener('install', (event) => {
+  console.log('Service Worker: Installed');
+});
+
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker: Activated');
+});
+
 /** @type {RegExp[] | undefined} */
 let allowlist
 // in dev mode, we disable precaching to avoid caching issues

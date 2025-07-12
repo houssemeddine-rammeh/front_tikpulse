@@ -48,6 +48,7 @@ import ManagerDashboardPageRedux from "./pages/ManagerDashboardPageRedux";
 import NotificationPrompt from "./notificationPrompt";
 import DataManagementPage from "./pages/DataManagementPage";
 import PWAInstallPrompt from "./components/PWA/InstallPrompt";
+import PWABadge from "./badge";
 // TikTok Theme Colors
 const theme = createTheme({
   palette: {
@@ -160,6 +161,7 @@ function App() {
 
   return (
     <Provider store={store}>
+      <PWABadge></PWABadge>
       <NotificationPrompt></NotificationPrompt>
       <PWAInstallPrompt />
       <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
