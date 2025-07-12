@@ -8,10 +8,15 @@ export default defineConfig({
     VitePWA({
       strategies: 'injectManifest',
       srcDir: 'src',
-      filename: 'sw.js', // ✅ different from src/sw.js
+      filename: 'sw-custom.js', // ✅ avoid filename clash
       injectRegister: 'auto',
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      includeAssets: [
+        'favicon.svg',
+        'favicon.ico',
+        'robots.txt',
+        'apple-touch-icon.png',
+      ],
       manifest: {
         name: 'My PWA React App',
         short_name: 'PWA App',
@@ -30,11 +35,9 @@ export default defineConfig({
           },
         ],
       },
-      devOptions: {
-        enabled: true, // For testing service worker in development
-      },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        globPatterns: ['**/*.{js,mjs,css,html,ico,png,svg}'],
+        globIgnores: ['**/node_modules/**/*'],
         runtimeCaching: [
           {
             urlPattern: ({ request }) => request.destination === 'document',
