@@ -34,12 +34,16 @@ const RealTimeChat = ({ ticket }) => {
 
   // Subscribe to real-time messages
   useEffect(() => {
-    dispatch(subscribeToMessages(ticket._id));
+    if (ticket?._id) {
+      dispatch(subscribeToMessages(ticket._id));
+    }
 
     return () => {
-      dispatch(unsubscribeFromMessages(ticket._id));
+      if (ticket?._id) {
+        dispatch(unsubscribeFromMessages(ticket._id));
+      }
     };
-  }, [dispatch, ticket]);
+  }, [dispatch, ticket?._id]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

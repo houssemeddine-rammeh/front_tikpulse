@@ -1,11 +1,9 @@
 // src/utils/socket.js
 
 import { io } from "socket.io-client";
-import { store } from "../app/store";
-import { addMessageToTicket } from "../features/ticketsSlice";
 
 let socket = null;
-
+const messageHandlers = {}; // Move this outside the functions
 /**
  * Initializes the socket connection once, after token is available
  */
@@ -45,35 +43,23 @@ export const sendMessageToTicket = (ticketId, content) => {
   socket.emit("sendMessage", { ticketId, content });
 };
 
-/**
- * Join a ticket room and subscribe to its messages
- */
-export const subscribeToTicketMessages = (ticketId) => {
+export const subscribeToTicketMessages = (ticketId, handler) => {
   if (!socket) return;
 
-  socket.emit("joinTicketRoom", { ticketId });
-
-  const handler = (message) => {
-    store.dispatch(addMessageToTicket(message));
-  };
-
-  socket.on("newMessage", handler);
-
-  // Store handler for future removal
-  socket._messageHandlers = socket._messageHandlers || {};
-  socket._messageHandlers[ticketId] = handler;
+  // Only subscribe if not already subscribed
+  if (!messageHandlers[ticketId]) {
+    socket.emit("joinTicketRoom", { ticketId });
+    socket.on("newMessage", handler);
+    messageHandlers[ticketId] = handler;
+  }
 };
 
-/**
- * Unsubscribe from a ticket room
- */
 export const unsubscribeFromTicketMessages = (ticketId) => {
-  if (!socket || !socket._messageHandlers?.[ticketId]) return;
+  if (!socket || !messageHandlers[ticketId]) return;
 
-  socket.off("newMessage", socket._messageHandlers[ticketId]);
-  delete socket._messageHandlers[ticketId];
-
-  socket.emit("leaveTicketRoom", { ticketId }); // Optional: depends on backend
+  socket.off("newMessage", messageHandlers[ticketId]);
+  delete messageHandlers[ticketId];
+  socket.emit("leaveTicketRoom", { ticketId });
 };
 
 /**

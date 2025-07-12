@@ -7,6 +7,8 @@ import {
 } from "../api/socketInstance";
 
 // Async thunks
+const activeSubscriptions = {};
+
 export const fetchTickets = createAsyncThunk(
   "tickets/fetchTickets",
   async (_, { rejectWithValue }) => {
@@ -65,17 +67,21 @@ export const sendMessage = createAsyncThunk(
 export const subscribeToMessages = createAsyncThunk(
   "tickets/subscribeToMessages",
   async (ticketId, { dispatch }) => {
-    subscribeToTicketMessages(ticketId, (message) => {
-      dispatch(addMessageToTicket(message)); // Dispatch the message to the Redux store
-    });
+    // Only subscribe if not already subscribed
+    if (!activeSubscriptions[ticketId]) {
+      subscribeToTicketMessages(ticketId, (message) => {
+        dispatch(addMessageToTicket(message));
+      });
+      activeSubscriptions[ticketId] = true;
+    }
   }
 );
 
-// Add a thunk for unsubscribing
 export const unsubscribeFromMessages = createAsyncThunk(
   "tickets/unsubscribeFromMessages",
   async (ticketId) => {
     unsubscribeFromTicketMessages(ticketId);
+    delete activeSubscriptions[ticketId];
   }
 );
 

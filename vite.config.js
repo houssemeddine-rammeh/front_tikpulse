@@ -8,15 +8,24 @@ export default defineConfig({
     VitePWA({
       strategies: "injectManifest",
 
-      // Path to the service worker source file
       srcDir: "src",
-      filename: "sw-inject.js", // final file inside dist
-
+      filename: "sw.js", // Final output file name
       injectManifest: {
-        swSrc: "src/sw-inject.js", // required
-        globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
-        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5MB
+        swSrc: "src/sw-inject.js",
+        globPatterns: ["**/*.{js,css,html,svg,png,ico,woff2}"],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        // Add these for better offline support
+        globIgnores: ["**/node_modules/**/*", "**/sw.js.map"],
+        dontCacheBustURLsMatching: /\.\w{8}\./,
       },
+      // Enable these for better PWA support
+      workbox: {
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+        skipWaiting: true,
+      },
+
+      // Path to the service worker source file
 
       registerType: "autoUpdate",
       injectRegister: false,
@@ -50,6 +59,10 @@ export default defineConfig({
         navigateFallback: "index.html",
         suppressWarnings: true,
         type: "module",
+      },
+      build: {
+        outDir: "dist",
+        emptyOutDir: true,
       },
     }),
   ],

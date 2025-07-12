@@ -58,7 +58,7 @@ import {
   fetchTickets,
   fetchTicket,
 } from "../features/ticketsSlice";
-import { connectSocket, subscribeToTicketMessages, unsubscribeFromTicketMessages } from "../api/socketInstance";
+import { connectSocket,disconnectSocket } from "../api/socketInstance";
 
 // Ticket status types and colors
 const ticketStatusColors = {
@@ -114,21 +114,18 @@ const ContactPage = () => {
     dispatch(fetchTickets());
   }, [dispatch]);
 
+  const token = getToken(); // Get your auth token
 
-  React.useEffect(() => {
-    const token = getToken();
-    const socket = connectSocket(token);
-
-    if (selectedTicket?._id && socket) {
-      subscribeToTicketMessages(selectedTicket?._id);
+  // Connect socket when component mounts
+  useEffect(() => {
+    if (token) {
+      connectSocket(token); // Connect with auth token
     }
 
     return () => {
-      if (selectedTicket?._id) {
-        unsubscribeFromTicketMessages(selectedTicket?._id);
-      }
+      disconnectSocket(); // Clean up on unmount
     };
-  }, [selectedTicket?._id]);
+  }, [token]);
 
   // Filter tickets when search or filter criteria change
   useEffect(() => {

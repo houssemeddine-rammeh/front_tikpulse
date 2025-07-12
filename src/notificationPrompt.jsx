@@ -28,14 +28,14 @@ const NotificationPrompt = () => {
         setShowPrompt(true);
       }
     } else {
-      console.warn("Notifications are not supported in this browser.");
+      setError("Notifications not supported in this browser");
     }
   }, [user, user?.user?._id]);
 
   function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding)
-      .replace(/\-/g, "+")
+      .replace(/-/g, "+")
       .replace(/_/g, "/");
 
     const rawData = atob(base64);
@@ -47,57 +47,68 @@ const NotificationPrompt = () => {
     return outputArray;
   }
 
-  const requestNotificationPermission = async () => {
-    try {
-      if ("Notification" in window) {
-        Notification.requestPermission().then(async (permission) => {
-          if (permission === "granted") {
-            console.log("Notification permission granted.");
-            // Wait for service worker to be ready
-            const registration = await navigator.serviceWorker.ready;
-            if (!registration.pushManager) {
-              console.warn("Push notifications not supported");
-              setError("Push notifications are not supported in this browser.");
-              setShowPrompt(false);
-              return;
-            }
+  // Add this to your notification prompt component
+  const checkNotificationSupport = async () => {
+    // Check for service worker support first
+    if (!("serviceWorker" in navigator)) {
+      setError("Service workers not supported - update your browser");
+      return false;
+    }
 
-            // Subscribe user
-            const subscription = await registration?.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: urlBase64ToUint8Array(
-                "BISJ4IiiIxkE0BVgbqgOZTYJQHN4PUSLvPYZ2KrS5R3yyW9BO3ABLsuw9AK2b4yYn9BeKhD7bke5ejq_yF0_Exs"
-              ),
-            });
+    // Check for push manager support
+    if (!("PushManager" in window)) {
+      setError("Push notifications not supported in this browser");
+      return false;
+    }
 
-            // Send subscription to backend
-            dispatch(
-              subscribeToNotifications({
-                subscription: JSON.stringify(subscription),
-                id: user?.user?._id,
-              })
-            );
-            setShowPrompt(false);
-          } else {
-            console.warn("Notification permission denied.");
-            setError("Notification permission denied.");
-            setShowPrompt(false);
-          }
-        });
-      } else {
-        // iOS doesn't support notifications in the browser, suggest adding to home screen
-        console.warn(
-          "Notifications are not supported in this browser. Please install the app to get notifications."
-        );
-        setError(
-          "Notifications are not supported in this browser. Please install the app to get notifications."
-        );
-        setShowPrompt(false);
-      }
-    } catch (error) {
-      console.error("Error requesting notification permission:", error);
+    // Check for Notification permission
+    if (Notification.permission === "denied") {
       setError(
-        error?.message || "An error occurred while requesting notification permission."
+        "Notifications were blocked. Please enable them in browser settings."
+      );
+      return false;
+    }
+
+    return true;
+  };
+
+  const requestNotificationPermission = async () => {
+    const isSupported = await checkNotificationSupport();
+    if (!isSupported) return;
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") {
+        throw new Error("Permission not granted");
+      }
+
+      const registration = await navigator.serviceWorker.ready;
+      if (!registration.pushManager) {
+        throw new Error("PushManager not available");
+      }
+
+      const subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(
+          "BISJ4IiiIxkE0BVgbqgOZTYJQHN4PUSLvPYZ2KrS5R3yyW9BO3ABLsuw9AK2b4yYn9BeKhD7bke5ejq_yF0_Exs"
+        ),
+      });
+
+      // Send subscription to backend
+      dispatch(
+        subscribeToNotifications({
+          subscription: JSON.stringify(subscription),
+          id: user?.user?._id,
+        })
+      );
+
+      setShowPrompt(false);
+    } catch (error) {
+      console.error("Notification error:", error);
+      setError(
+        error.message.includes("not supported")
+          ? "Please install the app for notifications"
+          : "Failed to enable notifications"
       );
       setShowPrompt(false);
     }
