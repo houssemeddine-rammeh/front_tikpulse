@@ -12,10 +12,6 @@ export default defineConfig({
       filename: "sw.js",
       registerType: "autoUpdate",
       injectRegister: false,
-      injectManifest: {
-        maximumFileSizeToCacheInBytes: 5000000,
-        globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
-      },
       manifest: {
         name: "TikPulse",
         short_name: "TikPulse",
@@ -74,12 +70,20 @@ export default defineConfig({
           },
         ],
       },
-
+      injectManifest: {
+        maximumFileSizeToCacheInBytes: 5000000,
+        globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
+        globIgnores: ["**/node_modules/**/*", "sw.js"],
+      },
       devOptions: {
         enabled: true,
         navigateFallback: "index.html",
-        suppressWarnings: true,
         type: "module",
+      },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
+        globIgnores: ["**/node_modules/**/*", "sw.js"],
+        maximumFileSizeToCacheInBytes: 5000000,
       },
     }),
   ],
