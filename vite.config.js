@@ -1,8 +1,8 @@
-import { VitePWA } from "vite-plugin-pwa";
+// vite.config.ts / vite.config.js
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import { VitePWA } from "vite-plugin-pwa";
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
@@ -13,79 +13,27 @@ export default defineConfig({
       registerType: "autoUpdate",
       injectRegister: false,
 
-      manifest: {
-        name: "Tikpulse",
-        short_name: "Tikpulse",
-        description: "Tikpulse",
-        theme_color: "#0098c3",
-        background_color: "#065781",
-        display: "standalone",
-        orientation: "portrait",
-        id: "p4p.app",
-        categories: ["entertainment", "lifestyle", "social"],
-        icons: [
-          {
-            src: "/icons/192x.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
-          {
-            src: "/icons/512x.png",
-            sizes: "512x512",
-            type: "image/png",
-          },
-          {
-            src: "/icons/48x.png",
-            sizes: "48x48",
-            type: "image/png",
-          },
-          {
-            src: "/icons/96x.png",
-            sizes: "96x96",
-            type: "image/png",
-          },
-          {
-            src: "/icons/144x.png",
-            sizes: "144x144",
-            type: "image/png",
-          },
-          {
-            src: "/icons/384x.png",
-            sizes: "384x384",
-            type: "image/png",
-          },
-          {
-            src: "/icons/72x.png",
-            sizes: "72x72",
-            type: "image/png",
-          },
-          {
-            src: "/icons/152x.png",
-            sizes: "152x152",
-            type: "image/png",
-          },
-          {
-            src: "/icons/128x.png",
-            sizes: "128x128",
-            type: "image/png",
-          },
-        ],
-      },
-
+      // ↓ ADD THIS
       injectManifest: {
         globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
+        maximumFileSizeToCacheInBytes: 5000000,   // 5 MiB
       },
+
+      manifest: {
+        /* …your manifest unchanged… */
+      },
+
       workbox: {
         cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
-            urlPattern: /^https:\/\/your-api\.com\/.*$/, // your API pattern
+            urlPattern: /^https:\/\/your-api\.com\/.*$/,
             handler: "NetworkFirst",
             options: {
               cacheName: "api-cache",
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24, // 1 day
+                maxAgeSeconds: 60 * 60 * 24, // 1 day
               },
             },
           },
