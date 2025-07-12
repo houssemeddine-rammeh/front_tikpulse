@@ -1,4 +1,3 @@
-// vite.config.ts / vite.config.js
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
@@ -12,10 +11,17 @@ export default defineConfig({
       filename: "sw.js",
       registerType: "autoUpdate",
       injectRegister: false,
+
+      // IMPORTANT: Add globDirectory here!
       injectManifest: {
+        globDirectory: "dist",  // <- Add this line to fix glob pattern warnings/errors
         globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
         maximumFileSizeToCacheInBytes: 5000000,
       },
+
+      // Remove the 'workbox' config here because it's not used with injectManifest strategy
+      // Instead, handle runtime caching inside your custom sw.js
+
       manifest: {
         name: "Tik Pulse",
         short_name: "Tik Pulse App",
@@ -31,25 +37,6 @@ export default defineConfig({
             src: "/icons/icon-512x512.png",
             sizes: "512x512",
             type: "image/png",
-          },
-        ],
-      },
-
-      workbox: {
-        globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
-        maximumFileSizeToCacheInBytes: 5000000,
-        cleanupOutdatedCaches: true,
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/your-api\.com\/.*$/,
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "api-cache",
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24, // 1 day
-              },
-            },
           },
         ],
       },
