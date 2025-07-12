@@ -7,20 +7,18 @@ export default defineConfig({
     react(),
     VitePWA({
       strategies: "injectManifest",
-      srcDir: "src",
-      filename: "sw.js",
-      registerType: "autoUpdate",
+      srcDir: "src",            // Your custom service worker location
+      filename: "sw.js",        // Output service worker in dist/
       injectRegister: false,
+      registerType: "autoUpdate",
 
-      // IMPORTANT: Add globDirectory here!
+      // This part is critical: make sure globDirectory points to "dist"
       injectManifest: {
-        globDirectory: "dist",  // <- Add this line to fix glob pattern warnings/errors
-        globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
+        globDirectory: "dist",
+        globPatterns: ["**/*.{js,css,html,png,svg,ico}"],
+        globIgnores: ["sw.js"],     // Exclude your own sw.js file from precache
         maximumFileSizeToCacheInBytes: 5000000,
       },
-
-      // Remove the 'workbox' config here because it's not used with injectManifest strategy
-      // Instead, handle runtime caching inside your custom sw.js
 
       manifest: {
         name: "Tik Pulse",
