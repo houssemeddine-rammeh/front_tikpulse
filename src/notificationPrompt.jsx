@@ -21,7 +21,7 @@ const NotificationPrompt = () => {
     "BISJ4IiiIxkE0BVgbqgOZTYJQHN4PUSLvPYZ2KrS5R3yyW9BO3ABLsuw9AK2b4yYn9BeKhD7bke5ejq_yF0_Exs";
 
   useEffect(() => {
-    if ("Notification" in window && user?._id) {
+    if ("Notification" in window && user?.user?._id) {
       if (
         Notification.permission === "default" ||
         Notification.permission === "denied"
@@ -49,47 +49,58 @@ const NotificationPrompt = () => {
   }
 
   const requestNotificationPermission = async () => {
-    if ("Notification" in window) {
-      Notification.requestPermission().then(async (permission) => {
-        if (permission === "granted") {
-          try {
-            const registration = await navigator.serviceWorker.ready;
-            if (!registration.pushManager) {
-              setErrorMessage("Push notifications are not supported.");
+    try {
+      if ("Notification" in window) {
+        Notification.requestPermission().then(async (permission) => {
+          console.log(permission);
+          if (permission === "granted") {
+            try {
+              console.log("00000000000000");
+
+              const registration = await navigator.serviceWorker.ready;
+              console.log("1111111111111111111111");
+
+              if (!registration.pushManager) {
+                setErrorMessage("Push notifications are not supported.");
+                console.log("2222222222222222222222");
+
+              }
+              console.log("3333333333333333333333");
+              const subscription = await registration?.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
+              });
+              console.log("4444444444444444444444");
+
+              await dispatch(
+                subscribeToNotifications({
+                  subscription: JSON.stringify(subscription),
+                  id: user?.user?._id,
+                })
+              ).unwrap();
+
+              console.log("Subscription successfully sent to backend.");
               setShowPrompt(false);
-              return;
+            } catch (error) {
+              setErrorMessage(
+                "Failed to send subscription to backend. Please try again."
+              );
+              console.error("Error:", error);
             }
-
-            const subscription = await registration?.pushManager.subscribe({
-              userVisibleOnly: true,
-              applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY),
-            });
-
-            await dispatch(
-              subscribeToNotifications({
-                subscription: JSON.stringify(subscription),
-                id: user?._id,
-              })
-            ).unwrap();
-
-            console.log("Subscription successfully sent to backend.");
+          } else {
+            setErrorMessage("Notification permission denied.");
             setShowPrompt(false);
-          } catch (error) {
-            setErrorMessage(
-              "Failed to send subscription to backend. Please try again."
-            );
-            console.error("Error:", error);
           }
-        } else {
-          setErrorMessage("Notification permission denied.");
-          setShowPrompt(false);
-        }
-      });
-    } else {
-      setErrorMessage(
-        "Notifications are not supported in this browser. Please install the app to get notifications."
-      );
-      setShowPrompt(false);
+        });
+      } else {
+        setErrorMessage(
+          "Notifications are not supported in this browser. Please install the app to get notifications."
+        );
+        setShowPrompt(false);
+      }
+    } catch (error) {
+      setErrorMessage("An unexpected error occurred. Please try again.");
+      console.error("Error requesting notification permission:", error);
     }
   };
 
