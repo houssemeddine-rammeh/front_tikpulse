@@ -6,6 +6,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js', // ✅ different from src/sw.js
+      injectRegister: 'auto',
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       manifest: {
@@ -41,10 +45,6 @@ export default defineConfig({
           },
         ],
       },
-      // Register your own service worker to handle push
-      srcDir: 'src',
-      filename: 'sw.js',
-      strategies: 'injectManifest',
     }),
   ],
 })
