@@ -47,6 +47,7 @@ import { useSelector } from "react-redux";
 import ManagerDashboardPageRedux from "./pages/ManagerDashboardPageRedux";
 import NotificationPrompt from "./notificationPrompt";
 import DataManagementPage from "./pages/DataManagementPage";
+import PWAInstallPrompt from "./components/PWA/InstallPrompt";
 // TikTok Theme Colors
 const theme = createTheme({
   palette: {
@@ -172,6 +173,7 @@ function App() {
   return (
     <Provider store={store}>
       <NotificationPrompt></NotificationPrompt>
+      <PWAInstallPrompt />
       <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
         <MuiThemeProvider theme={theme}>
           <CssBaseline />
