@@ -16,12 +16,12 @@ const NotificationPrompt = () => {
   const [errorMessage, setErrorMessage] = useState(""); // State for error messages
 
   const dispatch = useDispatch();
-  const { _id } = useSelector((state) => state.user);
+  const user = useSelector((state) => state.auth);
   const PUBLIC_VAPID_KEY =
     "BISJ4IiiIxkE0BVgbqgOZTYJQHN4PUSLvPYZ2KrS5R3yyW9BO3ABLsuw9AK2b4yYn9BeKhD7bke5ejq_yF0_Exs";
 
   useEffect(() => {
-    if ("Notification" in window && _id) {
+    if ("Notification" in window && user?._id) {
       if (
         Notification.permission === "default" ||
         Notification.permission === "denied"
@@ -31,12 +31,12 @@ const NotificationPrompt = () => {
     } else {
       console.warn("Notifications are not supported in this browser.");
     }
-  }, [_id]);
+  }, [user]);
 
   function urlBase64ToUint8Array(base64String) {
     const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
     const base64 = (base64String + padding)
-      .replace(/\-/g, "+")
+      .replace(/-/g, "+")
       .replace(/_/g, "/");
 
     const rawData = atob(base64);
@@ -68,7 +68,7 @@ const NotificationPrompt = () => {
             await dispatch(
               subscribeToNotifications({
                 subscription: JSON.stringify(subscription),
-                _id,
+                id: user?._id,
               })
             ).unwrap();
 
