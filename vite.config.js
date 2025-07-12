@@ -1,3 +1,4 @@
+// vite.config.ts / vite.config.js
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
@@ -8,46 +9,42 @@ export default defineConfig({
     VitePWA({
       strategies: "injectManifest",
       srcDir: "src",
-      filename: "sw-custom.js",
-      injectRegister: "auto",
+      filename: "sw.js",
       registerType: "autoUpdate",
-      includeAssets: [
-        "favicon.svg",
-        "favicon.ico",
-        "robots.txt",
-        "apple-touch-icon.png",
-      ],
-      manifest: {
-        name: "My PWA React App",
-        short_name: "PWA App",
-        description: "React + Vite PWA with push notifications",
-        theme_color: "#ffffff",
-        icons: [
-          {
-            src: "/pwa-192x192.png",
-            sizes: "192x192",
-            type: "image/png",
-          },
-          {
-            src: "/pwa-512x512.png",
-            sizes: "512x512",
-            type: "image/png",
-          },
-        ],
+      injectRegister: false,
+
+      // ↓ ADD THIS
+      injectManifest: {
+        globPatterns: ["**/*.{js,css,html,svg,png,ico}"],
+        maximumFileSizeToCacheInBytes: 5000000,   // 5 MiB
       },
+
+      manifest: {
+        /* …your manifest unchanged… */
+      },
+
       workbox: {
-        globDirectory: "dist", // 👈 EXPLICITLY set this
-        globPatterns: ["**/*.{js,mjs,css,html,ico,png,svg}"],
-        globIgnores: ["**/node_modules/**/*"], // ✅ remove sw-custom.js
+        cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
-            urlPattern: ({ request }) => request.destination === "document",
+            urlPattern: /^https:\/\/your-api\.com\/.*$/,
             handler: "NetworkFirst",
             options: {
-              cacheName: "html-cache",
+              cacheName: "api-cache",
+              expiration: {
+                maxEntries: 50,
+                maxAgeSeconds: 60 * 60 * 24, // 1 day
+              },
             },
           },
         ],
+      },
+
+      devOptions: {
+        enabled: true,
+        navigateFallback: "index.html",
+        suppressWarnings: true,
+        type: "module",
       },
     }),
   ],
