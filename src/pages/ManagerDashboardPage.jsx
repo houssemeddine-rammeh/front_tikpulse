@@ -278,19 +278,13 @@ const ManagerDashboardPage = () => {
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                     <CreatorsIcon sx={{ fontSize: 40, color: "#2e7d32" }} />
                     <Box sx={{ ml: 2, flex: 1 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold", color: "#2e7d32" }}
-                      >
+                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                         Total Creators
                       </Typography>
                     </Box>
                   </Box>
 
-                  <Typography
-                    variant="h3"
-                    sx={{ fontWeight: "bold", mb: 1, color: "#333" }}
-                  >
+                  <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1 }}>
                     {managerCreators?.length || 0}
                   </Typography>
                 </CardContent>
@@ -310,21 +304,15 @@ const ManagerDashboardPage = () => {
               >
                 <CardContent sx={{ p: 3 }}>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <LiveIcon sx={{ fontSize: 40, color: "#d32f2f" }} />
+                    <LiveIcon sx={{ fontSize: 40 }} />
                     <Box sx={{ ml: 2, flex: 1 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold", color: "#d32f2f" }}
-                      >
+                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                         Total Live duration
                       </Typography>
                     </Box>
                   </Box>
 
-                  <Typography
-                    variant="h3"
-                    sx={{ fontWeight: "bold", mb: 1, color: "#333" }}
-                  >
+                  <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1 }}>
                     {stats?.liveDuration || 0}
                   </Typography>
                 </CardContent>
@@ -355,10 +343,7 @@ const ManagerDashboardPage = () => {
                     </Box>
                   </Box>
 
-                  <Typography
-                    variant="h3"
-                    sx={{ fontWeight: "bold", mb: 1, color: "#333" }}
-                  >
+                  <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1 }}>
                     {stats?.validLiveDays || 0} Days
                   </Typography>
                 </CardContent>
@@ -528,7 +513,7 @@ const ManagerDashboardPage = () => {
                     gutterBottom
                     sx={{ color: "#e91e63", fontWeight: "bold" }}
                   >
-                   Total Diamonds from last Month
+                    Total Diamonds from last Month
                   </Typography>
                   <Typography
                     variant="h3"
