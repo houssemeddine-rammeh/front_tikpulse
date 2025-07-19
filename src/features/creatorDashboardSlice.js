@@ -18,6 +18,23 @@ export const getCreatorProfile = createAsyncThunk(
   }
 );
 
+// Async thunk for updating creator profile
+export const updateCreatorProfile = createAsyncThunk(
+  "creatorDashboard/updateCreatorProfile",
+  async (profileData, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.put("/auth/profile", profileData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to update creator profile"
+      );
+    }
+  }
+);
+
 // Async thunk for getting creator dashboard stats
 export const getCreatorStats = createAsyncThunk(
   "creatorDashboard/getCreatorStats",
@@ -177,6 +194,22 @@ const creatorDashboardSlice = createSlice({
         state.error = action.payload;
       });
 
+    // Update Creator Profile
+    builder
+      .addCase(updateCreatorProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateCreatorProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.creator = { ...state.creator, ...action.payload.user };
+        state.error = null;
+      })
+      .addCase(updateCreatorProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
     // Get Creator Stats
     builder
       .addCase(getCreatorStats.pending, (state) => {
@@ -233,22 +266,12 @@ const creatorDashboardSlice = createSlice({
       })
       .addCase(joinEvent.fulfilled, (state, action) => {
         state.loading.joining = false;
-        state.error.joining = null;
-        // Add the event to joined events
-        const event = state.availableEvents.find(
-          (e) => e.id === action.payload.eventId
+        // Update the event in available events
+        state.availableEvents = state.availableEvents.filter(
+          (event) => event._id !== action.payload.eventId
         );
-        if (event) {
-          state.joinedEvents.push(event);
-          // Remove from available events
-          state.availableEvents = state.availableEvents.filter(
-            (e) => e.id !== action.payload.eventId
-          );
-        }
-        // Update stats
-        state.stats.eventsJoined += 1;
-        state.showJoinModal = false;
-        state.selectedItem = null;
+        state.joinedEvents.push(action.payload);
+        state.error.joining = null;
       })
       .addCase(joinEvent.rejected, (state, action) => {
         state.loading.joining = false;
@@ -263,22 +286,12 @@ const creatorDashboardSlice = createSlice({
       })
       .addCase(joinCampaign.fulfilled, (state, action) => {
         state.loading.joining = false;
-        state.error.joining = null;
-        // Add the campaign to joined campaigns
-        const campaign = state.availableCampaigns.find(
-          (c) => c.id === action.payload.campaignId
+        // Update the campaign in available campaigns
+        state.availableCampaigns = state.availableCampaigns.filter(
+          (campaign) => campaign._id !== action.payload.campaignId
         );
-        if (campaign) {
-          state.joinedCampaigns.push(campaign);
-          // Remove from available campaigns
-          state.availableCampaigns = state.availableCampaigns.filter(
-            (c) => c.id !== action.payload.campaignId
-          );
-        }
-        // Update stats
-        state.stats.campaignsJoined += 1;
-        state.showJoinModal = false;
-        state.selectedItem = null;
+        state.joinedCampaigns.push(action.payload);
+        state.error.joining = null;
       })
       .addCase(joinCampaign.rejected, (state, action) => {
         state.loading.joining = false;
@@ -287,7 +300,6 @@ const creatorDashboardSlice = createSlice({
   },
 });
 
-// Export actions
 export const {
   setSelectedTab,
   setShowJoinModal,
@@ -297,6 +309,8 @@ export const {
   updateProfile,
   updateStats,
 } = creatorDashboardSlice.actions;
+
+export default creatorDashboardSlice.reducer;
 
 // Selectors
 export const selectCreatorProfile = (state) => state.creatorDashboard.profile;
@@ -316,6 +330,3 @@ export const selectShowJoinModal = (state) =>
   state.creatorDashboard.showJoinModal;
 export const selectSelectedItem = (state) =>
   state.creatorDashboard.selectedItem;
-
-// Export reducer
-export default creatorDashboardSlice.reducer;

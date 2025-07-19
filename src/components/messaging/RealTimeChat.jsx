@@ -77,7 +77,14 @@ const RealTimeChat = ({ ticket }) => {
     });
   };
 
-  const isCurrentUser = (userId) => userId === user._id;
+  const isCurrentUser = (userId) => {
+    // Handle both string IDs and object IDs
+    const currentUserId =
+      typeof user._id === "string" ? user._id : user._id.toString();
+    const messageUserId =
+      typeof userId === "string" ? userId : userId.toString();
+    return currentUserId === messageUserId;
+  };
 
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
@@ -85,8 +92,8 @@ const RealTimeChat = ({ ticket }) => {
       <Box sx={{ p: 2, backgroundColor: "#667eea", color: "white" }}>
         <Typography variant="h6">{ticket.title}</Typography>
         <Typography variant="body2">
-          Chat between {ticket.sender.username} and {ticket.receiver.firstName}{" "}
-          {ticket.receiver.username}
+          Chat between {ticket.sender?.username || ticket.sender?.firstName} and{" "}
+          {ticket.receiver?.firstName || ticket.receiver?.username}
         </Typography>
       </Box>
 
@@ -94,64 +101,107 @@ const RealTimeChat = ({ ticket }) => {
       <Box
         sx={{ flex: 1, overflowY: "auto", p: 2, backgroundColor: "#f8fafc" }}
       >
-        <List>
-          {ticket?.messages.map((message, index) => (
-            <ListItem
-              key={index}
-              sx={{
-                display: "flex",
-                flexDirection: isCurrentUser(message.sender._id)
-                  ? "row-reverse"
-                  : "row",
-                alignItems: "flex-start",
-                gap: 1,
-                mb: 1,
-              }}
-            >
-              <ListItemAvatar>
-                <Avatar>
-                  {isCurrentUser(message.sender._id)
-                    ? "You"
-                    : message?.sender?.username?.charAt(0) || "S"}
-                </Avatar>
-              </ListItemAvatar>
+        <List sx={{ p: 0 }}>
+          {ticket?.messages?.map((message, index) => {
+            const isOwnMessage = isCurrentUser(
+              message.sender?._id || message.sender
+            );
 
-              <Box
+            return (
+              <ListItem
+                key={index}
                 sx={{
-                  backgroundColor: isCurrentUser(message.sender._id)
-                    ? "#667eea"
-                    : "#ffffff",
-                  color: isCurrentUser(message.sender._id)
-                    ? "#ffffff"
-                    : "#000000",
-                  borderRadius: 2,
-                  p: 1,
-                  minWidth: "120px",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                  display: "flex",
+                  flexDirection: isOwnMessage ? "row-reverse" : "row",
+                  alignItems: "flex-start",
+                  gap: 1,
+                  mb: 2,
+                  px: 0,
                 }}
               >
-                <Typography fontWeight="bold" variant="body2">
-                  {isCurrentUser(message.sender._id)
-                    ? "You"
-                    : message.sender.username}
-                </Typography>
-                <Typography variant="body1" sx={{ whiteSpace: "pre-wrap" }}>
-                  {message.content}
-                </Typography>
-                <Typography
-                  variant="caption"
+                {/* Avatar - only show for other users */}
+                {!isOwnMessage && (
+                  <ListItemAvatar sx={{ minWidth: 40 }}>
+                    <Avatar
+                      sx={{ width: 32, height: 32, fontSize: "0.875rem" }}
+                    >
+                      {message?.sender?.username?.charAt(0) ||
+                        message?.sender?.firstName?.charAt(0) ||
+                        "U"}
+                    </Avatar>
+                  </ListItemAvatar>
+                )}
+
+                {/* Message Container */}
+                <Box
                   sx={{
-                    display: "block",
-                    textAlign: "right",
-                    opacity: 0.6,
-                    mt: 0.5,
+                    display: "flex",
+                    flexDirection: "column",
+                    maxWidth: "70%",
+                    alignItems: isOwnMessage ? "flex-end" : "flex-start",
                   }}
                 >
-                  {formatTime(message.createdAt)}
-                </Typography>
-              </Box>
-            </ListItem>
-          ))}
+                  {/* Sender Name */}
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: "#666",
+                      mb: 0.5,
+                      fontWeight: 500,
+                      fontSize: "0.75rem",
+                    }}
+                  >
+                    {isOwnMessage
+                      ? "You"
+                      : message?.sender?.username ||
+                        message?.sender?.firstName ||
+                        "Unknown"}
+                  </Typography>
+
+                  {/* Message Bubble */}
+                  <Box
+                    sx={{
+                      backgroundColor: isOwnMessage ? "#1976d2" : "#ffffff",
+                      color: isOwnMessage ? "#ffffff" : "#000000",
+                      borderRadius: 2,
+                      p: 1.5,
+                      boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
+                      border: isOwnMessage ? "none" : "1px solid #e0e0e0",
+                      position: "relative",
+                      wordBreak: "break-word",
+                      maxWidth: "100%",
+                    }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        whiteSpace: "pre-wrap",
+                        lineHeight: 1.4,
+                      }}
+                    >
+                      {message.content}
+                    </Typography>
+
+                    {/* Time */}
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        display: "block",
+                        textAlign: isOwnMessage ? "right" : "left",
+                        opacity: 0.7,
+                        mt: 0.5,
+                        fontSize: "0.7rem",
+                      }}
+                    >
+                      {formatTime(message.createdAt || message.timestamp)}
+                    </Typography>
+                  </Box>
+                </Box>
+
+                {/* Avatar for own messages - positioned on the right */}
+              </ListItem>
+            );
+          })}
         </List>
         <div ref={messagesEndRef} />
       </Box>
@@ -167,11 +217,23 @@ const RealTimeChat = ({ ticket }) => {
           onKeyPress={handleKeyPress}
           placeholder="Type a message..."
           variant="outlined"
+          size="small"
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
                 <Tooltip title="Send">
-                  <IconButton onClick={handleSendMessage}>
+                  <IconButton
+                    onClick={handleSendMessage}
+                    disabled={!newMessage.trim()}
+                    sx={{
+                      color: newMessage.trim() ? "#1976d2" : "#ccc",
+                      "&:hover": {
+                        backgroundColor: newMessage.trim()
+                          ? "rgba(25, 118, 210, 0.1)"
+                          : "transparent",
+                      },
+                    }}
+                  >
                     <Send />
                   </IconButton>
                 </Tooltip>

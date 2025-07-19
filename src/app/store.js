@@ -17,6 +17,7 @@ import managerDashboardReducer from "../features/managerDashboardSlice";
 import agencyManagerReducer from "../features/agencyManagerSlice";
 import eventsReducer from "../features/eventsSlice";
 import ticketsReducer from "../features/ticketsSlice";
+import bonusReducer from "../features/bonusSlice";
 // import clubReducer from "../features/clubSlice";
 // import userReducer from "../features/userSlice";
 // import matchReducer from "../features/matchSlice";
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
   agencyManager: agencyManagerReducer,
   events: eventsReducer,
   tickets : ticketsReducer,
+  bonus: bonusReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
 import {
   Container,
   Box,
@@ -21,6 +22,12 @@ import {
   ListItemIcon,
   IconButton,
   Chip,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Alert,
+  Snackbar,
 } from "@mui/material";
 import {
   NavigateNext,
@@ -48,45 +55,53 @@ import {
 } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useDispatch, useSelector } from "react-redux";
+import { getProfile } from "../features/authSlice";
+import { updateCreatorProfile } from "../features/creatorDashboardSlice";
 import LoadingScreen from "../components/LoadingScreen";
 import Layout from "../components/layout/Layout";
+import moment from "moment";
 
 const ProfilePage = () => {
+  const { id: tikTokId } = useParams();
   const { user } = useAuth();
+  const dispatch = useDispatch();
+  const { profile, loading, error } = useSelector((state) => state.auth);
+  
   const [activeTab, setActiveTab] = useState(0);
   const [editMode, setEditMode] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+
+  // Check if current user can edit this profile
+  const canEdit = user?.role === "creator" && user?._id === profile?._id;
 
   // Enhanced profile data with all requested information
   const [profileData, setProfileData] = useState({
-    fullName: user?.fullName || "John Creator",
-    username: user?.username || "johncreator",
-    email: user?.email || "john.creator@example.com",
-    phone: "+1 (555) 123-4567",
-    bio:
-      user?.role === "admin"
-        ? "System Administrator managing the TikTok Agency platform."
-        : user?.role === "manager"
-        ? "Senior Manager at TikPulse Digital Agency. Managing top-tier creators and brand partnerships since 2022."
-        : user?.role === "sub_manager"
-        ? "Sub-Manager at TikPulse Digital Agency. Supporting creator development and campaign execution."
-        : "TikTok creator specializing in comedy and lifestyle content. Working with top brands since 2020.",
-    tiktokUrl: "https://tiktok.com/@johncreator",
-    instagramUrl: "https://instagram.com/johncreator",
+    fullName: "",
+    username: "",
+    email: "",
+    phone: "",
+    bio: "",
+    tikTokId: "",
+    category: "",
+    tiktokUrl: "",
+    instagramUrl: "",
     // Social Media Stats (for creators)
-    joinedDate: "January 15, 2024",
-    following: "1,234",
-    videos: "456",
-    followers: "125,000",
-    likes: "2.5M",
-    views: "15.8M",
+    joinedDate: "",
+    following: "0",
+    videos: "0",
+    followers: "0",
+    likes: "0",
+    views: "0",
     // Contract Details (for creators)
-    contractStartDate: "January 15, 2024",
+    contractStartDate: "",
     contractDuration: "12 months",
-    daysWithAgency: "145",
-    diamondsCollected: "75,800",
+    daysWithAgency: "0",
+    diamondsCollected: "0",
     // Payment Details (for creators)
-    bankAccount: "FR76 3000 4000 0100 0000 1234 567",
-    paypalAccount: "creator@tikpulse.com",
+    bankAccount: "",
+    paypalAccount: "",
     // Manager-specific data
     department: "Creator Management",
     employeeId: "TPA-001",
@@ -100,6 +115,56 @@ const ProfilePage = () => {
     assignedCreators: "12",
     taskCompletion: "94%",
   });
+
+  // Fetch profile data when component mounts or tikTokId changes
+  useEffect(() => {
+    if (tikTokId) {
+      dispatch(getProfile(tikTokId));
+    }
+  }, [tikTokId, dispatch]);
+
+  // Update profile data when profile is fetched
+  useEffect(() => {
+    if (profile) {
+      setProfileData({
+        fullName: `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim() || "John Creator",
+        username: profile?.username || "johncreator",
+        email: profile?.email || "john.creator@example.com",
+        phone: profile?.phone || "+1 (555) 123-4567",
+        bio: profile?.bio || "TikTok creator specializing in comedy and lifestyle content. Working with top brands since 2020.",
+        tikTokId: profile?.tikTokId || "",
+        category: profile?.category || "",
+        tiktokUrl: `https://tiktok.com/@${profile?.tikTokId || "johncreator"}`,
+        instagramUrl: "https://instagram.com/johncreator",
+        // Social Media Stats (for creators)
+        joinedDate: profile?.joinDate ? moment(profile.joinDate).format("MMMM DD, YYYY") : "January 15, 2024",
+        following: profile?.profile?.subscribers?.toString() || "1,234",
+        videos: profile?.profile?.videos?.toString() || "456",
+        followers: profile?.profile?.followers?.toLocaleString() || "125,000",
+        likes: profile?.profile?.likes?.toLocaleString() || "2.5M",
+        views: profile?.profile?.views?.toLocaleString() || "15.8M",
+        // Contract Details (for creators)
+        contractStartDate: profile?.joinDate ? moment(profile.joinDate).format("MMMM DD, YYYY") : "January 15, 2024",
+        contractDuration: "12 months",
+        daysWithAgency: profile?.profile?.daysSinceJoining?.toString() || "145",
+        diamondsCollected: profile?.profile?.diamonds?.toLocaleString() || "75,800",
+        // Payment Details (for creators)
+        bankAccount: profile?.rib || "FR76 3000 4000 0100 0000 1234 567",
+        paypalAccount: profile?.email || "creator@tikpulse.com",
+        // Keep existing manager data
+        department: "Creator Management",
+        employeeId: "TPA-001",
+        hireDate: "March 1, 2022",
+        managedCreators: "45",
+        totalDiamondsManaged: "2.8M",
+        regionCovered: "North America & Europe",
+        specialization: "Brand Partnerships & Creator Development",
+        supervisedBy: "Sarah Johnson",
+        assignedCreators: "12",
+        taskCompletion: "94%",
+      });
+    }
+  }, [profile]);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -116,17 +181,104 @@ const ProfilePage = () => {
     });
   };
 
-  const handleSaveProfile = () => {
-    // In a real app, this would save the profile data to the server
-    setEditMode(false);
-    // Show success notification
+  const handleSaveProfile = async () => {
+    if (!canEdit) return;
+    
+    setSaving(true);
+    try {
+      // Prepare update data (exclude tikTokId as it should not be editable)
+      const updateData = {
+        username: profileData.username,
+        bio: profileData.bio,
+        email: profileData.email,
+        phone: profileData.phone,
+        category: profileData.category,
+        rib: profileData.bankAccount,
+        firstName: profileData.fullName.split(' ')[0] || "",
+        lastName: profileData.fullName.split(' ').slice(1).join(' ') || "",
+      };
+
+      // Remove empty fields
+      Object.keys(updateData).forEach(key => {
+        if (!updateData[key]) delete updateData[key];
+      });
+
+      await dispatch(updateCreatorProfile(updateData)).unwrap();
+      
+      setSnackbar({
+        open: true,
+        message: "Profile updated successfully!",
+        severity: "success"
+      });
+      setEditMode(false);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error.message || "Failed to update profile",
+        severity: "error"
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancelEdit = () => {
-    // Revert changes
+    // Reset to original data
+    if (profile) {
+      setProfileData({
+        fullName: `${profile?.firstName || ""} ${profile?.lastName || ""}`.trim() || "John Creator",
+        username: profile?.username || "johncreator",
+        email: profile?.email || "john.creator@example.com",
+        phone: profile?.phone || "+1 (555) 123-4567",
+        bio: profile?.bio || "TikTok creator specializing in comedy and lifestyle content. Working with top brands since 2020.",
+        tikTokId: profile?.tikTokId || "",
+        category: profile?.category || "",
+        tiktokUrl: `https://tiktok.com/@${profile?.tikTokId || "johncreator"}`,
+        instagramUrl: "https://instagram.com/johncreator",
+        joinedDate: profile?.joinDate ? moment(profile.joinDate).format("MMMM DD, YYYY") : "January 15, 2024",
+        following: profile?.profile?.subscribers?.toString() || "1,234",
+        videos: profile?.profile?.videos?.toString() || "456",
+        followers: profile?.profile?.followers?.toLocaleString() || "125,000",
+        likes: profile?.profile?.likes?.toLocaleString() || "2.5M",
+        views: profile?.profile?.views?.toLocaleString() || "15.8M",
+        contractStartDate: profile?.joinDate ? moment(profile.joinDate).format("MMMM DD, YYYY") : "January 15, 2024",
+        contractDuration: "12 months",
+        daysWithAgency: profile?.profile?.daysSinceJoining?.toString() || "145",
+        diamondsCollected: profile?.profile?.diamonds?.toLocaleString() || "75,800",
+        bankAccount: profile?.rib || "FR76 3000 4000 0100 0000 1234 567",
+        paypalAccount: profile?.email || "creator@tikpulse.com",
+        department: "Creator Management",
+        employeeId: "TPA-001",
+        hireDate: "March 1, 2022",
+        managedCreators: "45",
+        totalDiamondsManaged: "2.8M",
+        regionCovered: "North America & Europe",
+        specialization: "Brand Partnerships & Creator Development",
+        supervisedBy: "Sarah Johnson",
+        assignedCreators: "12",
+        taskCompletion: "94%",
+      });
+    }
     setEditMode(false);
-    // Reset profile data to original state (from server)
   };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
+  if (loading) return <LoadingScreen />;
+  
+  if (error || !profile) {
+    return (
+      <Layout>
+        <Container maxWidth="md" sx={{ py: 10 }}>
+          <Typography variant="h4" align="center" color="error" fontWeight="bold">
+            Profile not found!
+          </Typography>
+        </Container>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -333,7 +485,7 @@ const ProfilePage = () => {
 
                   <Divider sx={{ my: 2 }} />
 
-                  {user?.role !== "admin" && (
+                  {canEdit && (
                     <Box sx={{ textAlign: "center" }}>
                       <Button
                         variant="contained"
@@ -341,13 +493,14 @@ const ProfilePage = () => {
                         onClick={
                           editMode ? handleSaveProfile : handleEditToggle
                         }
+                        disabled={saving}
                         sx={{
                           mr: 1,
                           bgcolor: "#6200ea",
                           "&:hover": { bgcolor: "#3700b3" },
                         }}
                       >
-                        {editMode ? "Save" : "Edit Profile"}
+                        {saving ? "Saving..." : editMode ? "Save" : "Edit Profile"}
                       </Button>
 
                       {editMode && (
@@ -355,11 +508,20 @@ const ProfilePage = () => {
                           variant="outlined"
                           startIcon={<Cancel />}
                           onClick={handleCancelEdit}
+                          disabled={saving}
                         >
                           Cancel
                         </Button>
                       )}
                     </Box>
+                  )}
+
+                  {!canEdit && user?.role === "creator" && (
+                    <Alert severity="info" sx={{ mt: 2 }}>
+                      <Typography variant="body2">
+                        <strong>Note:</strong> You can only edit your own profile.
+                      </Typography>
+                    </Alert>
                   )}
                 </CardContent>
               </Card>
@@ -441,6 +603,51 @@ const ProfilePage = () => {
                         />
                       </Grid>
 
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="TikTok ID"
+                          value={profileData.tikTokId}
+                          disabled={true}
+                          variant="outlined"
+                          helperText="TikTok ID cannot be edited for security reasons"
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <FormControl fullWidth disabled={!editMode}>
+                          <InputLabel>Category</InputLabel>
+                          <Select
+                            value={profileData.category}
+                            onChange={handleInputChange("category")}
+                            label="Category"
+                          >
+                            <MenuItem value="lifestyle">Lifestyle</MenuItem>
+                            <MenuItem value="fashion">Fashion</MenuItem>
+                            <MenuItem value="beauty">Beauty</MenuItem>
+                            <MenuItem value="fitness">Fitness</MenuItem>
+                            <MenuItem value="food">Food</MenuItem>
+                            <MenuItem value="travel">Travel</MenuItem>
+                            <MenuItem value="tech">Tech</MenuItem>
+                            <MenuItem value="gaming">Gaming</MenuItem>
+                            <MenuItem value="music">Music</MenuItem>
+                            <MenuItem value="dance">Dance</MenuItem>
+                            <MenuItem value="comedy">Comedy</MenuItem>
+                            <MenuItem value="education">Education</MenuItem>
+                            <MenuItem value="business">Business</MenuItem>
+                            <MenuItem value="health">Health</MenuItem>
+                            <MenuItem value="parenting">Parenting</MenuItem>
+                            <MenuItem value="pets">Pets</MenuItem>
+                            <MenuItem value="sports">Sports</MenuItem>
+                            <MenuItem value="art">Art</MenuItem>
+                            <MenuItem value="diy">DIY</MenuItem>
+                            <MenuItem value="automotive">Automotive</MenuItem>
+                            <MenuItem value="finance">Finance</MenuItem>
+                            <MenuItem value="other">Other</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
                       <Grid item xs={12}>
                         <TextField
                           fullWidth
@@ -497,15 +704,12 @@ const ProfilePage = () => {
                         <Grid container spacing={2}>
                           <Grid item xs={6} sm={3}>
                             <Card variant="outlined">
-                              <CardContent sx={{ textAlign: "center" }}>
-                                <People
-                                  color="primary"
-                                  sx={{ fontSize: 40, mb: 1 }}
-                                />
-                                <Typography variant="h6">
+                              <CardContent sx={{ textAlign: "center", py: 2 }}>
+                                <People color="primary" sx={{ fontSize: 40 }} />
+                                <Typography variant="h6" sx={{ mt: 1 }}>
                                   {profileData.followers}
                                 </Typography>
-                                <Typography variant="caption">
+                                <Typography variant="body2" color="text.secondary">
                                   Followers
                                 </Typography>
                               </CardContent>
@@ -514,46 +718,41 @@ const ProfilePage = () => {
 
                           <Grid item xs={6} sm={3}>
                             <Card variant="outlined">
-                              <CardContent sx={{ textAlign: "center" }}>
-                                <Favorite
-                                  color="error"
-                                  sx={{ fontSize: 40, mb: 1 }}
-                                />
-                                <Typography variant="h6">
-                                  {profileData.likes}
-                                </Typography>
-                                <Typography variant="caption">Likes</Typography>
-                              </CardContent>
-                            </Card>
-                          </Grid>
-
-                          <Grid item xs={6} sm={3}>
-                            <Card variant="outlined">
-                              <CardContent sx={{ textAlign: "center" }}>
-                                <Visibility
-                                  color="action"
-                                  sx={{ fontSize: 40, mb: 1 }}
-                                />
-                                <Typography variant="h6">
-                                  {profileData.views}
-                                </Typography>
-                                <Typography variant="caption">Views</Typography>
-                              </CardContent>
-                            </Card>
-                          </Grid>
-
-                          <Grid item xs={6} sm={3}>
-                            <Card variant="outlined">
-                              <CardContent sx={{ textAlign: "center" }}>
-                                <VideoLibrary
-                                  color="secondary"
-                                  sx={{ fontSize: 40, mb: 1 }}
-                                />
-                                <Typography variant="h6">
+                              <CardContent sx={{ textAlign: "center", py: 2 }}>
+                                <VideoLibrary color="primary" sx={{ fontSize: 40 }} />
+                                <Typography variant="h6" sx={{ mt: 1 }}>
                                   {profileData.videos}
                                 </Typography>
-                                <Typography variant="caption">
+                                <Typography variant="body2" color="text.secondary">
                                   Videos
+                                </Typography>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+
+                          <Grid item xs={6} sm={3}>
+                            <Card variant="outlined">
+                              <CardContent sx={{ textAlign: "center", py: 2 }}>
+                                <Favorite color="primary" sx={{ fontSize: 40 }} />
+                                <Typography variant="h6" sx={{ mt: 1 }}>
+                                  {profileData.likes}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  Likes
+                                </Typography>
+                              </CardContent>
+                            </Card>
+                          </Grid>
+
+                          <Grid item xs={6} sm={3}>
+                            <Card variant="outlined">
+                              <CardContent sx={{ textAlign: "center", py: 2 }}>
+                                <Visibility color="primary" sx={{ fontSize: 40 }} />
+                                <Typography variant="h6" sx={{ mt: 1 }}>
+                                  {profileData.views}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                  Views
                                 </Typography>
                               </CardContent>
                             </Card>
@@ -564,11 +763,11 @@ const ProfilePage = () => {
                   </Box>
                 )}
 
-                {/* Contract Details Tab - Creators only */}
+                {/* Contract Details Tab */}
                 {activeTab === 2 && user?.role === "creator" && (
                   <Box>
                     <Typography variant="h6" sx={{ mb: 2 }}>
-                      Contract Information
+                      Contract Details
                     </Typography>
 
                     <Grid container spacing={2}>
@@ -577,7 +776,7 @@ const ProfilePage = () => {
                           fullWidth
                           label="Contract Start Date"
                           value={profileData.contractStartDate}
-                          disabled
+                          disabled={true}
                           variant="outlined"
                         />
                       </Grid>
@@ -587,7 +786,7 @@ const ProfilePage = () => {
                           fullWidth
                           label="Contract Duration"
                           value={profileData.contractDuration}
-                          disabled
+                          disabled={true}
                           variant="outlined"
                         />
                       </Grid>
@@ -597,7 +796,7 @@ const ProfilePage = () => {
                           fullWidth
                           label="Days with Agency"
                           value={profileData.daysWithAgency}
-                          disabled
+                          disabled={true}
                           variant="outlined"
                         />
                       </Grid>
@@ -607,20 +806,15 @@ const ProfilePage = () => {
                           fullWidth
                           label="Diamonds Collected"
                           value={profileData.diamondsCollected}
-                          disabled
+                          disabled={true}
                           variant="outlined"
-                          InputProps={{
-                            startAdornment: (
-                              <Diamond color="primary" sx={{ mr: 1 }} />
-                            ),
-                          }}
                         />
                       </Grid>
                     </Grid>
                   </Box>
                 )}
 
-                {/* Payment Info Tab - Creators only */}
+                {/* Payment Info Tab */}
                 {activeTab === 3 && user?.role === "creator" && (
                   <Box>
                     <Typography variant="h6" sx={{ mb: 2 }}>
@@ -631,16 +825,11 @@ const ProfilePage = () => {
                       <Grid item xs={12}>
                         <TextField
                           fullWidth
-                          label="Bank Account"
+                          label="Bank Account (RIB)"
                           value={profileData.bankAccount}
                           onChange={handleInputChange("bankAccount")}
                           disabled={!editMode}
                           variant="outlined"
-                          InputProps={{
-                            startAdornment: (
-                              <AccountBalance color="primary" sx={{ mr: 1 }} />
-                            ),
-                          }}
                         />
                       </Grid>
 
@@ -652,195 +841,91 @@ const ProfilePage = () => {
                           onChange={handleInputChange("paypalAccount")}
                           disabled={!editMode}
                           variant="outlined"
-                          InputProps={{
-                            startAdornment: (
-                              <Payment color="primary" sx={{ mr: 1 }} />
-                            ),
-                          }}
                         />
                       </Grid>
                     </Grid>
                   </Box>
                 )}
 
-                {/* Work Details Tab - Managers only */}
-                {(activeTab === 2 || activeTab === 4) &&
-                  (user?.role === "manager" ||
-                    user?.role === "sub_manager") && (
-                    <Box>
-                      <Typography variant="h6" sx={{ mb: 2 }}>
-                        Work Details
-                      </Typography>
+                {/* Work Details Tab */}
+                {activeTab === 4 && (user?.role === "manager" || user?.role === "sub_manager") && (
+                  <Box>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                      Work Details
+                    </Typography>
 
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            label="Department"
-                            value={profileData.department}
-                            disabled
-                            variant="outlined"
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            label="Employee ID"
-                            value={profileData.employeeId}
-                            disabled
-                            variant="outlined"
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            label="Hire Date"
-                            value={profileData.hireDate}
-                            disabled
-                            variant="outlined"
-                          />
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            label={
-                              user?.role === "manager"
-                                ? "Managed Creators"
-                                : "Assigned Creators"
-                            }
-                            value={
-                              user?.role === "manager"
-                                ? profileData.managedCreators
-                                : profileData.assignedCreators
-                            }
-                            disabled
-                            variant="outlined"
-                          />
-                        </Grid>
-
-                        {user?.role === "manager" && (
-                          <>
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                fullWidth
-                                label="Total Diamonds Managed"
-                                value={profileData.totalDiamondsManaged}
-                                disabled
-                                variant="outlined"
-                                InputProps={{
-                                  startAdornment: (
-                                    <Diamond color="primary" sx={{ mr: 1 }} />
-                                  ),
-                                }}
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                fullWidth
-                                label="Region Covered"
-                                value={profileData.regionCovered}
-                                disabled
-                                variant="outlined"
-                              />
-                            </Grid>
-                          </>
-                        )}
-
-                        {user?.role === "sub_manager" && (
-                          <>
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                fullWidth
-                                label="Supervised By"
-                                value={profileData.supervisedBy}
-                                disabled
-                                variant="outlined"
-                              />
-                            </Grid>
-
-                            <Grid item xs={12} sm={6}>
-                              <TextField
-                                fullWidth
-                                label="Task Completion Rate"
-                                value={profileData.taskCompletion}
-                                disabled
-                                variant="outlined"
-                              />
-                            </Grid>
-                          </>
-                        )}
+                    <Grid container spacing={2}>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Department"
+                          value={profileData.department}
+                          disabled={true}
+                          variant="outlined"
+                        />
                       </Grid>
-                    </Box>
-                  )}
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Employee ID"
+                          value={profileData.employeeId}
+                          disabled={true}
+                          variant="outlined"
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Hire Date"
+                          value={profileData.hireDate}
+                          disabled={true}
+                          variant="outlined"
+                        />
+                      </Grid>
+
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          fullWidth
+                          label="Managed Creators"
+                          value={profileData.managedCreators}
+                          disabled={true}
+                          variant="outlined"
+                        />
+                      </Grid>
+                    </Grid>
+                  </Box>
+                )}
 
                 {/* Security Tab */}
-                {((activeTab === 3 && user?.role === "manager") ||
-                  (activeTab === 3 && user?.role === "sub_manager") ||
-                  (activeTab === 5 && user?.role === "creator") ||
-                  (activeTab === 1 && user?.role === "admin")) && (
+                {activeTab === 5 && (
                   <Box>
-                    <Typography
-                      variant="h6"
-                      sx={{ mb: 2, display: "flex", alignItems: "center" }}
-                    >
-                      <Security sx={{ mr: 1 }} />
+                    <Typography variant="h6" sx={{ mb: 2 }}>
                       Security Settings
                     </Typography>
 
-                    <List>
-                      <ListItem>
-                        <ListItemIcon>
-                          <Key />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="Change Password"
-                          secondary="Update your account password"
-                        />
-                        <Button variant="outlined" size="small">
-                          Change
-                        </Button>
-                      </ListItem>
-
-                      <Divider />
-
-                      <ListItem>
-                        <ListItemIcon>
-                          <Notifications />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="Notification Settings"
-                          secondary="Manage your notification preferences"
-                        />
-                        <Button variant="outlined" size="small">
-                          Configure
-                        </Button>
-                      </ListItem>
-
-                      <Divider />
-
-                      <ListItem>
-                        <ListItemIcon>
-                          <Help />
-                        </ListItemIcon>
-                        <ListItemText
-                          primary="Privacy Settings"
-                          secondary="Control your privacy and data settings"
-                        />
-                        <Button variant="outlined" size="small">
-                          Manage
-                        </Button>
-                      </ListItem>
-                    </List>
+                    <Typography variant="body2" color="text.secondary">
+                      Security settings are managed by your administrator.
+                    </Typography>
                   </Box>
                 )}
               </Paper>
             </Grid>
           </Grid>
         </Box>
+
+        {/* Snackbar for notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Container>
     </Layout>
   );

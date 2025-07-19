@@ -76,40 +76,6 @@ const Header = () => {
     return displayName.charAt(0).toUpperCase();
   };
 
-  // Mock data for top creators - replace with real data from API/Redux
-  const topCreators = [
-    {
-      id: 1,
-      name: "Alex Johnson",
-      handle: "@alexj_creates",
-      followers: "1.2M",
-    },
-    {
-      id: 2,
-      name: "Sarah Wilson",
-      handle: "@sarahw_official",
-      followers: "890K",
-    },
-    {
-      id: 3,
-      name: "Mike Chen",
-      handle: "@mikechen_tk",
-      followers: "756K",
-    },
-    {
-      id: 4,
-      name: "Emma Davis",
-      handle: "@emmad_viral",
-      followers: "623K",
-    },
-    {
-      id: 5,
-      name: "Carlos Rodriguez",
-      handle: "@carlos_content",
-      followers: "445K",
-    },
-  ];
-
   // User menu
   const [anchorEl, setAnchorEl] = useState(null);
   const openUserMenu = Boolean(anchorEl);
@@ -1166,7 +1132,7 @@ const Header = () => {
               variant="body2"
               sx={{ opacity: 0.9, fontSize: "0.8rem" }}
             >
-              {topCreators.length} active creators
+              {/* topCreators.length */} active creators
             </Typography>
           </Box>
 

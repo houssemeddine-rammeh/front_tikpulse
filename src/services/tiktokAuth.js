@@ -5,8 +5,8 @@ import { TIKTOK_CLIENT_SECRET } from "../config/api"; // ⚠️ Don't expose sec
 
 // TikTok OAuth Configuration
 export const TIKTOK_CONFIG = {
-  CLIENT_KEY: "your-tiktok-client-key",
-  REDIRECT_URI: "http://localhost:3000/auth/tiktok/callback",
+  CLIENT_KEY: "sbaw5rww8nk7v6lzej",
+  REDIRECT_URI: "http://localhost:5000/auth/tiktok/callback",
   SCOPE: "user.info.basic",
   RESPONSE_TYPE: "code",
   AUTH_URL: "https://www.tiktok.com/v2/auth/authorize/",
@@ -33,7 +33,7 @@ class TikTokAuthService {
     Cookies.set("tiktok_csrf_token", csrfToken, { expires: 1 });
 
     const params = new URLSearchParams({
-      client_key: TIKTOK_CONFIG.CLIENT_KEY,
+      client_key: "sbaw5rww8nk7v6lzej",
       redirect_uri: TIKTOK_CONFIG.REDIRECT_URI,
       scope: TIKTOK_CONFIG.SCOPE,
       response_type: TIKTOK_CONFIG.RESPONSE_TYPE,
@@ -79,8 +79,8 @@ class TikTokAuthService {
         "Cache-Control": "no-cache",
       },
       body: new URLSearchParams({
-        client_key: TIKTOK_CONFIG.CLIENT_KEY,
-        client_secret: TIKTOK_CLIENT_SECRET, // ⚠️ Don't use in frontend production
+        client_key: "sbaw5rww8nk7v6lzej",
+        client_secret: "7FPJnExX8VIbZ9QY3wJ9OLxRYMIT69mI", // ⚠️ Don't use in frontend production
         code,
         grant_type: "authorization_code",
         redirect_uri: TIKTOK_CONFIG.REDIRECT_URI,

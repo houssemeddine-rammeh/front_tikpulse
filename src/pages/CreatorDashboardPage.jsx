@@ -53,51 +53,6 @@ import { getCreatorProfile } from "../features/creatorDashboardSlice";
 import Profile from "./profile";
 import moment from "moment";
 
-// Agency bonus calculation rules
-const agencyBonusRules = {
-  bronze: { minValidDays: 15, minHours: 30, rate: 0.03, baseBonus: 200 },
-  silver: { minValidDays: 20, minHours: 50, rate: 0.04, baseBonus: 400 },
-  gold: { minValidDays: 25, minHours: 70, rate: 0.05, baseBonus: 600 },
-  platinum: { minValidDays: 30, minHours: 100, rate: 0.06, baseBonus: 800 },
-};
-
-// Bonus calculation functions
-const calculateAgencyBonus = (creator) => {
-  if (!creator) return { amount: 0, tier: "none", qualified: false };
-
-  const validDays = creator?.validLiveDays || 0;
-  const hours = creator?.liveDuration || 0;
-  const diamonds = creator?.diamondsLastMonth || 0;
-  const tier = creator?.contractDetails?.tier?.toLowerCase() || "bronze";
-
-  const rules = agencyBonusRules[tier] || agencyBonusRules.bronze;
-
-  const meetsRequirements =
-    validDays >= rules.minValidDays && hours >= rules.minHours;
-
-  if (!meetsRequirements) {
-    return { amount: 0, tier, qualified: false, requirements: rules };
-  }
-
-  // Calculate bonus: base bonus + percentage of diamonds
-  const diamondBonus = diamonds * rules.rate;
-  const totalAgencyBonus = rules.baseBonus + diamondBonus;
-
-  return {
-    amount: Math.round(totalAgencyBonus),
-    tier,
-    qualified: true,
-    requirements: rules,
-    breakdown: {
-      baseBonus: rules.baseBonus,
-      diamondBonus: Math.round(diamondBonus),
-      diamonds: diamonds,
-    },
-  };
-};
-
-
-
 const CreatorDashboardPage = () => {
   const { user } = useAuth();
   const theme = useTheme();
@@ -129,28 +84,6 @@ const CreatorDashboardPage = () => {
 
     if (user?._id || user?.id) {
       fetchCreatorData();
-    } else {
-      // If no user ID, still show demo data
-      const mockCreator = {
-        username: "Demo Creator",
-        tikTokId: "@demo_creator",
-        email: "demo@example.com",
-        phone: "+1 (555) 123-4567",
-        followers: 125000,
-        videos: 45,
-        views: 2450000,
-        daysSinceJoining: 120,
-        diamonds: 15750,
-        validLiveDays: 25,
-        liveDuration: 85,
-        diamondsLastMonth: 8500,
-        contractDetails: {
-          tier: "Gold",
-          rate: 0.04,
-          monthlyDiamondGoal: 10000,
-        },
-        joinedDate: new Date(2023, 5, 15),
-      };
     }
   }, [user?._id, user?.id, user?.name, user?.email]);
 
@@ -260,13 +193,6 @@ const CreatorDashboardPage = () => {
               Report Issue
             </Button>
           </Box>
-
-          {/* Creator Info Card */}
-
-          {/* Performance Metrics */}
-          <Grid xs={12} spacing={4} mb={4}>
-            <Profile creator={creator} />
-          </Grid>
 
           {/* Agency Bonus Details */}
           <Card sx={{ mb: 4 }}>

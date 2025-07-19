@@ -109,66 +109,6 @@ const AdminDashboardPage = () => {
     severity: 'success' 
   });
 
-  // Comprehensive metrics data
-  const metricsData = [
-    {
-      title: 'Total Managers',
-      value: '24',
-      fromLastMonth: '+3',
-      trend: 'up',
-      icon: <DashboardOutlined sx={{ fontSize: 40, color: '#1976d2' }} />,
-      color: '#1976d2'
-    },
-    {
-      title: 'Total Creators',
-      value: '187',
-      fromLastMonth: '+15',
-      trend: 'up',
-      icon: <CreatorsIcon sx={{ fontSize: 40, color: '#2e7d32' }} />,
-      color: '#2e7d32'
-    },
-    {
-      title: 'Total Followers',
-      value: '2.8M',
-      fromLastMonth: '+180K',
-      trend: 'up',
-      icon: <FollowersIcon sx={{ fontSize: 40, color: '#ed6c02' }} />,
-      color: '#ed6c02'
-    },
-    {
-      title: 'Total Diamonds',
-      value: '1.2M',
-      fromLastMonth: '+85K',
-      trend: 'up',
-      icon: <DiamondIcon sx={{ fontSize: 40, color: '#9c27b0' }} />,
-      color: '#9c27b0'
-    },
-    {
-      title: 'Live Sessions',
-      value: '1,456',
-      fromLastMonth: '+124',
-      trend: 'up',
-      icon: <LiveIcon sx={{ fontSize: 40, color: '#d32f2f' }} />,
-      color: '#d32f2f'
-    },
-    {
-      title: 'Valid Days (>1h)',
-      value: '3,892',
-      fromLastMonth: '+287',
-      trend: 'up',
-      icon: <ValidDaysIcon sx={{ fontSize: 40, color: '#0288d1' }} />,
-      color: '#0288d1'
-    }
-  ];
-
-  // Program rules data (keeping for backward compatibility)
-  const programRules = [
-    { program: 'Bronze', validDay: '≥7', hours: '≥15', rate: '0,03%' },
-    { program: 'Silver', validDay: '≥15', hours: '≥40', rate: '0,04%' },
-    { program: 'Gold', validDay: '≥20', hours: '≥80', rate: '0,05%' },
-    { program: 'Platinum', validDay: '≥22', hours: '≥100', rate: '0,06%' },
-  ];
-
   // Stats data
   const totalManagers = 12;
   const totalCreators = 87;
@@ -251,62 +191,10 @@ const AdminDashboardPage = () => {
             </Typography>
           </Box>
 
-          {/* Metrics Grid */}
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            {metricsData.map((metric, index) => (
-              <Grid item xs={12} sm={6} md={4} key={index}>
-                <Card 
-                  sx={{ 
-                    height: '100%',
-                    transition: 'transform 0.2s',
-                    '&:hover': {
-                      transform: 'translateY(-4px)',
-                      boxShadow: '0 8px 25px rgba(0,0,0,0.15)'
-                    }
-                  }}
-                >
-                  <CardContent sx={{ p: 3 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                      {metric.icon}
-                      <Box sx={{ ml: 2, flex: 1 }}>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: metric.color }}>
-                          {metric.title}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    
-                    <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 1, color: '#333' }}>
-                      {metric.value}
-                    </Typography>
-                    
-                    <Divider sx={{ my: 1.5 }} />
-                    
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                      <Typography variant="body2" color="text.secondary">
-                        From Last Month:
-                      </Typography>
-                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        {metric.trend === 'up' ? (
-                          <TrendingUpIcon sx={{ fontSize: 16, color: '#4caf50', mr: 0.5 }} />
-                        ) : (
-                          <TrendingDownIcon sx={{ fontSize: 16, color: '#f44336', mr: 0.5 }} />
-                        )}
-                        <Typography 
-                          variant="body2" 
-                          sx={{ 
-                            fontWeight: 'bold',
-                            color: metric.trend === 'up' ? '#4caf50' : '#f44336'
-                          }}
-                        >
-                          {metric.fromLastMonth}
-                        </Typography>
-                      </Box>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
+          {/* Platform Overview */}
+          <Typography variant="h5" sx={{ mb: 3 }}>
+            Platform Overview
+          </Typography>
 
           {/* Editable Bonus Rules Section */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>

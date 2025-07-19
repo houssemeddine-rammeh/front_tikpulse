@@ -51,25 +51,6 @@ import { useCreatorDashboard } from '../hooks/useCreatorDashboard';
 import { useNotifications } from '../contexts/NotificationContext';
 import Layout from "../components/layout/Layout";
 
-// Agency bonus calculation rules
-const agencyBonusRules = {
-  bronze: { minValidDays: 15, minHours: 30, rate: 0.03, baseBonus: 200 },
-  silver: { minValidDays: 20, minHours: 50, rate: 0.04, baseBonus: 400 },
-  gold: { minValidDays: 25, minHours: 70, rate: 0.05, baseBonus: 600 },
-  platinum: { minValidDays: 30, minHours: 100, rate: 0.06, baseBonus: 800 }
-};
-
-// Agency details structure
-const agencyDetails = {
-  name: 'TikPulse Digital Agency',
-  id: 'TDA-001',
-  managerName: 'Sarah Johnson',
-  joinDate: new Date(2023, 0, 15),
-  region: 'Europe',
-  supportEmail: 'support@tikpulse.agency',
-  description: 'Leading digital talent agency specializing in TikTok creators and brand partnerships'
-};
-
 const CreatorDashboardPageRedux = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -132,41 +113,6 @@ const CreatorDashboardPageRedux = () => {
 
     loadDashboardData();
   }, [fetchProfile, fetchStats, fetchAvailableEvents, fetchAvailableCampaigns]);
-
-  // Calculate agency bonus
-  const calculateAgencyBonus = (profile) => {
-    if (!profile) return { amount: 0, tier: 'none', qualified: false };
-
-    const validDays = profile.validLiveDays || 0;
-    const hours = profile.liveDuration || 0;
-    const diamonds = profile.diamondsLastMonth || 0;
-    const tier = profile.contractDetails?.tier?.toLowerCase() || 'bronze';
-
-    const rules = agencyBonusRules[tier] || agencyBonusRules.bronze;
-    
-    const meetsRequirements = validDays >= rules.minValidDays && hours >= rules.minHours;
-    
-    if (!meetsRequirements) {
-      return { amount: 0, tier, qualified: false, requirements: rules };
-    }
-
-    const diamondBonus = diamonds * rules.rate;
-    const totalAgencyBonus = rules.baseBonus + diamondBonus;
-
-    return { 
-      amount: Math.round(totalAgencyBonus), 
-      tier, 
-      qualified: true, 
-      requirements: rules,
-      breakdown: {
-        baseBonus: rules.baseBonus,
-        diamondBonus: Math.round(diamondBonus),
-        diamonds: diamonds
-      }
-    };
-  };
-
-  const agencyBonus = calculateAgencyBonus(profile);
 
   const handleReportDialogOpen = () => {
     setReportDialogOpen(true);
@@ -393,7 +339,7 @@ const CreatorDashboardPageRedux = () => {
                 <CardContent sx={{ textAlign: 'center', p: 3 }}>
                   <AttachMoney sx={{ fontSize: 40, color: '#ff9800', mb: 1 }} />
                   <Typography variant="h4" sx={{ color: '#ff9800', fontWeight: 'bold' }}>
-                    €{agencyBonus?.amount || 0}
+                    €0
                   </Typography>
                   <Typography variant="body2" color="text.secondary">Total Bonus</Typography>
                 </CardContent>
@@ -649,15 +595,15 @@ const CreatorDashboardPageRedux = () => {
                   <Typography variant="h6" gutterBottom>Agency Support</Typography>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <Business sx={{ mr: 1, color: '#1976d2' }} />
-                    <Typography variant="body1">{agencyDetails.name}</Typography>
+                    <Typography variant="body1">Agency Name</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <Person sx={{ mr: 1, color: '#1976d2' }} />
-                    <Typography variant="body1">Manager: {agencyDetails.managerName}</Typography>
+                    <Typography variant="body1">Manager: Manager Name</Typography>
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <Email sx={{ mr: 1, color: '#1976d2' }} />
-                    <Typography variant="body1">{agencyDetails.supportEmail}</Typography>
+                    <Typography variant="body1">support@agency.com</Typography>
                   </Box>
                 </Grid>
               </Grid>

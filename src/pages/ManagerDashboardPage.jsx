@@ -58,6 +58,7 @@ import {
 import Layout from "../components/layout/Layout";
 import { useDispatch } from "react-redux";
 import { getManagerStats } from "../features/managerDashboardSlice";
+import CreatorsBonusTable from "../components/CreatorsBonusTable";
 
 const ManagerDashboardPage = () => {
   // Modal states
@@ -94,82 +95,6 @@ const ManagerDashboardPage = () => {
     category: "",
     tier: "Bronze",
   });
-
-  // Creators data
-  const creators = [
-    {
-      id: 1,
-      name: "Emma Chen",
-      followers: 800000,
-      diamonds: 45000,
-      status: "active",
-    },
-    {
-      id: 2,
-      name: "Liam Wong",
-      followers: 750000,
-      diamonds: 38000,
-      status: "active",
-    },
-    {
-      id: 3,
-      name: "Sophia Kim",
-      followers: 1200000,
-      diamonds: 52000,
-      status: "active",
-    },
-    {
-      id: 4,
-      name: "Noah Park",
-      followers: 650000,
-      diamonds: 31000,
-      status: "inactive",
-    },
-    {
-      id: 5,
-      name: "Olivia Liu",
-      followers: 900000,
-      diamonds: 41000,
-      status: "active",
-    },
-  ];
-
-  // Diamonds data per month for the chart
-  const diamondsData = [
-    { month: "Jan", diamonds: 180000, target: 200000 },
-    { month: "Feb", diamonds: 195000, target: 200000 },
-    { month: "Mar", diamonds: 210000, target: 200000 },
-    { month: "Apr", diamonds: 198000, target: 200000 },
-    { month: "May", diamonds: 225000, target: 220000 },
-    { month: "Jun", diamonds: 240000, target: 220000 },
-    { month: "Jul", diamonds: 255000, target: 240000 },
-    { month: "Aug", diamonds: 270000, target: 240000 },
-    { month: "Sep", diamonds: 285000, target: 260000 },
-    { month: "Oct", diamonds: 295000, target: 260000 },
-    { month: "Nov", diamonds: 310000, target: 280000 },
-    { month: "Dec", diamonds: 325000, target: 280000 },
-  ];
-
-  // Statistics
-  const totalDiamonds = creators.reduce(
-    (sum, creator) => sum + creator.diamonds,
-    0
-  );
-  const totalFollowers = creators.reduce(
-    (sum, creator) => sum + creator.followers,
-    0
-  );
-  const activeCreators = creators.filter(
-    (creator) => creator.status === "active"
-  ).length;
-
-  // Monthly statistics
-  const monthlyStats = {
-    creatorsLastMonth: 12,
-    followersLastMonth: 850000,
-    viewsLastMonth: 45200000,
-    diamondsThisMonth: 285000,
-  };
 
   // Modal handlers
   const handleCampaignSubmit = () => {
@@ -536,7 +461,7 @@ const ManagerDashboardPage = () => {
           <Paper sx={{ p: 3, mb: 4 }}>
             <ResponsiveContainer width="100%" height={400}>
               <LineChart
-                data={diamondsData}
+                data={[]} // No data for diamondsData
                 margin={{
                   top: 20,
                   right: 30,
@@ -610,9 +535,7 @@ const ManagerDashboardPage = () => {
                   </Typography>
                   <Typography variant="h6" sx={{ color: "#2196f3" }}>
                     💎{" "}
-                    {diamondsData[
-                      diamondsData.length - 1
-                    ].diamonds.toLocaleString()}
+                    {(0).toLocaleString()}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={4}>
@@ -621,9 +544,7 @@ const ManagerDashboardPage = () => {
                   </Typography>
                   <Typography variant="h6" sx={{ color: "#ff9800" }}>
                     🎯{" "}
-                    {diamondsData[
-                      diamondsData.length - 1
-                    ].target.toLocaleString()}
+                    {(0).toLocaleString()}
                   </Typography>
                 </Grid>
                 <Grid item xs={12} sm={4}>
@@ -682,6 +603,11 @@ const ManagerDashboardPage = () => {
             onRowsPerPageChange={handleChangeRowsPerPage}
             rowsPerPageOptions={[5, 10, 25, 50]}
           />
+
+          {/* Bonus Information */}
+          <Box mt={4}>
+            <CreatorsBonusTable />
+          </Box>
 
           {/* Recent Activity */}
           <Typography variant="h5" sx={{ mb: 2 }}>
