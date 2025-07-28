@@ -80,7 +80,7 @@ const SupportTicket = () => {
           <Typography variant="h5" gutterBottom sx={{ 
             display: 'flex', 
             alignItems: 'center',
-            color: '#FF0050',
+            color: (theme) => theme.palette.primary.main,
             fontWeight: 'bold'
           }}>
             <SupportIcon sx={{ mr: 1 }} />
@@ -147,9 +147,11 @@ const SupportTicket = () => {
             variant="contained"
             startIcon={<Send />}
             onClick={handleSubmit}
+            color="primary"
             sx={{
-              backgroundColor: '#FF0050',
-              '&:hover': { backgroundColor: '#e6004a' }
+              '&:hover': { 
+                backgroundColor: (theme) => theme.palette.primary.dark 
+              }
             }}
           >
             Envoyer le Ticket
@@ -161,7 +163,7 @@ const SupportTicket = () => {
       <Card elevation={3}>
         <CardContent>
           <Typography variant="h6" gutterBottom sx={{ 
-            color: '#25F4EE',
+            color: (theme) => theme.palette.secondary.main,
             fontWeight: 'bold'
           }}>
             Mes Tickets Récents

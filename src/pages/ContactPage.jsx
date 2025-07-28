@@ -429,7 +429,10 @@ const ContactPage = () => {
                   elevation={2}
                   sx={{ borderRadius: 2, overflow: "hidden" }}
                 >
-                  <Box sx={{ bgcolor: "#f5f5f5", p: 2 }}>
+                  <Box sx={{ 
+                    bgcolor: (theme) => theme.palette.mode === 'light' ? '#f5f5f5' : 'grey.800', 
+                    p: 2 
+                  }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>
                       Real-Time Support Tickets
                     </Typography>
@@ -699,8 +702,8 @@ const ContactPage = () => {
                     <Box
                       sx={{
                         p: 2,
-                        bgcolor: "#f8f9fa",
-                        borderBottom: "1px solid #e0e0e0",
+                        bgcolor: (theme) => theme.palette.mode === 'light' ? '#f8f9fa' : 'grey.800',
+                        borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
                       }}
                     >
                       <Box
@@ -760,7 +763,7 @@ const ContactPage = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      bgcolor: "#f8f9fa",
+                      bgcolor: (theme) => theme.palette.mode === 'light' ? '#f8f9fa' : 'grey.800',
                     }}
                   >
                     <Box sx={{ textAlign: "center", color: "text.secondary" }}>
