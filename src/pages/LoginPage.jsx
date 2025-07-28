@@ -317,9 +317,13 @@ const LoginPage = () => {
                 sx={{
                   p: { xs: 3, md: 5 },
                   borderRadius: 4,
-                  background: "rgba(255,255,255,0.95)",
+                  background: (theme) => theme.palette.mode === 'light' 
+                    ? "rgba(255,255,255,0.95)" 
+                    : "rgba(31, 41, 55, 0.95)", // Dark background for dark mode
                   backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255,255,255,0.2)",
+                  border: (theme) => theme.palette.mode === 'light'
+                    ? "1px solid rgba(255,255,255,0.2)"
+                    : "1px solid rgba(255,255,255,0.1)",
                   boxShadow: "0 32px 64px rgba(0,0,0,0.15)",
                 }}
               >
@@ -346,7 +350,7 @@ const LoginPage = () => {
                     variant="h4"
                     sx={{
                       fontWeight: 700,
-                      color: "#2d3748",
+                      color: (theme) => theme.palette.text.primary,
                       mb: 1,
                     }}
                   >
