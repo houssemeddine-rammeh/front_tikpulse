@@ -195,6 +195,22 @@ function App() {
                       element={<TikTokCallbackPage />}
                     />
                     <Route
+                      path="/sig"
+                      element={
+                        <div style={{ 
+                          display: 'flex', 
+                          justifyContent: 'center', 
+                          alignItems: 'center', 
+                          height: '100vh',
+                          fontFamily: 'monospace',
+                          fontSize: '16px',
+                          whiteSpace: 'pre-wrap'
+                        }}>
+                          tiktok-developers-site-verification=8FNV6EUQAjSiPhSiGIsNbHzAP3KZ3FkB
+                        </div>
+                      }
+                    />
+                    <Route
                       path="/privacy"
                       element={
                         <PublicRoute>
