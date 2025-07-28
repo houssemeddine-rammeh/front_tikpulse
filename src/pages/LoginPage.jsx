@@ -39,7 +39,28 @@ import {
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { signIn, clearError } from "../features/authSlice";
-import TikTokAuthService from "../services/tiktokAuth";
+
+// TikTok-compliant PKCE helper functions
+function generateCodeVerifier(length = 64) {
+  const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
+  let result = '';
+  const values = new Uint32Array(length);
+  window.crypto.getRandomValues(values);
+  for (let i = 0; i < length; i++) {
+    result += charset[values[i] % charset.length];
+  }
+  return result;
+}
+async function generateCodeChallenge(codeVerifier) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(codeVerifier);
+  const digest = await window.crypto.subtle.digest('SHA-256', data);
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(digest)))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+  return base64;
+}
 
 const LoginPage = () => {
   const { user, token, isLoading, error } = useSelector((state) => state.auth);
@@ -86,7 +107,7 @@ const LoginPage = () => {
       setFormError("Please fill in all fields");
       return;
     }
-    
+
     setIsSubmitting(true);
     try {
       const resultAction = await dispatch(signIn({ email, password }));
@@ -104,15 +125,17 @@ const LoginPage = () => {
     }
   };
 
-  const handleTikTokLogin = () => {
-    try {
-      const tikTokAuthService = TikTokAuthService.getInstance();
-      const authUrl = tikTokAuthService.generateAuthUrl();
-      window.location.href = authUrl;
-    } catch (error) {
-      console.error("TikTok OAuth initialization error:", error);
-      setFormError("Failed to initialize TikTok login");
-    }
+  const handleTikTokLogin = async () => {
+    // Generate TikTok-compliant PKCE codes
+    const code_verifier = generateCodeVerifier(64);
+    const code_challenge = await generateCodeChallenge(code_verifier);
+    sessionStorage.setItem('tiktok_code_verifier', code_verifier);
+    // Redirect to backend TikTok OAuth endpoint with PKCE
+    // Ensure no double /api/v1 in the URL
+    let apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
+    apiBase = apiBase.replace(/\/?api\/v1\/?$/, ''); // Remove trailing /api/v1 if present
+    const url = `${apiBase}/api/v1/auth/tiktok?code_challenge=${code_challenge}&code_challenge_method=S256`;
+    window.location.href = url;
   };
 
   const demoUsers = [

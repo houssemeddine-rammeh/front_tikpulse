@@ -1,44 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import './AnalyticsDashboard.css';
 import api from '../../services/api';
-
-;
-  timeSeriesData: {
-    date;
-    views;
-    likes;
-    shares;
-    comments;
-    followers;
-  }[];
-  topContent: {
-    id;
-    title;
-    type;
-    views;
-    likes;
-    engagementRate;
-    publishedAt;
-  }[];
-  demographics: {
-    ageGroups: { range; percentage: number }[];
-    genders: { gender; percentage: number }[];
-    locations: { country; percentage: number }[];
-  };
-  performance: {
-    bestPostingTimes: { hour; engagement: number }[];
-    hashtagPerformance: { hashtag; reach; engagement: number }[];
-  };
-}
 
 const AnalyticsDashboard = () => {
   const [analyticsData, setAnalyticsData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('7d');
   const [activeTab, setActiveTab] = useState('overview');
+  const [monthlyStats, setMonthlyStats] = useState(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [monthlyStatsError, setMonthlyStatsError] = useState(null);
 
   useEffect(() => {
     fetchAnalyticsData();
+    fetchMonthlyStats();
   }, []);
 
   const fetchAnalyticsData = async () => {
@@ -51,16 +25,30 @@ const AnalyticsDashboard = () => {
     }
   };
 
+  const fetchMonthlyStats = async () => {
+    setLoadingStats(true);
+    setMonthlyStatsError(null);
+    try {
+      const stats = await api.getMonthlyStats();
+      setMonthlyStats(stats);
+    } catch (error) {
+      setMonthlyStats(null);
+      setMonthlyStatsError('Failed to load monthly stats');
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
   const generateTimeSeriesData = () => {
     const data = [];
-    const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 ;
+    const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
     
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       
       data.push({
-        date).split('T')[0],
+        date: date.toISOString().split('T')[0],
         views: Math.floor(Math.random() * 50000) + 20000,
         likes: Math.floor(Math.random() * 5000) + 2000,
         shares: Math.floor(Math.random() * 1000) + 500,
@@ -108,7 +96,8 @@ const AnalyticsDashboard = () => {
       <div className="analytics-controls">
         <div className="time-range-selector">
           <button
-            className={timeRange === '7d' ? 'active' ) => setTimeRange('7d')}
+            className={timeRange === '7d' ? 'active' : ''}
+            onClick={() => setTimeRange('7d')}
           >
             7 Days
           </button>
@@ -233,12 +222,12 @@ const AnalyticsDashboard = () => {
                     <div
                       className="bar"
                       style={{
-                        height) * 100}%`,
+                        height: `${(data.views / 50000) * 100}%`,
                         backgroundColor: '#ff6b6b',
                       }}
                     ></div>
                     <span className="bar-label">
-                      {new Date(data.date).toLocaleDateString('en-US', { weekday)}
+                      {new Date(data.date).toLocaleDateString('en-US', { weekday: 'numeric' })}
                     </span>
                   </div>
                 ))}
@@ -285,7 +274,11 @@ const AnalyticsDashboard = () => {
                     <div className="demographic-bar">
                       <div
                         className="demographic-fill"
-                        style={{ width))}
+                        style={{ width: `${(group.percentage / 100) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -298,7 +291,11 @@ const AnalyticsDashboard = () => {
                     <div className="demographic-bar">
                       <div
                         className="demographic-fill"
-                        style={{ width))}
+                        style={{ width: `${(gender.percentage / 100) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -311,7 +308,11 @@ const AnalyticsDashboard = () => {
                     <div className="demographic-bar">
                       <div
                         className="demographic-fill"
-                        style={{ width))}
+                        style={{ width: `${(location.percentage / 100) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -346,7 +347,7 @@ const AnalyticsDashboard = () => {
                   <div key={index} className="hashtag-item">
                     <span className="hashtag-name">#{hashtag.hashtag}</span>
                     <div className="hashtag-stats">
-                      <span>Reach)}</span>
+                      <span>Reach: {formatNumber(hashtag.reach)}</span>
                       <span>Engagement: {hashtag.engagement}%</span>
                     </div>
                   </div>
@@ -356,6 +357,53 @@ const AnalyticsDashboard = () => {
           </div>
         </div>
       )}
+
+      {/* Monthly Performance Section */}
+      <div className="monthly-performance-section">
+        <h2>Monthly Performance</h2>
+        {loadingStats ? (
+          <div>Loading monthly stats...</div>
+        ) : monthlyStatsError ? (
+          <div style={{ color: 'red' }}>{monthlyStatsError}</div>
+        ) : monthlyStats ? (
+          <div className="monthly-performance-grid">
+            <div className="monthly-stat-card">
+              <h4>Total Creators (This Month)</h4>
+              <p>{monthlyStats.current.totalCreators ?? '--'}</p>
+            </div>
+            <div className="monthly-stat-card">
+              <h4>Total Creators (Last Month)</h4>
+              <p>{monthlyStats.lastMonth.totalCreators ?? '--'}</p>
+            </div>
+            <div className="monthly-stat-card">
+              <h4>Total Followers (This Month)</h4>
+              <p>{monthlyStats.current.totalFollowers ?? '--'}</p>
+            </div>
+            <div className="monthly-stat-card">
+              <h4>Total Followers (Last Month)</h4>
+              <p>{monthlyStats.lastMonth.totalFollowers ?? '--'}</p>
+            </div>
+            <div className="monthly-stat-card">
+              <h4>Total Views (This Month)</h4>
+              <p>{monthlyStats.current.totalViews ?? '--'}</p>
+            </div>
+            <div className="monthly-stat-card">
+              <h4>Total Views (Last Month)</h4>
+              <p>{monthlyStats.lastMonth.totalViews ?? '--'}</p>
+            </div>
+            <div className="monthly-stat-card">
+              <h4>Total Diamonds (This Month)</h4>
+              <p>{monthlyStats.current.totalDiamonds ?? '--'}</p>
+            </div>
+            <div className="monthly-stat-card">
+              <h4>Total Diamonds (Last Month)</h4>
+              <p>{monthlyStats.lastMonth.totalDiamonds ?? '--'}</p>
+            </div>
+          </div>
+        ) : (
+          <div>No monthly stats available.</div>
+        )}
+      </div>
     </div>
   );
 };

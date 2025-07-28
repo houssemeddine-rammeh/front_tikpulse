@@ -307,7 +307,7 @@ const AdminCreatorManagementPage = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {creators.length === 0 ? (
+                  {creators?.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
                         <Typography color="textSecondary">No creators found</Typography>

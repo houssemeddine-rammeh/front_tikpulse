@@ -892,7 +892,7 @@ const Header = () => {
                   sx={{ fontSize: "0.75rem" }}
                 >
                   {user?.role === UserRole.MANAGER
-                    ? "Senior Manager"
+                    ? "Manager"
                     : user?.role === UserRole.SUB_MANAGER
                     ? "Sub-Manager"
                     : user?.role === UserRole.ADMIN
@@ -906,92 +906,12 @@ const Header = () => {
                     color="primary"
                     sx={{ fontSize: "0.7rem", fontWeight: "bold" }}
                   >
-                    ID:{" "}
-                    {user?.role === UserRole.MANAGER ? "TPA-001" : "TPA-002"}
+                    ID: {user?.tiktokId || "N/A"}
                   </Typography>
                 )}
               </Box>
             </Box>
           </Box>
-
-          {/* Manager-specific quick stats - Hidden on mobile */}
-          {(user?.role === UserRole.MANAGER ||
-            user?.role === UserRole.SUB_MANAGER) &&
-            !isMobile && (
-              <Box
-                sx={{
-                  px: 2,
-                  py: 1,
-                  borderBottom: "1px solid #e0e0e0",
-                  bgcolor: "#f8f9fa",
-                }}
-              >
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  sx={{ fontSize: "0.7rem", mb: 0.5 }}
-                >
-                  Quick Stats
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    gap: 1,
-                  }}
-                >
-                  <Box sx={{ textAlign: "center" }}>
-                    <Typography
-                      variant="body2"
-                      fontWeight="bold"
-                      sx={{ fontSize: "0.9rem" }}
-                    >
-                      {user?.role === UserRole.MANAGER ? "15" : "8"}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: "0.65rem", color: "text.secondary" }}
-                    >
-                      {user?.role === UserRole.MANAGER ? "Managed" : "Assigned"}
-                    </Typography>
-                  </Box>
-                  {user?.role === UserRole.MANAGER && (
-                    <Box sx={{ textAlign: "center" }}>
-                      <Typography
-                        variant="body2"
-                        fontWeight="bold"
-                        sx={{ fontSize: "0.9rem" }}
-                      >
-                        2.8M
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ fontSize: "0.65rem", color: "text.secondary" }}
-                      >
-                        Diamonds
-                      </Typography>
-                    </Box>
-                  )}
-                  <Box sx={{ textAlign: "center" }}>
-                    <Typography
-                      variant="body2"
-                      fontWeight="bold"
-                      sx={{ fontSize: "0.9rem", color: "#4caf50" }}
-                    >
-                      {user?.role === UserRole.MANAGER ? "98%" : "94%"}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ fontSize: "0.65rem", color: "text.secondary" }}
-                    >
-                      {user?.role === UserRole.MANAGER
-                        ? "Success"
-                        : "Completion"}
-                    </Typography>
-                  </Box>
-                </Box>
-              </Box>
-            )}
 
           {/* Profile Menu Items */}
           <MenuItem component={Link} to="/profile" onClick={handleMenuClose}>
@@ -1137,7 +1057,6 @@ const Header = () => {
           </Box>
 
           {/* Top Creators List */}
-     
 
           <Divider />
 

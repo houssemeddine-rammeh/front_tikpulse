@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Box, Typography, CircularProgress, Alert, Container } from '@mui/material';
-import TikTokAuthService from '../services/tiktokAuth';
 import { useAuth } from '../contexts/AuthContext';
 
 const TikTokCallbackPage = () => {
@@ -28,39 +27,36 @@ const TikTokCallbackPage = () => {
 
         setStatus('loading');
 
-        // Handle TikTok OAuth callback
-        const tikTokAuthService = TikTokAuthService.getInstance();
-        const tikTokUser = await tikTokAuthService.handleCallback(code, state);
-
-        // Login or register user with TikTok data
-        await loginWithTikTok({
-          tikTokId: tikTokUser.tikTokId,
-          username: tikTokUser.username,
-          displayName: tikTokUser.displayName,
-          avatar: tikTokUser.avatar
+        // Send code to backend
+        const codeVerifier = sessionStorage.getItem('tiktok_code_verifier');
+        const url = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'}/api/v1/auth/tiktok/callback?code=${encodeURIComponent(code)}${codeVerifier ? `&code_verifier=${encodeURIComponent(codeVerifier)}` : ''}`;
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' },
         });
-
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || data.message || 'TikTok login failed');
+        }
+        const data = await response.json();
+        // Login or register user with TikTok data
+        await loginWithTikTok(data.token);
         setStatus('success');
-
-        // Redirect to dashboard after successful login
         setTimeout(() => {
           navigate('/dashboard');
         }, 2000);
-
       } catch (error) {
         console.error('TikTok OAuth callback error:', error);
         setStatus('error');
         setErrorMessage(error instanceof Error ? error.message : 'An unknown error occurred');
-
-        // Redirect to login page after error
         setTimeout(() => {
           navigate('/login');
         }, 3000);
       }
     };
-
     handleCallback();
-  }, [searchParams, navigate, loginWithTikTok]);
+    // eslint-disable-next-line
+  }, []);
 
   return (
     <Container maxWidth="sm">

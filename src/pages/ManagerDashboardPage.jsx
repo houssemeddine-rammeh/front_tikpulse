@@ -25,6 +25,11 @@ import {
   MenuItem,
   TablePagination,
   Divider,
+  CircularProgress,
+  Alert,
+  Snackbar,
+  DialogContentText,
+  Tooltip as MuiTooltip,
 } from "@mui/material";
 import {
   Diamond as DiamondIcon,
@@ -43,8 +48,10 @@ import {
   Cancel as CancelIcon,
   Add as AddIcon,
   Delete as DeleteIcon,
+  Refresh as RefreshIcon,
+  Warning as WarningIcon,
 } from "@mui/icons-material";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   LineChart,
   Line,
@@ -56,15 +63,29 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import Layout from "../components/layout/Layout";
-import { useDispatch } from "react-redux";
 import { getManagerStats } from "../features/managerDashboardSlice";
 import CreatorsBonusTable from "../components/CreatorsBonusTable";
+import { fetchCreatorsWithBonus, selectCreatorsWithBonus, selectBonusLoading, selectBonusErrors } from '../features/bonusSlice';
+import { fetchMonthlyStats, selectMonthlyStats, fetchDiamondsTrend, selectDiamondsTrend } from '../features/managerDashboardSlice';
+import axiosInstance from '../api/axiosInstance';
 
 const ManagerDashboardPage = () => {
   // Modal states
   const [campaignModalOpen, setCampaignModalOpen] = useState(false);
   const [eventModalOpen, setEventModalOpen] = useState(false);
   const [creatorModalOpen, setCreatorModalOpen] = useState(false);
+  
+  // Reset dialog state
+  const [resetDialog, setResetDialog] = useState({
+    open: false,
+    loading: false
+  });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+
   const dispatch = useDispatch();
   // Form states
   const [campaignForm, setCampaignForm] = useState({
@@ -134,13 +155,100 @@ const ManagerDashboardPage = () => {
       tier: "Bronze",
     });
   };
+
+  // Reset handlers
+  const handleResetClick = () => {
+    setResetDialog({ open: true, loading: false });
+  };
+
+  const handleResetClose = () => {
+    setResetDialog({ open: false, loading: false });
+  };
+
+  const handleResetConfirm = async () => {
+    setResetDialog({ open: true, loading: true });
+    
+    try {
+      const response = await axiosInstance.post('/users/reset-creators-data');
+      
+      setSnackbar({
+        open: true,
+        message: response.data.message,
+        severity: 'success'
+      });
+      
+      // Refresh the data after reset
+      dispatch(fetchCreatorsWithBonus());
+      dispatch(fetchMonthlyStats());
+      dispatch(fetchDiamondsTrend());
+      
+      handleResetClose();
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || 'Erreur lors de la réinitialisation',
+        severity: 'error'
+      });
+      setResetDialog({ open: true, loading: false });
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
+
   const { creators: managerCreators = [], stats = {} } = useSelector(
     (state) => state.managerDashboard.managerData || {}
   );
 
+  // Redux selectors for bonus data
+  const creatorsWithBonus = useSelector(selectCreatorsWithBonus);
+  const bonusLoading = useSelector(selectBonusLoading);
+  const bonusError = useSelector(selectBonusErrors);
+
+  // Redux selectors for monthly stats
+  const monthlyStats = useSelector(selectMonthlyStats);
+  const diamondsTrend = useSelector(selectDiamondsTrend);
+
   React.useEffect(() => {
     dispatch(getManagerStats());
+    dispatch(fetchMonthlyStats());
+    dispatch(fetchDiamondsTrend());
   }, [dispatch]);
+
+  // Helper to format delta
+  const formatDelta = (current, last) => {
+    const diff = current - last;
+    const sign = diff > 0 ? '+' : diff < 0 ? '-' : '';
+    return `${sign}${Math.abs(diff).toLocaleString()}`;
+  };
+
+  // Helper to calculate growth rate
+  const calculateGrowthRate = (current, last) => {
+    if (last === 0) return current > 0 ? 100 : 0;
+    return ((current - last) / last) * 100;
+  };
+
+  // Prepare chart data for diamonds per month using trend data
+  const chartData = diamondsTrend.months.map((month, index) => ({
+    month,
+    diamonds: diamondsTrend.diamonds[index] || 0,
+    target: diamondsTrend.targets[index] || 0,
+  }));
+
+  // Calculate monthly stats from creatorsWithBonus
+  let totalCreators = 0;
+  let totalFollowers = 0;
+  let totalViews = 0;
+  let totalDiamonds = 0;
+  if ((creatorsWithBonus || []).length > 0) {
+    totalCreators = (creatorsWithBonus || []).length;
+    (creatorsWithBonus || []).forEach((creator) => {
+      totalFollowers += creator.profile?.followers || 0;
+      totalViews += creator.profile?.views || 0;
+      totalDiamonds += creator.profile?.diamonds || 0;
+    });
+  }
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10); // You can adjust default value
@@ -185,96 +293,26 @@ const ManagerDashboardPage = () => {
             <Typography variant="h4" component="h1">
               Manager Dashboard
             </Typography>
+            <Button
+              variant="outlined"
+              color="warning"
+              startIcon={<RefreshIcon />}
+              onClick={handleResetClick}
+              sx={{ 
+                borderColor: 'warning.main',
+                color: 'warning.main',
+                '&:hover': {
+                  borderColor: 'warning.dark',
+                  backgroundColor: 'warning.light',
+                  color: 'warning.dark'
+                }
+              }}
+            >
+              Réinitialiser les Données
+            </Button>
           </Box>
 
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={4}>
-              <Card
-                sx={{
-                  height: "100%",
-                  transition: "transform 0.2s",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
-                  },
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <CreatorsIcon sx={{ fontSize: 40, color: "#2e7d32" }} />
-                    <Box sx={{ ml: 2, flex: 1 }}>
-                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        Total Creators
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1 }}>
-                    {managerCreators?.length || 0}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <Card
-                sx={{
-                  height: "100%",
-                  transition: "transform 0.2s",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
-                  },
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <LiveIcon sx={{ fontSize: 40 }} />
-                    <Box sx={{ ml: 2, flex: 1 }}>
-                      <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                        Total Live duration
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1 }}>
-                    {stats?.liveDuration || 0}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-
-            <Grid item xs={12} sm={6} md={4}>
-              <Card
-                sx={{
-                  height: "100%",
-                  transition: "transform 0.2s",
-                  "&:hover": {
-                    transform: "translateY(-4px)",
-                    boxShadow: "0 8px 25px rgba(0,0,0,0.15)",
-                  },
-                }}
-              >
-                <CardContent sx={{ p: 3 }}>
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <ValidDaysIcon sx={{ fontSize: 40, color: "#0288d1" }} />
-                    <Box sx={{ ml: 2, flex: 1 }}>
-                      <Typography
-                        variant="h6"
-                        sx={{ fontWeight: "bold", color: "#0288d1" }}
-                      >
-                        Valid Days ({">"}1h)
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Typography variant="h3" sx={{ fontWeight: "bold", mb: 1 }}>
-                    {stats?.validLiveDays || 0} Days
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          </Grid>
+          {/* Monthly Performance & Analytics */}
 
           {/* Main Stats */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -303,14 +341,18 @@ const ManagerDashboardPage = () => {
               </Card>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" gutterBottom>
-                    Active Creators
-                  </Typography>
-                  <Typography variant="h4">{stats?.activeCount}</Typography>
-                </CardContent>
-              </Card>
+              <MuiTooltip title="Active = valid hours in the last 7 days">
+                <Card>
+                  <CardContent>
+                    <Typography variant="h6" gutterBottom>
+                      Active Creators
+                    </Typography>
+                    <Typography variant="h4" color="success.main">
+                      {(creatorsWithBonus || []).filter(c => c.active).length}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </MuiTooltip>
             </Grid>
           </Grid>
 
@@ -318,291 +360,264 @@ const ManagerDashboardPage = () => {
           <Typography variant="h5" sx={{ mb: 3 }}>
             Monthly Performance
           </Typography>
-          <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={3}>
-              <Card
-                sx={{
-                  bgcolor: "#e3f2fd",
-                  border: "1px solid #2196f3",
-                  "&:hover": {
-                    boxShadow: "0 4px 12px rgba(33, 150, 243, 0.3)",
-                  },
-                }}
-              >
-                <CardContent sx={{ textAlign: "center" }}>
-                  <PersonIcon sx={{ color: "#2196f3", fontSize: 40, mb: 1 }} />
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{ color: "#2196f3", fontWeight: "bold" }}
-                  >
-                    Total Creators from Last Month
-                  </Typography>
-                  <Typography
-                    variant="h3"
-                    sx={{ color: "#1976d2", fontWeight: "bold" }}
-                  >
-                    ----
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: "#1565c0", mt: 1 }}>
-                    Active creators last month
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+          {monthlyStats.loading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
+              <CircularProgress />
+            </Box>
+          ) : monthlyStats.error ? (
+            <Alert severity="error">{monthlyStats.error}</Alert>
+          ) : (
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card
+                  sx={{
+                    bgcolor: "#e3f2fd",
+                    border: "1px solid #2196f3",
+                    "&:hover": {
+                      boxShadow: "0 4px 12px rgba(33, 150, 243, 0.3)",
+                    },
+                  }}
+                >
+                  <CardContent sx={{ textAlign: "center" }}>
+                    <PersonIcon sx={{ color: "#2196f3", fontSize: 40, mb: 1 }} />
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ color: "#2196f3", fontWeight: "bold" }}
+                    >
+                      Total Creators (This Month)
+                    </Typography>
+                    <Typography
+                      variant="h3"
+                      sx={{ color: "#1976d2", fontWeight: "bold" }}
+                    >
+                      {monthlyStats.current.totalCreators.toLocaleString()}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#1565c0", mt: 1 }}>
+                      Last Month: {monthlyStats.lastMonth.totalCreators.toLocaleString()} (<span style={{color: '#2196f3'}}>{formatDelta(monthlyStats.current.totalCreators, monthlyStats.lastMonth.totalCreators)}</span>)
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <Card
-                sx={{
-                  bgcolor: "#e8f5e8",
-                  border: "1px solid #4caf50",
-                  "&:hover": { boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)" },
-                }}
-              >
-                <CardContent sx={{ textAlign: "center" }}>
-                  <FollowersIcon
-                    sx={{ color: "#4caf50", fontSize: 40, mb: 1 }}
-                  />
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{ color: "#4caf50", fontWeight: "bold" }}
-                  >
-                    Total Followers from Last Month
-                  </Typography>
-                  <Typography
-                    variant="h3"
-                    sx={{ color: "#388e3c", fontWeight: "bold" }}
-                  >
-                    ---
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: "#2e7d32", mt: 1 }}>
-                    Followers gained last month
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card
+                  sx={{
+                    bgcolor: "#e8f5e8",
+                    border: "1px solid #4caf50",
+                    "&:hover": { boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)" },
+                  }}
+                >
+                  <CardContent sx={{ textAlign: "center" }}>
+                    <FollowersIcon
+                      sx={{ color: "#4caf50", fontSize: 40, mb: 1 }}
+                    />
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ color: "#4caf50", fontWeight: "bold" }}
+                    >
+                      Total Followers (This Month)
+                    </Typography>
+                    <Typography
+                      variant="h3"
+                      sx={{ color: "#388e3c", fontWeight: "bold" }}
+                    >
+                      {monthlyStats.current.totalFollowers.toLocaleString()}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#2e7d32", mt: 1 }}>
+                      Last Month: {monthlyStats.lastMonth.totalFollowers.toLocaleString()} (<span style={{color: '#4caf50'}}>{formatDelta(monthlyStats.current.totalFollowers, monthlyStats.lastMonth.totalFollowers)}</span>)
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <Card
-                sx={{
-                  bgcolor: "#fff3e0",
-                  border: "1px solid #ff9800",
-                  "&:hover": { boxShadow: "0 4px 12px rgba(255, 152, 0, 0.3)" },
-                }}
-              >
-                <CardContent sx={{ textAlign: "center" }}>
-                  <Typography
-                    variant="h6"
-                    sx={{
-                      color: "#ff9800",
-                      fontSize: 40,
-                      mb: 1,
-                      fontWeight: "bold",
-                    }}
-                  >
-                    👁️
-                  </Typography>
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{ color: "#ff9800", fontWeight: "bold" }}
-                  >
-                    Total Views from Last Month
-                  </Typography>
-                  <Typography
-                    variant="h3"
-                    sx={{ color: "#f57c00", fontWeight: "bold" }}
-                  >
-                    ----
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: "#ef6c00", mt: 1 }}>
-                    Total Valid days form last month
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card
+                  sx={{
+                    bgcolor: "#fff3e0",
+                    border: "1px solid #ff9800",
+                    "&:hover": { boxShadow: "0 4px 12px rgba(255, 152, 0, 0.3)" },
+                  }}
+                >
+                  <CardContent sx={{ textAlign: "center" }}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        color: "#ff9800",
+                        fontSize: 40,
+                        mb: 1,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      👁️
+                    </Typography>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ color: "#ff9800", fontWeight: "bold" }}
+                    >
+                      Total Views (This Month)
+                    </Typography>
+                    <Typography
+                      variant="h3"
+                      sx={{ color: "#f57c00", fontWeight: "bold" }}
+                    >
+                      {monthlyStats.current.totalViews.toLocaleString()}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#ef6c00", mt: 1 }}>
+                      Last Month: {monthlyStats.lastMonth.totalViews.toLocaleString()} (<span style={{color: '#ff9800'}}>{formatDelta(monthlyStats.current.totalViews, monthlyStats.lastMonth.totalViews)}</span>)
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
-              <Card
-                sx={{
-                  bgcolor: "#fce4ec",
-                  border: "1px solid #e91e63",
-                  "&:hover": { boxShadow: "0 4px 12px rgba(233, 30, 99, 0.3)" },
-                }}
-              >
-                <CardContent sx={{ textAlign: "center" }}>
-                  <DiamondIcon sx={{ color: "#e91e63", fontSize: 40, mb: 1 }} />
-                  <Typography
-                    variant="h6"
-                    gutterBottom
-                    sx={{ color: "#e91e63", fontWeight: "bold" }}
-                  >
-                    Total Diamonds from last Month
-                  </Typography>
-                  <Typography
-                    variant="h3"
-                    sx={{ color: "#c2185b", fontWeight: "bold" }}
-                  >
-                    ----
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: "#ad1457", mt: 1 }}>
-                    Diamonds collected this month
-                  </Typography>
-                </CardContent>
-              </Card>
+              <Grid item xs={12} sm={6} md={3}>
+                <Card
+                  sx={{
+                    bgcolor: "#fce4ec",
+                    border: "1px solid #e91e63",
+                    "&:hover": { boxShadow: "0 4px 12px rgba(233, 30, 99, 0.3)" },
+                  }}
+                >
+                  <CardContent sx={{ textAlign: "center" }}>
+                    <DiamondIcon sx={{ color: "#e91e63", fontSize: 40, mb: 1 }} />
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ color: "#e91e63", fontWeight: "bold" }}
+                    >
+                      Total Diamonds (This Month)
+                    </Typography>
+                    <Typography
+                      variant="h3"
+                      sx={{ color: "#c2185b", fontWeight: "bold" }}
+                    >
+                      {monthlyStats.current.totalDiamonds.toLocaleString()}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#ad1457", mt: 1 }}>
+                      Last Month: {monthlyStats.lastMonth.totalDiamonds.toLocaleString()} (<span style={{color: '#e91e63'}}>{formatDelta(monthlyStats.current.totalDiamonds, monthlyStats.lastMonth.totalDiamonds)}</span>)
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
             </Grid>
-          </Grid>
+          )}
 
           {/* Total Diamonds per Month Chart */}
           <Typography variant="h5" sx={{ mb: 2 }}>
             Total Diamonds per Month
           </Typography>
           <Paper sx={{ p: 3, mb: 4 }}>
-            <ResponsiveContainer width="100%" height={400}>
-              <LineChart
-                data={[]} // No data for diamondsData
-                margin={{
-                  top: 20,
-                  right: 30,
-                  left: 20,
-                  bottom: 20,
-                }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis
-                  dataKey="month"
-                  tick={{ fontSize: 12 }}
-                  axisLine={{ stroke: "#e0e0e0" }}
-                />
-                <YAxis
-                  tick={{ fontSize: 12 }}
-                  axisLine={{ stroke: "#e0e0e0" }}
-                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
-                />
-                <Tooltip
-                  formatter={(value, name) => [
-                    `${value.toLocaleString()}`,
-                    name === "diamonds" ? "Actual Diamonds" : "Target Diamonds",
-                  ]}
-                  labelFormatter={(label) => `Month: ${label}`}
-                  contentStyle={{
-                    backgroundColor: "#fff",
-                    border: "1px solid #ccc",
-                    borderRadius: "8px",
-                    boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                  }}
-                />
-                <Legend wrapperStyle={{ paddingTop: "20px" }} />
-                <Line
-                  type="monotone"
-                  dataKey="diamonds"
-                  stroke="#2196f3"
-                  strokeWidth={3}
-                  dot={{ fill: "#2196f3", strokeWidth: 2, r: 6 }}
-                  activeDot={{
-                    r: 8,
-                    stroke: "#2196f3",
-                    strokeWidth: 2,
-                    fill: "#fff",
-                  }}
-                  name="Actual Diamonds"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="target"
-                  stroke="#ff9800"
-                  strokeWidth={2}
-                  strokeDasharray="8 8"
-                  dot={{ fill: "#ff9800", strokeWidth: 2, r: 4 }}
-                  activeDot={{
-                    r: 6,
-                    stroke: "#ff9800",
-                    strokeWidth: 2,
-                    fill: "#fff",
-                  }}
-                  name="Target Diamonds"
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {diamondsTrend.loading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
+                <CircularProgress />
+              </Box>
+            ) : diamondsTrend.error ? (
+              <Alert severity="error">{diamondsTrend.error}</Alert>
+            ) : (
+              <>
+                <ResponsiveContainer width="100%" height={400}>
+                  <LineChart
+                    data={chartData}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 20,
+                      bottom: 20,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis
+                      dataKey="month"
+                      tick={{ fontSize: 12 }}
+                      axisLine={{ stroke: "#e0e0e0" }}
+                    />
+                    <YAxis
+                      tick={{ fontSize: 12 }}
+                      axisLine={{ stroke: "#e0e0e0" }}
+                      tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                    />
+                    <Tooltip
+                      formatter={(value, name) => [
+                        `${value.toLocaleString()}`,
+                        name === "diamonds" ? "Actual Diamonds" : "Target Diamonds",
+                      ]}
+                      labelFormatter={(label) => `Month: ${label}`}
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        border: "1px solid #ccc",
+                        borderRadius: "8px",
+                        boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+                      }}
+                    />
+                    <Legend wrapperStyle={{ paddingTop: "20px" }} />
+                    <Line
+                      type="monotone"
+                      dataKey="diamonds"
+                      stroke="#2196f3"
+                      strokeWidth={3}
+                      dot={{ fill: "#2196f3", strokeWidth: 2, r: 6 }}
+                      activeDot={{
+                        r: 8,
+                        stroke: "#2196f3",
+                        strokeWidth: 2,
+                        fill: "#fff",
+                      }}
+                      name="Actual Diamonds"
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="target"
+                      stroke="#ff9800"
+                      strokeWidth={2}
+                      strokeDasharray="8 8"
+                      dot={{ fill: "#ff9800", strokeWidth: 2, r: 4 }}
+                      activeDot={{
+                        r: 6,
+                        stroke: "#ff9800",
+                        strokeWidth: 2,
+                        fill: "#fff",
+                      }}
+                      name="Target Diamonds"
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
 
-            {/* Chart Summary */}
-            <Box sx={{ mt: 2, p: 2, bgcolor: "#f8f9fa", borderRadius: 1 }}>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={4}>
-                  <Typography variant="body2" color="text.secondary">
-                    Current Month
-                  </Typography>
-                  <Typography variant="h6" sx={{ color: "#2196f3" }}>
-                    💎{" "}
-                    {(0).toLocaleString()}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Typography variant="body2" color="text.secondary">
-                    Monthly Target
-                  </Typography>
-                  <Typography variant="h6" sx={{ color: "#ff9800" }}>
-                    🎯{" "}
-                    {(0).toLocaleString()}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Typography variant="body2" color="text.secondary">
-                    Growth Rate
-                  </Typography>
-                  <Typography variant="h6" sx={{ color: "#4caf50" }}>
-                    📈 +8.5%
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Box>
+                {/* Chart Summary */}
+                <Box sx={{ mt: 2, p: 2, bgcolor: "#f8f9fa", borderRadius: 1 }}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={4}>
+                      <Typography variant="body2" color="text.secondary">
+                        Current Month
+                      </Typography>
+                      <Typography variant="h6" sx={{ color: "#2196f3" }}>
+                        💎{" "}
+                        {monthlyStats.current.totalDiamonds.toLocaleString()}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Typography variant="body2" color="text.secondary">
+                        Monthly Target
+                      </Typography>
+                      <Typography variant="h6" sx={{ color: "#ff9800" }}>
+                        🎯{" "}
+                        {Math.round(monthlyStats.current.totalDiamonds * 1.1).toLocaleString()}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Typography variant="body2" color="text.secondary">
+                        Growth Rate
+                      </Typography>
+                      <Typography variant="h6" sx={{ color: "#4caf50" }}>
+                        📈 {calculateGrowthRate(monthlyStats.current.totalDiamonds, monthlyStats.lastMonth.totalDiamonds).toFixed(1)}%
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                </Box>
+              </>
+            )}
           </Paper>
-
-          {/* Creators Table */}
-          <Typography variant="h5" sx={{ mb: 2 }}>
-            My Creators
-          </Typography>
-          <TableContainer component={Paper} sx={{ mb: 4 }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Username</TableCell>
-                  <TableCell>Followers</TableCell>
-                  <TableCell>Diamonds</TableCell>
-                  <TableCell>Status</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {paginatedCreators?.map((creator) => (
-                  <TableRow key={creator?._id}>
-                    <TableCell>{creator.name}</TableCell>
-                    <TableCell>{creator.username}</TableCell>
-                    <TableCell>{creator?.profile?.followers || 0}</TableCell>
-                    <TableCell>{creator?.profile?.diamonds || 0}</TableCell>
-                    <TableCell>
-                      {creator?.isActive ? (
-                        <span style={{ color: "green" }}>Active</span>
-                      ) : (
-                        <span style={{ color: "red" }}>Inactive</span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-
-          <TablePagination
-            component="div"
-            count={managerCreators?.length || 0}
-            page={page}
-            onPageChange={handleChangePage}
-            rowsPerPage={rowsPerPage}
-            onRowsPerPageChange={handleChangeRowsPerPage}
-            rowsPerPageOptions={[5, 10, 25, 50]}
-          />
 
           {/* Bonus Information */}
           <Box mt={4}>
@@ -617,6 +632,66 @@ const ManagerDashboardPage = () => {
             <Typography>No recent activity to display.</Typography>
           </Paper>
         </Box>
+
+        {/* Reset Confirmation Dialog */}
+        <Dialog
+          open={resetDialog.open}
+          onClose={handleResetClose}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle sx={{ display: 'flex', alignItems: 'center', color: 'warning.main' }}>
+            <WarningIcon sx={{ mr: 1, color: 'warning.main' }} />
+            Réinitialiser les Données des Créateurs
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              <Alert severity="warning" sx={{ mb: 2 }}>
+                <strong>Attention!</strong> Cette action est irréversible.
+              </Alert>
+              Êtes-vous sûr de vouloir réinitialiser toutes les données de profil de vos créateurs ?
+              <br /><br />
+              <strong>Données qui seront réinitialisées :</strong>
+              <ul>
+                <li>Diamants : 0</li>
+                <li>Followers : 0</li>
+                <li>Jours de live valides : 0</li>
+                <li>Durée de live : 0h 0m</li>
+                <li>Streams de live : 0</li>
+                <li>Matches : 0</li>
+                <li>Et toutes les autres métriques...</li>
+              </ul>
+              <br />
+              Cette action affectera {(creatorsWithBonus || []).length} créateur(s).
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleResetClose} disabled={resetDialog.loading}>
+              Annuler
+            </Button>
+            <Button
+              onClick={handleResetConfirm}
+              variant="contained"
+              color="warning"
+              disabled={resetDialog.loading}
+              startIcon={resetDialog.loading ? <RefreshIcon /> : <WarningIcon />}
+            >
+              {resetDialog.loading ? 'Réinitialisation...' : 'Réinitialiser'}
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Snackbar for notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
 
         {/* Create Campaign Modal */}
         <Dialog

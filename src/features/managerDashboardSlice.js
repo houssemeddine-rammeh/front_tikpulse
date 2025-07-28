@@ -382,11 +382,52 @@ export const deleteEvent = createAsyncThunk(
   }
 );
 
+export const fetchMonthlyStats = createAsyncThunk(
+  'managerDashboard/fetchMonthlyStats',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get('/users/monthly-stats');
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || 'Failed to fetch monthly stats'
+      );
+    }
+  }
+);
+
+export const fetchDiamondsTrend = createAsyncThunk(
+  'managerDashboard/fetchDiamondsTrend',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get('/users/diamonds-trend');
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || error.message || 'Failed to fetch diamonds trend'
+      );
+    }
+  }
+);
+
 // Initial state
 const initialState = {
   managerData: null,
   loading: false,
   error: null,
+  monthlyStats: {
+    current: { totalCreators: 0, totalFollowers: 0, totalViews: 0, totalDiamonds: 0 },
+    lastMonth: { totalCreators: 0, totalFollowers: 0, totalViews: 0, totalDiamonds: 0 },
+    loading: false,
+    error: null,
+  },
+  diamondsTrend: {
+    months: [],
+    diamonds: [],
+    targets: [],
+    loading: false,
+    error: null,
+  },
 };
 
 // Manager Dashboard Slice
@@ -788,6 +829,39 @@ const managerDashboardSlice = createSlice({
         state.loading.analytics = false;
         state.error.analytics = action.payload;
       });
+
+    builder
+      .addCase(fetchMonthlyStats.pending, (state) => {
+        state.monthlyStats.loading = true;
+        state.monthlyStats.error = null;
+      })
+      .addCase(fetchMonthlyStats.fulfilled, (state, action) => {
+        state.monthlyStats.loading = false;
+        state.monthlyStats.current = action.payload.current;
+        state.monthlyStats.lastMonth = action.payload.lastMonth;
+        state.monthlyStats.error = null;
+      })
+      .addCase(fetchMonthlyStats.rejected, (state, action) => {
+        state.monthlyStats.loading = false;
+        state.monthlyStats.error = action.payload;
+      });
+
+    builder
+      .addCase(fetchDiamondsTrend.pending, (state) => {
+        state.diamondsTrend.loading = true;
+        state.diamondsTrend.error = null;
+      })
+      .addCase(fetchDiamondsTrend.fulfilled, (state, action) => {
+        state.diamondsTrend.loading = false;
+        state.diamondsTrend.months = action.payload.months;
+        state.diamondsTrend.diamonds = action.payload.diamonds;
+        state.diamondsTrend.targets = action.payload.targets;
+        state.diamondsTrend.error = null;
+      })
+      .addCase(fetchDiamondsTrend.rejected, (state, action) => {
+        state.diamondsTrend.loading = false;
+        state.diamondsTrend.error = action.payload;
+      });
   },
 });
 
@@ -835,6 +909,9 @@ export const selectManagerModals = (state) => ({
   showDeleteModal: state.managerDashboard.showDeleteModal,
   modalType: state.managerDashboard.modalType,
 });
+
+export const selectMonthlyStats = (state) => state.managerDashboard.monthlyStats;
+export const selectDiamondsTrend = (state) => state.managerDashboard.diamondsTrend;
 
 // Export reducer
 export default managerDashboardSlice.reducer;

@@ -29,6 +29,9 @@ import {
   Avatar,
   Fab,
   InputAdornment,
+  Snackbar,
+  Alert,
+  CircularProgress,
 } from "@mui/material";
 import {
   ContactSupport,
@@ -44,6 +47,7 @@ import {
   Person,
   ArrowForward,
   Chat,
+  Save,
 } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
@@ -52,6 +56,7 @@ import RealTimeChat from "../components/messaging/RealTimeChat";
 import Layout from "../components/layout/Layout";
 import { useSelector, useDispatch } from "react-redux";
 import { getToken } from "../utils/tokenManager";
+import axiosInstance from "../api/axiosInstance";
 
 import {
   createTicket,
@@ -79,6 +84,8 @@ const ticketCategoryColors = {
 
 const ContactPage = () => {
   const { user } = useAuth();
+  const isManager = user?.role === UserRole.MANAGER || user?.role === UserRole.SUB_MANAGER;
+  const isAdmin = user?.role === UserRole.ADMIN;
 
   // Form state for creating new tickets
   const [newTicketDialog, setNewTicketDialog] = useState(false);
@@ -97,6 +104,14 @@ const ContactPage = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [sortOrder, setSortOrder] = useState("newest");
+
+  // Status update state
+  const [updatingStatus, setUpdatingStatus] = useState({});
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
 
   const dispatch = useDispatch();
   // Chat state
@@ -222,6 +237,45 @@ const ContactPage = () => {
     setManagerSubject("");
   };
 
+  // Handle status update
+  const handleStatusUpdate = async (ticketId, newStatus) => {
+    if (!isManager && !isAdmin) return;
+    
+    setUpdatingStatus(prev => ({ ...prev, [ticketId]: true }));
+    
+    try {
+      const response = await axiosInstance.put(`/tickets/${ticketId}`, {
+        status: newStatus
+      });
+      
+      // Update the ticket in local filteredTickets state
+      setFilteredTickets((prev) =>
+        prev.map((ticket) =>
+          ticket._id === ticketId ? { ...ticket, status: newStatus } : ticket
+        )
+      );
+      
+      setSnackbar({
+        open: true,
+        message: 'Ticket status updated successfully!',
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Error updating ticket status:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || 'Failed to update ticket status',
+        severity: 'error'
+      });
+    } finally {
+      setUpdatingStatus(prev => ({ ...prev, [ticketId]: false }));
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
+  };
+
   const formatDate = (date) => {
     if (!date) return "";
     const d = typeof date === "string" ? new Date(date) : date;
@@ -327,74 +381,36 @@ const ContactPage = () => {
   return (
     <Layout>
       <Container maxWidth="xl">
-        <Box sx={{ py: 3 }}>
-          {/* Breadcrumbs */}
-          <Breadcrumbs
-            separator={<NavigateNext fontSize="small" />}
-            sx={{ mb: 2 }}
-          >
-            <Link
-              component={RouterLink}
-              to="/dashboard"
-              color="inherit"
-              sx={{ display: "flex", alignItems: "center" }}
-            >
-              <ContactSupport sx={{ mr: 0.5 }} fontSize="inherit" />
-              Dashboard
-            </Link>
-            <Typography color="text.primary">Contact & Support</Typography>
-          </Breadcrumbs>
-
+        <Box sx={{ my: 2 }}>
           {/* Header */}
-          <Paper
-            elevation={3}
-            sx={{
-              p: 4,
-              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-              color: "white",
-              borderRadius: 2,
-              mb: 3,
-            }}
-          >
+          <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={8}>
-                <Typography
-                  variant="h4"
-                  component="h1"
-                  gutterBottom
-                  sx={{ fontWeight: "bold" }}
-                >
-                  Support Center
-                </Typography>
-
-                <Typography variant="body1">
-                  {user?.role === UserRole.ADMIN
-                    ? "View and monitor all support tickets across the platform. You have read-only access to all ticket conversations."
-                    : "Need help with anything? Create a support ticket or contact your manager directly. Our support team is here to assist you."}
-                </Typography>
+              <Grid item xs={12} sm={6}>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                  <ContactSupport sx={{ fontSize: 40, color: "#6200ea" }} />
+                  <Box>
+                    <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
+                      Support Center
+                    </Typography>
+                    <Typography variant="body1" color="text.secondary">
+                      Get help and manage your support tickets
+                    </Typography>
+                  </Box>
+                </Box>
               </Grid>
-              <Grid
-                item
-                xs={12}
-                md={4}
-                sx={{
-                  display: "flex",
-                  justifyContent: { xs: "flex-start", md: "flex-end" },
-                  gap: 2,
-                }}
-              >
-                {/* Contact Manager button for creators only */}
-                {user?.role === UserRole.CREATOR && (
+              <Grid item xs={12} sm={6} sx={{ textAlign: "right" }}>
+                <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
+                  <Link color="inherit" href="/">
+                    Dashboard
+                  </Link>
+                  <Typography color="text.primary">Support</Typography>
+                </Breadcrumbs>
+                {user?.role === "admin" && (
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     startIcon={<Email />}
                     onClick={handleEmailManager}
-                    sx={{
-                      bgcolor: "rgba(255,255,255,0.2)",
-                      "&:hover": {
-                        bgcolor: "rgba(255,255,255,0.3)",
-                      },
-                    }}
+                    sx={{ mt: 1 }}
                   >
                     Contact Manager
                   </Button>
@@ -616,20 +632,54 @@ const ContactPage = () => {
                                       flexWrap: "wrap",
                                     }}
                                   >
-                                    <Chip
-                                      label={getStatusText(ticket.status)}
-                                      size="small"
-                                      sx={{
-                                        bgcolor: `${
-                                          ticketStatusColors[ticket.status] ||
-                                          "#9e9e9e"
-                                        }20`,
-                                        color:
-                                          ticketStatusColors[ticket.status] ||
-                                          "#9e9e9e",
-                                        fontWeight: 500,
-                                      }}
-                                    />
+                                    {isManager || isAdmin ? (
+                                      <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                                        {updatingStatus[ticket._id] ? (
+                                          <CircularProgress size={16} />
+                                        ) : (
+                                          <FormControl size="small" sx={{ minWidth: 100 }}>
+                                            <Select
+                                              value={ticket.status || 'open'}
+                                              onChange={(e) => {
+                                                e.stopPropagation();
+                                                handleStatusUpdate(ticket._id, e.target.value);
+                                              }}
+                                              onClick={(e) => e.stopPropagation()}
+                                              sx={{ 
+                                                height: 24,
+                                                '& .MuiSelect-select': { 
+                                                  py: 0.25,
+                                                  px: 0.5,
+                                                  fontSize: '0.7rem',
+                                                  fontWeight: 500,
+                                                  color: ticketStatusColors[ticket.status] || "#9e9e9e"
+                                                }
+                                              }}
+                                            >
+                                              <MenuItem value="open">Open</MenuItem>
+                                              <MenuItem value="inProgress">In Progress</MenuItem>
+                                              <MenuItem value="resolved">Resolved</MenuItem>
+                                              <MenuItem value="closed">Closed</MenuItem>
+                                            </Select>
+                                          </FormControl>
+                                        )}
+                                      </Box>
+                                    ) : (
+                                      <Chip
+                                        label={getStatusText(ticket.status)}
+                                        size="small"
+                                        sx={{
+                                          bgcolor: `${
+                                            ticketStatusColors[ticket.status] ||
+                                            "#9e9e9e"
+                                          }20`,
+                                          color:
+                                            ticketStatusColors[ticket.status] ||
+                                            "#9e9e9e",
+                                          fontWeight: 500,
+                                        }}
+                                      />
+                                    )}
                                     <Chip
                                       label={getCategoryText(ticket.category)}
                                       size="small"
@@ -711,20 +761,50 @@ const ContactPage = () => {
                           mb: 1,
                         }}
                       >
-                        <Chip
-                          label={getStatusText(selectedTicket.status)}
-                          size="small"
-                          sx={{
-                            bgcolor: `${
-                              ticketStatusColors[selectedTicket.status] ||
-                              "#9e9e9e"
-                            }20`,
-                            color:
-                              ticketStatusColors[selectedTicket.status] ||
-                              "#9e9e9e",
-                            fontWeight: 500,
-                          }}
-                        />
+                        {isManager || isAdmin ? (
+                          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                            {updatingStatus[selectedTicket._id] ? (
+                              <CircularProgress size={16} />
+                            ) : (
+                              <FormControl size="small" sx={{ minWidth: 120 }}>
+                                <Select
+                                  value={selectedTicket.status || 'open'}
+                                  onChange={(e) => handleStatusUpdate(selectedTicket._id, e.target.value)}
+                                  sx={{ 
+                                    height: 32,
+                                    '& .MuiSelect-select': { 
+                                      py: 0.5,
+                                      px: 1,
+                                      fontSize: '0.75rem',
+                                      fontWeight: 500,
+                                      color: ticketStatusColors[selectedTicket.status] || "#9e9e9e"
+                                    }
+                                  }}
+                                >
+                                  <MenuItem value="open">Open</MenuItem>
+                                  <MenuItem value="inProgress">In Progress</MenuItem>
+                                  <MenuItem value="resolved">Resolved</MenuItem>
+                                  <MenuItem value="closed">Closed</MenuItem>
+                                </Select>
+                              </FormControl>
+                            )}
+                          </Box>
+                        ) : (
+                          <Chip
+                            label={getStatusText(selectedTicket.status)}
+                            size="small"
+                            sx={{
+                              bgcolor: `${
+                                ticketStatusColors[selectedTicket.status] ||
+                                "#9e9e9e"
+                              }20`,
+                              color:
+                                ticketStatusColors[selectedTicket.status] ||
+                                "#9e9e9e",
+                              fontWeight: 500,
+                            }}
+                          />
+                        )}
                         <Chip
                           label={getCategoryText(selectedTicket.category)}
                           size="small"
@@ -802,48 +882,7 @@ const ContactPage = () => {
                   subject: e.target.value,
                 }))
               }
-              sx={{ mb: 2 }}
             />
-
-            <FormControl fullWidth margin="dense" sx={{ mb: 2 }}>
-              <InputLabel>Category</InputLabel>
-              <Select
-                value={newTicketData.category}
-                onChange={(e) =>
-                  setNewTicketData((prev) => ({
-                    ...prev,
-                    category: e.target.value,
-                  }))
-                }
-                label="Category"
-              >
-                <MenuItem value="general">General Inquiry</MenuItem>
-                <MenuItem value="match_planning">Match Planning</MenuItem>
-                <MenuItem value="bug_report">Bug Report</MenuItem>
-                <MenuItem value="ban_report">Ban Report</MenuItem>
-                <MenuItem value="departure_request">Departure Request</MenuItem>
-              </Select>
-            </FormControl>
-
-            <FormControl fullWidth margin="dense" sx={{ mb: 2 }}>
-              <InputLabel>Priority</InputLabel>
-              <Select
-                value={newTicketData.priority}
-                onChange={(e) =>
-                  setNewTicketData((prev) => ({
-                    ...prev,
-                    priority: e.target.value,
-                  }))
-                }
-                label="Priority"
-              >
-                <MenuItem value="low">Low</MenuItem>
-                <MenuItem value="medium">Medium</MenuItem>
-                <MenuItem value="high">High</MenuItem>
-                <MenuItem value="urgent">Urgent</MenuItem>
-              </Select>
-            </FormControl>
-
             <TextField
               margin="dense"
               label="Description"
@@ -858,16 +897,62 @@ const ContactPage = () => {
                   description: e.target.value,
                 }))
               }
-              placeholder="Please describe your issue or question in detail..."
             />
+            <Grid container spacing={2} sx={{ mt: 1 }}>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Category</InputLabel>
+                  <Select
+                    value={newTicketData.category}
+                    onChange={(e) =>
+                      setNewTicketData((prev) => ({
+                        ...prev,
+                        category: e.target.value,
+                      }))
+                    }
+                    label="Category"
+                  >
+                    <MenuItem value="general">General</MenuItem>
+                    <MenuItem value="match_planning">Match Planning</MenuItem>
+                    <MenuItem value="bug_report">Bug Report</MenuItem>
+                    <MenuItem value="ban_report">Ban Report</MenuItem>
+                    <MenuItem value="departure_request">Departure Request</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={6}>
+                <FormControl fullWidth>
+                  <InputLabel>Priority</InputLabel>
+                  <Select
+                    value={newTicketData.priority}
+                    onChange={(e) =>
+                      setNewTicketData((prev) => ({
+                        ...prev,
+                        priority: e.target.value,
+                      }))
+                    }
+                    label="Priority"
+                  >
+                    <MenuItem value="low">Low</MenuItem>
+                    <MenuItem value="medium">Medium</MenuItem>
+                    <MenuItem value="high">High</MenuItem>
+                    <MenuItem value="urgent">Urgent</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleNewTicketClose}>Cancel</Button>
             <Button
               onClick={handleNewTicketSubmit}
               variant="contained"
-              disabled={!newTicketData.subject || !newTicketData.description}
-              sx={{ bgcolor: "#6200ea", "&:hover": { bgcolor: "#3700b3" } }}
+              disabled={
+                !newTicketData.subject ||
+                !newTicketData.description ||
+                !newTicketData.category ||
+                !newTicketData.priority
+              }
             >
               Create Ticket
             </Button>
@@ -923,6 +1008,18 @@ const ContactPage = () => {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Snackbar for notifications */}
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        >
+          <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
       </Container>
     </Layout>
   );

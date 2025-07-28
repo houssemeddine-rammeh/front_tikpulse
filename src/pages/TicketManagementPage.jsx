@@ -21,7 +21,10 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Button
+  Button,
+  Snackbar,
+  Alert,
+  CircularProgress
 } from '@mui/material';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { 
@@ -30,13 +33,15 @@ import {
   Search,
   FilterList,
   Visibility,
-  Sort
+  Sort,
+  Save
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import { ticketsAPI } from '../services/api';
 import { UserRole } from '../types';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import axiosInstance from '../api/axiosInstance';
 
 // Ticket status types and colors
 const ticketStatusColors = {
@@ -67,6 +72,7 @@ const TicketManagementPage = () => {
   const { user } = useAuth();
   const location = useLocation();
   const isAdmin = user?.role === UserRole.ADMIN;
+  const isManager = user?.role === UserRole.MANAGER || user?.role === UserRole.SUB_MANAGER;
   
   const [tickets, setTickets] = useState([]);
   const [filteredTickets, setFilteredTickets] = useState([]);
@@ -78,6 +84,14 @@ const TicketManagementPage = () => {
   
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Status update state
+  const [updatingStatus, setUpdatingStatus] = useState({});
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
 
   useEffect(() => {
     fetchTickets();
@@ -87,13 +101,55 @@ const TicketManagementPage = () => {
     setIsLoading(true);
     setError(null);
     try {
-      setTickets([]);
+      const response = await axiosInstance.get('/tickets');
+      setTickets(response.data.data || []);
     } catch (err) {
       console.error('Error fetching tickets:', err);
       setError('Failed to load tickets. Please try again later.');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  // Handle status update
+  const handleStatusUpdate = async (ticketId, newStatus) => {
+    if (!isManager && !isAdmin) return;
+    
+    setUpdatingStatus(prev => ({ ...prev, [ticketId]: true }));
+    
+    try {
+      const response = await axiosInstance.put(`/tickets/${ticketId}`, {
+        status: newStatus
+      });
+      
+      // Update the ticket in local state
+      setTickets(prevTickets => 
+        prevTickets.map(ticket => 
+          ticket._id === ticketId 
+            ? { ...ticket, status: newStatus }
+            : ticket
+        )
+      );
+      
+      setSnackbar({
+        open: true,
+        message: 'Ticket status updated successfully!',
+        severity: 'success'
+      });
+    } catch (error) {
+      console.error('Error updating ticket status:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || 'Failed to update ticket status',
+        severity: 'error'
+      });
+    } finally {
+      setUpdatingStatus(prev => ({ ...prev, [ticketId]: false }));
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar(prev => ({ ...prev, open: false }));
   };
 
   // Apply filters and sorting
@@ -324,10 +380,10 @@ const TicketManagementPage = () => {
                   </TableRow>
                 ) : (
                   filteredTickets.map((ticket) => (
-                    <TableRow key={ticket.id} hover>
-                      <TableCell>{ticket.id}</TableCell>
+                    <TableRow key={ticket._id} hover>
+                      <TableCell>{ticket._id}</TableCell>
                       <TableCell>{ticket.title}</TableCell>
-                      <TableCell>{ticket.creatorId}</TableCell>
+                      <TableCell>{ticket.sender?.username || 'Unknown'}</TableCell>
                       <TableCell>
                         <Chip 
                           label={getCategoryText(ticket.category)} 
@@ -351,22 +407,52 @@ const TicketManagementPage = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        <Chip 
-                          label={getStatusText(ticket.status)} 
-                          size="small" 
-                          sx={{ 
-                            bgcolor: `${ticketStatusColors[ticket.status] || ticketStatusColors.open}20`,
-                            color: ticketStatusColors[ticket.status] || ticketStatusColors.open,
-                            fontWeight: 500
-                          }} 
-                        />
+                        {isManager || isAdmin ? (
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {updatingStatus[ticket._id] ? (
+                              <CircularProgress size={16} />
+                            ) : (
+                              <FormControl size="small" sx={{ minWidth: 120 }}>
+                                <Select
+                                  value={ticket.status || 'open'}
+                                  onChange={(e) => handleStatusUpdate(ticket._id, e.target.value)}
+                                  sx={{ 
+                                    height: 32,
+                                    '& .MuiSelect-select': { 
+                                      py: 0.5,
+                                      px: 1,
+                                      fontSize: '0.75rem',
+                                      fontWeight: 500,
+                                      color: ticketStatusColors[ticket.status] || ticketStatusColors.open
+                                    }
+                                  }}
+                                >
+                                  <MenuItem value="open">Open</MenuItem>
+                                  <MenuItem value="in_progress">In Progress</MenuItem>
+                                  <MenuItem value="resolved">Resolved</MenuItem>
+                                  <MenuItem value="closed">Closed</MenuItem>
+                                </Select>
+                              </FormControl>
+                            )}
+                          </Box>
+                        ) : (
+                          <Chip 
+                            label={getStatusText(ticket.status)} 
+                            size="small" 
+                            sx={{ 
+                              bgcolor: `${ticketStatusColors[ticket.status] || ticketStatusColors.open}20`,
+                              color: ticketStatusColors[ticket.status] || ticketStatusColors.open,
+                              fontWeight: 500
+                            }} 
+                          />
+                        )}
                       </TableCell>
                       <TableCell>{formatDateTime(ticket.updatedAt)}</TableCell>
                       <TableCell align="right">
                         <IconButton 
                           size="small" 
                           component={RouterLink} 
-                          to={`${location.pathname}/${ticket.id}`}
+                          to={`${location.pathname}/${ticket._id}`}
                           sx={{ color: '#1976d2' }}
                         >
                           <Visibility fontSize="small" />
@@ -380,6 +466,18 @@ const TicketManagementPage = () => {
           </TableContainer>
         </Paper>
       </Box>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity} sx={{ width: '100%' }}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

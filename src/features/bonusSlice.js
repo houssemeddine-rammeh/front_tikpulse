@@ -105,8 +105,14 @@ const bonusSlice = createSlice({
       })
       .addCase(fetchCreatorsWithBonus.fulfilled, (state, action) => {
         state.loading.creators = false;
-        state.creatorsWithBonus = action.payload.data.creators;
-        state.totalBonus = action.payload.data.totalBonus;
+        // Accept both array and object responses
+        state.creatorsWithBonus = Array.isArray(action.payload.data)
+          ? action.payload.data
+          : action.payload.data.creators || [];
+        // Recalculate totalBonus if needed
+        state.totalBonus = Array.isArray(state.creatorsWithBonus)
+          ? state.creatorsWithBonus.reduce((sum, c) => sum + (c.bonus?.bonusAmount || 0), 0)
+          : 0;
         state.error.creators = null;
       })
       .addCase(fetchCreatorsWithBonus.rejected, (state, action) => {

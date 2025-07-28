@@ -152,6 +152,20 @@ const api = {
     }
   },
 
+  async getMonthlyStats() {
+    try {
+      // Use the new endpoint for manager analytics
+      const response = await axiosInstance.get("/users/monthly-stats");
+      return response.data.data;
+    } catch (error) {
+      console.warn("Backend not available, returning empty monthly stats");
+      return {
+        current: { totalCreators: 0, totalFollowers: 0, totalViews: 0, totalDiamonds: 0 },
+        lastMonth: { totalCreators: 0, totalFollowers: 0, totalViews: 0, totalDiamonds: 0 },
+      };
+    }
+  },
+
   async getPerformanceMetrics(params) {
     try {
       const response = await axiosInstance.get("/analytics/performance", {
