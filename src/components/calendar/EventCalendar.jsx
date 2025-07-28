@@ -4,10 +4,19 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./EventCalendar.css";
 import { buildApiUrl, getApiHeaders } from "../../config/api";
+import { 
+  Box, 
+  Typography, 
+  CircularProgress, 
+  useTheme,
+  alpha 
+} from "@mui/material";
 
 const localizer = momentLocalizer(moment);
 
 const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
+  const theme = useTheme();
+  
   const getEventTypeColor = (type) => {
     switch (type?.toLowerCase()) {
       case "live stream":
@@ -29,7 +38,7 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
       case "match":
         return "#32CD32"; // LimeGreen
       default:
-        return "#1976d2"; // Default Blue
+        return theme.palette.primary.main; // Use theme primary color
     }
   };
   const eventStyleGetter = (event) => {
@@ -81,71 +90,205 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
 
   if (loading) {
     return (
-      <div className="calendar-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading calendar...</p>
-      </div>
+      <Box 
+        sx={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          alignItems: 'center', 
+          justifyContent: 'center',
+          py: 8,
+          textAlign: 'center'
+        }}
+      >
+        <CircularProgress size={48} sx={{ mb: 2 }} />
+        <Typography variant="h6" color="text.primary">
+          Loading calendar...
+        </Typography>
+      </Box>
     );
   }
 
   return (
-    <div className="event-calendar-container">
-      <div className="calendar-header">
-        <h2>📅 Events Calendar</h2>
-        <div className="calendar-legend">
-          <div className="legend-item">
-            <span
+    <Box 
+      className={`event-calendar-container ${theme.palette.mode === 'dark' ? 'dark-mode' : 'light-mode'}`}
+      sx={{ 
+        bgcolor: theme.palette.background.paper,
+        borderRadius: 2,
+        p: 3,
+        border: `1px solid ${theme.palette.divider}`
+      }}
+    >
+      <Box className="calendar-header" sx={{ mb: 3 }}>
+        <Typography 
+          variant="h5" 
+          component="h2" 
+          gutterBottom 
+          sx={{ 
+            fontWeight: 'bold',
+            color: theme.palette.text.primary,
+            mb: 2 
+          }}
+        >
+          📅 Events Calendar
+        </Typography>
+        <Box 
+          className="calendar-legend"
+          sx={{ 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            gap: 2,
+            mb: 3 
+          }}
+        >
+          <Box className="legend-item" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
               className="legend-color"
-              style={{ backgroundColor: "#ff6b35" }}
-            ></span>
-            <span>Tournament</span>
-          </div>
-          <div className="legend-item">
-            <span
+              sx={{ 
+                width: 16, 
+                height: 16, 
+                borderRadius: 1,
+                backgroundColor: "#FFD700" 
+              }}
+            />
+            <Typography variant="body2" color="text.secondary">Tournament</Typography>
+          </Box>
+          <Box className="legend-item" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
               className="legend-color"
-              style={{ backgroundColor: "#4caf50" }}
-            ></span>
-            <span>Challenge</span>
-          </div>
-          <div className="legend-item">
-            <span
+              sx={{ 
+                width: 16, 
+                height: 16, 
+                borderRadius: 1,
+                backgroundColor: "#FF4500" 
+              }}
+            />
+            <Typography variant="body2" color="text.secondary">Challenge</Typography>
+          </Box>
+          <Box className="legend-item" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
               className="legend-color"
-              style={{ backgroundColor: "#2196f3" }}
-            ></span>
-            <span>Meeting</span>
-          </div>
-          <div className="legend-item">
-            <span
+              sx={{ 
+                width: 16, 
+                height: 16, 
+                borderRadius: 1,
+                backgroundColor: "#1E90FF" 
+              }}
+            />
+            <Typography variant="body2" color="text.secondary">Meeting</Typography>
+          </Box>
+          <Box className="legend-item" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
               className="legend-color"
-              style={{ backgroundColor: "#9c27b0" }}
-            ></span>
-            <span>Match</span>
-          </div>
-        </div>
-      </div>
+              sx={{ 
+                width: 16, 
+                height: 16, 
+                borderRadius: 1,
+                backgroundColor: "#32CD32" 
+              }}
+            />
+            <Typography variant="body2" color="text.secondary">Match</Typography>
+          </Box>
+        </Box>
+      </Box>
 
-      <div className="calendar-stats">
-        <div className="stat-item">
-          <span className="stat-number">
+      <Box 
+        className="calendar-stats"
+        sx={{ 
+          display: 'flex', 
+          gap: 3, 
+          mb: 3,
+          flexWrap: 'wrap'
+        }}
+      >
+        <Box 
+          className="stat-item"
+          sx={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            alignItems: 'center',
+            p: 2,
+            bgcolor: alpha(theme.palette.primary.main, 0.1),
+            borderRadius: 2,
+            minWidth: 100
+          }}
+        >
+          <Typography 
+            variant="h6" 
+            component="span" 
+            sx={{ 
+              fontWeight: 'bold',
+              color: theme.palette.primary.main 
+            }}
+          >
             {events.filter((e) => e.type === "tournament").length}
-          </span>
-          <span className="stat-label">Tournaments</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-number">
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Tournaments
+          </Typography>
+        </Box>
+        <Box 
+          className="stat-item"
+          sx={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            alignItems: 'center',
+            p: 2,
+            bgcolor: alpha(theme.palette.secondary.main, 0.1),
+            borderRadius: 2,
+            minWidth: 100
+          }}
+        >
+          <Typography 
+            variant="h6" 
+            component="span" 
+            sx={{ 
+              fontWeight: 'bold',
+              color: theme.palette.secondary.main 
+            }}
+          >
             {events.filter((e) => e.type === "challenge").length}
-          </span>
-          <span className="stat-label">Challenges</span>
-        </div>
-        <div className="stat-item">
-          <span className="stat-number">
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Challenges
+          </Typography>
+        </Box>
+        <Box 
+          className="stat-item"
+          sx={{ 
+            display: 'flex', 
+            flexDirection: 'column',
+            alignItems: 'center',
+            p: 2,
+            bgcolor: alpha(theme.palette.success.main, 0.1),
+            borderRadius: 2,
+            minWidth: 100
+          }}
+        >
+          <Typography 
+            variant="h6" 
+            component="span" 
+            sx={{ 
+              fontWeight: 'bold',
+              color: theme.palette.success.main 
+            }}
+          >
             {events.filter((e) => e.type === "match").length}
-          </span>
-          <span className="stat-label">Matches</span>
-        </div>
-      </div>
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Matches
+          </Typography>
+        </Box>
+      </Box>
 
-      <div className="calendar-wrapper">
+      <Box 
+        className="calendar-wrapper"
+        sx={{ 
+          bgcolor: theme.palette.background.default,
+          borderRadius: 2,
+          p: 2,
+          border: `1px solid ${theme.palette.divider}`
+        }}
+      >
         <Calendar
           localizer={localizer}
           events={events}
@@ -165,8 +308,8 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
           }
           dayLayoutAlgorithm="no-overlap"
         />
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
