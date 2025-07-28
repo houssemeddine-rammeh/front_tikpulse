@@ -27,6 +27,7 @@ import {
   CircularProgress,
   Avatar,
   Divider,
+  alpha,
 } from "@mui/material";
 import {
   Diamond,
@@ -200,7 +201,7 @@ const CreatorDashboardPage = () => {
               <Typography
                 variant="h5"
                 gutterBottom
-                sx={{ color: "#1976d2", fontWeight: "bold" }}
+                sx={{ color: (theme) => theme.palette.primary.main, fontWeight: "bold" }}
               >
                 💎 Agency Bonus Program
               </Typography>
@@ -249,7 +250,7 @@ const CreatorDashboardPage = () => {
                   <Typography variant="h6" gutterBottom>
                     Requirements Progress
                   </Typography>
-                  <Box sx={{ bgcolor: "#f5f5f5", p: 2, borderRadius: 1 }}>
+                  <Box sx={{ bgcolor: (theme) => theme.palette.mode === 'light' ? '#f5f5f5' : 'grey.800', p: 2, borderRadius: 1 }}>
                     <Typography variant="body2" sx={{ mb: 1 }}>
                       Valid Live Days: {creator?.profile?.validLiveDays ?? 0}/
                       {agencyBonus?.requirements?.minValidDays ?? 20}
@@ -273,7 +274,7 @@ const CreatorDashboardPage = () => {
               <Typography
                 variant="h5"
                 gutterBottom
-                sx={{ color: "#1976d2", fontWeight: "bold" }}
+                sx={{ color: (theme) => theme.palette.primary.main, fontWeight: "bold" }}
               >
                 🤝 Sponsorship Earnings
               </Typography>
@@ -283,13 +284,13 @@ const CreatorDashboardPage = () => {
                     sx={{
                       textAlign: "center",
                       p: 2,
-                      bgcolor: "#e8f5e8",
+                      bgcolor: (theme) => theme.palette.mode === 'light' ? '#e8f5e8' : alpha(theme.palette.success.main, 0.1),
                       borderRadius: 1,
                     }}
                   >
                     <Typography
                       variant="h4"
-                      sx={{ color: "#4caf50", fontWeight: "bold" }}
+                      sx={{ color: (theme) => theme.palette.success.main, fontWeight: "bold" }}
                     >
                       €
                       {activeSponsorships.reduce(
@@ -307,13 +308,13 @@ const CreatorDashboardPage = () => {
                     sx={{
                       textAlign: "center",
                       p: 2,
-                      bgcolor: "#f3e5f5",
+                      bgcolor: (theme) => theme.palette.mode === 'light' ? '#f3e5f5' : alpha(theme.palette.secondary.main, 0.1),
                       borderRadius: 1,
                     }}
                   >
                     <Typography
                       variant="h4"
-                      sx={{ color: "#9c27b0", fontWeight: "bold" }}
+                      sx={{ color: (theme) => theme.palette.secondary.main, fontWeight: "bold" }}
                     >
                       {activeSponsorships.length}
                     </Typography>
@@ -327,13 +328,13 @@ const CreatorDashboardPage = () => {
                     sx={{
                       textAlign: "center",
                       p: 2,
-                      bgcolor: "#fff3e0",
+                      bgcolor: (theme) => theme.palette.mode === 'light' ? '#fff3e0' : alpha(theme.palette.warning.main, 0.1),
                       borderRadius: 1,
                     }}
                   >
                     <Typography
                       variant="h4"
-                      sx={{ color: "#ff9800", fontWeight: "bold" }}
+                      sx={{ color: (theme) => theme.palette.warning.main, fontWeight: "bold" }}
                     >
                       {
                         sponsorships.filter((s) => s.status === "pending")
@@ -355,7 +356,7 @@ const CreatorDashboardPage = () => {
               <Typography
                 variant="h5"
                 gutterBottom
-                sx={{ color: "#1976d2", fontWeight: "bold" }}
+                sx={{ color: (theme) => theme.palette.primary.main, fontWeight: "bold" }}
               >
                 📞 Contact Information
               </Typography>
@@ -365,19 +366,19 @@ const CreatorDashboardPage = () => {
                     Creator Details
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <Email sx={{ mr: 1, color: "#1976d2" }} />
+                    <Email sx={{ mr: 1, color: (theme) => theme.palette.primary.main }} />
                     <Typography variant="body1">
                       {creator?.email ?? ""}
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <Phone sx={{ mr: 1, color: "#1976d2" }} />
+                    <Phone sx={{ mr: 1, color: (theme) => theme.palette.primary.main }} />
                     <Typography variant="body1">
                       {creator?.phone ?? ""}
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <CalendarToday sx={{ mr: 1, color: "#1976d2" }} />
+                    <CalendarToday sx={{ mr: 1, color: (theme) => theme.palette.primary.main }} />
                     <Typography variant="body1">
                       Joined{" "}
                       {moment(creator?.joinedDate).format("MMM D, YYYY h:mm A")}
@@ -389,20 +390,20 @@ const CreatorDashboardPage = () => {
                     Agency Support
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <Business sx={{ mr: 1, color: "#1976d2" }} />
+                    <Business sx={{ mr: 1, color: (theme) => theme.palette.primary.main }} />
                     <Typography variant="body1">
                     {creator?.manager?.agency?.name}
 
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <Person sx={{ mr: 1, color: "#1976d2" }} />
+                    <Person sx={{ mr: 1, color: (theme) => theme.palette.primary.main }} />
                     <Typography variant="body1">
                       Manager: {creator?.manager?.username}
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Email sx={{ mr: 1, color: "#1976d2" }} />
+                    <Email sx={{ mr: 1, color: (theme) => theme.palette.primary.main }} />
                     <Typography variant="body1">
                       {creator?.manager?.email}
                     </Typography>
