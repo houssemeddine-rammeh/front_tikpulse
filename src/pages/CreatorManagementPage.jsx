@@ -31,6 +31,7 @@ import {
   Stack,
   Alert,
   Pagination,
+  alpha,
 } from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -291,7 +292,7 @@ const CreatorManagementPage = () => {
               <Typography
                 variant="h4"
                 component="h1"
-                sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}
+                sx={{ fontWeight: 700, color: (theme) => theme.palette.text.primary, mb: 1 }}
               >
                 Creator Management
               </Typography>
@@ -337,8 +338,8 @@ const CreatorManagementPage = () => {
                 sx={{
                   p: 2.5,
                   borderRadius: 3,
-                  border: "1px solid #e0e7ff",
-                  bgcolor: "#f8faff",
+                  border: (theme) => `1px solid ${theme.palette.divider}`,
+                  bgcolor: (theme) => theme.palette.mode === 'light' ? '#f8faff' : 'grey.800',
                 }}
               >
                 <TextField
@@ -354,8 +355,11 @@ const CreatorManagementPage = () => {
                     ),
                     sx: {
                       borderRadius: 2,
-                      bgcolor: "white",
-                      "& fieldset": { borderColor: "#e0e7ff", borderWidth: 1 },
+                      bgcolor: (theme) => theme.palette.background.paper,
+                      "& fieldset": { 
+                        borderColor: (theme) => theme.palette.divider, 
+                        borderWidth: 1 
+                      },
                       "&:hover fieldset": {
                         borderColor: "#667eea",
                         borderWidth: 1,
@@ -429,8 +433,8 @@ const CreatorManagementPage = () => {
           sx={{
             borderRadius: 3,
             overflow: "hidden",
-            border: "1px solid #e0e7ff",
-            bgcolor: "white",
+            border: (theme) => `1px solid ${theme.palette.divider}`,
+            bgcolor: (theme) => theme.palette.background.paper,
           }}
         >
           <TableContainer>
@@ -485,12 +489,12 @@ const CreatorManagementPage = () => {
             ) : (
               <>
                 <Table>
-                  <TableHead sx={{ bgcolor: "#f8faff" }}>
+                  <TableHead sx={{ bgcolor: (theme) => theme.palette.mode === 'light' ? '#f8faff' : 'grey.900' }}>
                     <TableRow>
                       <TableCell
                         sx={{
                           fontWeight: 700,
-                          color: "#374151",
+                          color: (theme) => theme.palette.text.primary,
                           fontSize: "0.9rem",
                           py: 2.5,
                         }}
@@ -500,7 +504,7 @@ const CreatorManagementPage = () => {
                       <TableCell
                         sx={{
                           fontWeight: 700,
-                          color: "#374151",
+                          color: (theme) => theme.palette.text.primary,
                           fontSize: "0.9rem",
                           py: 2.5,
                         }}
@@ -510,7 +514,7 @@ const CreatorManagementPage = () => {
                       <TableCell
                         sx={{
                           fontWeight: 700,
-                          color: "#374151",
+                          color: (theme) => theme.palette.text.primary,
                           fontSize: "0.9rem",
                           py: 2.5,
                           cursor: "pointer",
@@ -537,7 +541,7 @@ const CreatorManagementPage = () => {
                       <TableCell
                         sx={{
                           fontWeight: 700,
-                          color: "#374151",
+                          color: (theme) => theme.palette.text.primary,
                           fontSize: "0.9rem",
                           py: 2.5,
                           cursor: "pointer",
@@ -564,7 +568,7 @@ const CreatorManagementPage = () => {
                       <TableCell
                         sx={{
                           fontWeight: 700,
-                          color: "#374151",
+                          color: (theme) => theme.palette.text.primary,
                           fontSize: "0.9rem",
                           py: 2.5,
                         }}
@@ -574,7 +578,7 @@ const CreatorManagementPage = () => {
                       <TableCell
                         sx={{
                           fontWeight: 700,
-                          color: "#374151",
+                          color: (theme) => theme.palette.text.primary,
                           fontSize: "0.9rem",
                           py: 2.5,
                         }}
@@ -584,7 +588,7 @@ const CreatorManagementPage = () => {
                       <TableCell
                         sx={{
                           fontWeight: 700,
-                          color: "#374151",
+                          color: (theme) => theme.palette.text.primary,
                           fontSize: "0.9rem",
                           py: 2.5,
                         }}
@@ -594,7 +598,7 @@ const CreatorManagementPage = () => {
                       <TableCell
                         sx={{
                           fontWeight: 700,
-                          color: "#374151",
+                          color: (theme) => theme.palette.text.primary,
                           fontSize: "0.9rem",
                           py: 2.5,
                         }}
@@ -604,7 +608,7 @@ const CreatorManagementPage = () => {
                       <TableCell
                         sx={{
                           fontWeight: 700,
-                          color: "#374151",
+                          color: (theme) => theme.palette.text.primary,
                           fontSize: "0.9rem",
                           py: 2.5,
                           textAlign: "right",
@@ -620,9 +624,9 @@ const CreatorManagementPage = () => {
                         key={creator.id}
                         hover
                         sx={{
-                          "&:hover": { bgcolor: "#f8faff" },
+                          "&:hover": { bgcolor: (theme) => theme.palette.mode === 'light' ? '#f8faff' : 'grey.800' },
                           transition: "background-color 0.2s ease",
-                          borderBottom: "1px solid #f1f5f9",
+                          borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
                         }}
                       >
                         <TableCell sx={{ py: 2.5 }}>
@@ -658,7 +662,7 @@ const CreatorManagementPage = () => {
                             <Typography
                               variant="body1"
                               fontWeight={600}
-                              color="#374151"
+                              color={(theme) => theme.palette.text.primary}
                               style={{ cursor: "pointer" }}
                               onClick={() =>
                                 navigate(`/profile/${creator.tikTokId}`)
@@ -673,8 +677,8 @@ const CreatorManagementPage = () => {
                             label={creator.category || "General"}
                             size="small"
                             sx={{
-                              bgcolor: "#e0e7ff",
-                              color: "#3730a3",
+                              bgcolor: (theme) => theme.palette.mode === 'light' ? '#e0e7ff' : alpha(theme.palette.primary.main, 0.2),
+                              color: (theme) => theme.palette.mode === 'light' ? '#3730a3' : theme.palette.primary.main,
                               fontWeight: 600,
                               fontSize: "0.8rem",
                               px: 1,
@@ -685,7 +689,7 @@ const CreatorManagementPage = () => {
                           <Typography
                             variant="body2"
                             fontWeight={600}
-                            color="#374151"
+                            color={(theme) => theme.palette.text.primary}
                           >
                             {creator?.profile?.followers || "0"}
                           </Typography>
@@ -694,7 +698,7 @@ const CreatorManagementPage = () => {
                           <Typography
                             variant="body2"
                             fontWeight={600}
-                            color="#374151"
+                            color={(theme) => theme.palette.text.primary}
                           >
                             {creator?.profile?.diamonds || "0"}
                           </Typography>
@@ -703,7 +707,7 @@ const CreatorManagementPage = () => {
                           <Typography
                             variant="body2"
                             fontWeight={600}
-                            color="#374151"
+                            color={(theme) => theme.palette.text.primary}
                           >
                             {creator?.profile?.liveDuration || "0h 0m"}
                           </Typography>
@@ -712,7 +716,7 @@ const CreatorManagementPage = () => {
                           <Typography
                             variant="body2"
                             fontWeight={600}
-                            color="#374151"
+                            color={(theme) => theme.palette.text.primary}
                           >
                             {creator?.profile?.validLiveDays || "0"}
                           </Typography>
@@ -721,7 +725,7 @@ const CreatorManagementPage = () => {
                           <Typography
                             variant="body2"
                             fontWeight={600}
-                            color="#374151"
+                            color={(theme) => theme.palette.text.primary}
                           >
                             {creator?.profile?.matches || "0"}
                           </Typography>
@@ -829,9 +833,9 @@ const CreatorManagementPage = () => {
               px: 3,
               fontSize: "1.5rem",
               fontWeight: 700,
-              color: "#1f2937",
+              color: (theme) => theme.palette.text.primary,
               textAlign: "center",
-              borderBottom: "1px solid #f3f4f6",
+              borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
             }}
           >
             {editingCreator ? "Edit Creator" : "Add New Creator"}
@@ -1003,7 +1007,7 @@ const CreatorManagementPage = () => {
             </Box>
           </DialogContent>
           <DialogActions
-            sx={{ px: 3, pb: 3, pt: 2, borderTop: "1px solid #f3f4f6" }}
+            sx={{ px: 3, pb: 3, pt: 2, borderTop: (theme) => `1px solid ${theme.palette.divider}` }}
           >
             {error && (
               <Alert
@@ -1062,7 +1066,7 @@ const CreatorManagementPage = () => {
           </DialogActions>
         </Dialog>
 
-        <Divider sx={{ my: 5, borderColor: "#e5e7eb" }} />
+        <Divider sx={{ my: 5, borderColor: (theme) => theme.palette.divider }} />
       </Container>
     </Box>
   );
