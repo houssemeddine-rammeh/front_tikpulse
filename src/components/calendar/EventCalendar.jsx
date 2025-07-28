@@ -16,6 +16,8 @@ const localizer = momentLocalizer(moment);
 
 const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
   const theme = useTheme();
+  const [currentView, setCurrentView] = useState('month');
+  const [currentDate, setCurrentDate] = useState(new Date());
   
   const getEventTypeColor = (type) => {
     switch (type?.toLowerCase()) {
@@ -66,6 +68,14 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
     if (onEventCreate) {
       onEventCreate(slotInfo);
     }
+  };
+
+  const handleViewChange = (view) => {
+    setCurrentView(view);
+  };
+
+  const handleNavigate = (date) => {
+    setCurrentDate(date);
   };
 
   const getEventTypeIcon = (type) => {
@@ -301,7 +311,10 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
           selectable={true}
           eventPropGetter={eventStyleGetter}
           views={["month", "week", "day"]}
-          defaultView="month"
+          view={currentView}
+          date={currentDate}
+          onView={handleViewChange}
+          onNavigate={handleNavigate}
           popup={true}
           tooltipAccessor={(event) =>
             `${event.title} - ${event.description || "No description"}`

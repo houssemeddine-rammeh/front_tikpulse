@@ -82,6 +82,13 @@
   border-bottom: 1px solid var(--calendar-border);
   padding: 10px;
   border-radius: 8px 8px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  position: relative;
+  z-index: 2;
 }
 
 .rbc-toolbar button {
@@ -92,11 +99,29 @@
   margin: 0 2px;
   border-radius: 4px;
   transition: all 0.2s ease;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  position: relative;
+  z-index: 1;
 }
 
 .rbc-toolbar button:hover {
   background-color: var(--calendar-button-hover);
   transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rbc-toolbar button:active {
+  transform: translateY(0);
+  transition: transform 0.1s ease;
+}
+
+.rbc-toolbar button:focus {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
 }
 
 .rbc-toolbar button.rbc-active {
@@ -155,6 +180,62 @@
 .rbc-btn-group button {
   font-size: 14px;
   font-weight: 500;
+}
+
+/* Ensure react-big-calendar functionality isn't broken */
+.rbc-toolbar .rbc-btn-group {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.rbc-toolbar .rbc-btn-group button {
+  background-color: var(--calendar-button-bg);
+  color: var(--calendar-text);
+  border: 1px solid var(--calendar-border);
+  padding: 6px 12px;
+  margin: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.rbc-toolbar .rbc-btn-group button:hover {
+  background-color: var(--calendar-button-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rbc-toolbar .rbc-btn-group button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.rbc-toolbar .rbc-btn-group button.rbc-active {
+  background-color: #1976d2 !important;
+  color: #ffffff !important;
+  border-color: #1976d2 !important;
+  box-shadow: 0 2px 4px rgba(25, 118, 210, 0.3);
+}
+
+/* Navigation buttons (Today, Back, Next) */
+.rbc-toolbar button {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Ensure toolbar label is properly styled */
+.rbc-toolbar .rbc-toolbar-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--calendar-text);
+  margin: 0 15px;
+  white-space: nowrap;
 }
 
 /* Responsive improvements */
