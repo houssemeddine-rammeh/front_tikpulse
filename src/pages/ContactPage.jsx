@@ -32,6 +32,7 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
+  alpha,
 } from "@mui/material";
 import {
   ContactSupport,
@@ -445,7 +446,10 @@ const ContactPage = () => {
                   elevation={2}
                   sx={{ borderRadius: 2, overflow: "hidden" }}
                 >
-                  <Box sx={{ bgcolor: "#f5f5f5", p: 2 }}>
+                  <Box sx={{ 
+                    bgcolor: (theme) => theme.palette.mode === 'light' ? '#f5f5f5' : 'grey.800', 
+                    p: 2 
+                  }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>
                       Real-Time Support Tickets
                     </Typography>
@@ -515,7 +519,10 @@ const ContactPage = () => {
                         <IconButton
                           onClick={handleSortOrderChange}
                           size="small"
-                          sx={{ bgcolor: "white", boxShadow: 1 }}
+                          sx={{ 
+                            bgcolor: (theme) => theme.palette.background.paper, 
+                            boxShadow: 1 
+                          }}
                         >
                           <Sort />
                         </IconButton>
@@ -700,8 +707,8 @@ const ContactPage = () => {
                                       label="Real-time"
                                       size="small"
                                       sx={{
-                                        bgcolor: "#e8f5e8",
-                                        color: "#2e7d32",
+                                        bgcolor: (theme) => theme.palette.mode === 'light' ? '#e8f5e8' : alpha(theme.palette.success.main, 0.2),
+                                        color: (theme) => theme.palette.success.main,
                                         fontWeight: 500,
                                       }}
                                     />
@@ -749,8 +756,8 @@ const ContactPage = () => {
                     <Box
                       sx={{
                         p: 2,
-                        bgcolor: "#f8f9fa",
-                        borderBottom: "1px solid #e0e0e0",
+                        bgcolor: (theme) => theme.palette.mode === 'light' ? '#f8f9fa' : 'grey.800',
+                        borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
                       }}
                     >
                       <Box
@@ -840,7 +847,7 @@ const ContactPage = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      bgcolor: "#f8f9fa",
+                      bgcolor: (theme) => theme.palette.mode === 'light' ? '#f8f9fa' : 'grey.800',
                     }}
                   >
                     <Box sx={{ textAlign: "center", color: "text.secondary" }}>
