@@ -129,7 +129,7 @@ const CreatorBonusCard = ({ tikTokId }) => {
                 Heures:
               </Typography>
               <Typography variant="body1" fontWeight="bold" sx={{ ml: 1 }}>
-                {bonus.hours || 0}h
+                {bonus.hoursFormatted || (bonus.hours + 'h') || '0h'}
               </Typography>
             </Box>
           </Grid>
@@ -156,7 +156,7 @@ const CreatorBonusCard = ({ tikTokId }) => {
                 Taux:
               </Typography>
               <Chip 
-                label={bonus.ratePercentage} 
+                label={bonus.rateFormatted || bonus.ratePercentage || ''} 
                 color="success"
                 variant="outlined"
                 size="small"

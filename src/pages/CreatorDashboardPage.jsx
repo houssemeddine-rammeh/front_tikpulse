@@ -27,6 +27,9 @@ import {
   CircularProgress,
   Avatar,
   Divider,
+  FormControl,
+  InputLabel,
+  Select,
 } from "@mui/material";
 import {
   Diamond,
@@ -52,6 +55,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { getCreatorProfile } from "../features/creatorDashboardSlice";
 import Profile from "./profile";
 import moment from "moment";
+import BonusRules from '../components/BonusRules';
+import CreatorBonusCard from '../components/CreatorBonusCard';
+import { createTicket } from '../features/ticketsSlice';
 
 const CreatorDashboardPage = () => {
   const { user } = useAuth();
@@ -62,10 +68,12 @@ const CreatorDashboardPage = () => {
   const [reportDialogOpen, setReportDialogOpen] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
   const [reportData, setReportData] = useState({
-    title: "",
+    subject: "",
     description: "",
-    category: "technical",
+    category: "general",
+    priority: "medium",
   });
+  const [reportError, setReportError] = useState("");
   const { addNotification } = useNotifications();
   const { loading: isLoading, creator } = useSelector(
     (state) => state.creatorDashboard
@@ -94,10 +102,12 @@ const CreatorDashboardPage = () => {
   const handleReportDialogClose = () => {
     setReportDialogOpen(false);
     setReportData({
-      title: "",
+      subject: "",
       description: "",
-      category: "technical",
+      category: "general",
+      priority: "medium",
     });
+    setReportError("");
   };
 
   const handleReportInputChange = (field) => (event) => {
@@ -108,22 +118,33 @@ const CreatorDashboardPage = () => {
   };
 
   const handleReportSubmit = async () => {
+    if (!reportData.subject || !reportData.description) {
+      setReportError("Subject and description are required.");
+      return;
+    }
     setSubmitLoading(true);
+    setReportError("");
     try {
-      // In a real app, this would submit to an API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
+      const newTicketPayload = {
+        title: reportData.subject,
+        description: reportData.description,
+        category: reportData.category,
+        priority: reportData.priority,
+      };
+      await dispatch(createTicket(newTicketPayload)).unwrap();
+      setReportDialogOpen(false);
+      setReportData({
+        subject: "",
+        description: "",
+        category: "general",
+        priority: "medium",
+      });
       addNotification({
         type: "success",
-        message: "Report submitted successfully",
+        message: "Ticket created successfully!",
       });
-
-      handleReportDialogClose();
     } catch (error) {
-      addNotification({
-        type: "error",
-        message: "Error submitting report",
-      });
+      setReportError(error?.message || "Failed to create ticket.");
     } finally {
       setSubmitLoading(false);
     }
@@ -194,160 +215,21 @@ const CreatorDashboardPage = () => {
             </Button>
           </Box>
 
+          {/* Bonus Rules and My Bonus */}
+          <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Grid item xs={12} md={6}>
+              <BonusRules />
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <CreatorBonusCard tikTokId={creator?.tikTokId || creator?.tikTokID || creator?.tiktokId || creator?.tiktokID || creator?.id} />
+            </Grid>
+          </Grid>
+
           {/* Agency Bonus Details */}
-          <Card sx={{ mb: 4 }}>
-            <CardContent>
-              <Typography
-                variant="h5"
-                gutterBottom
-                sx={{ color: "#1976d2", fontWeight: "bold" }}
-              >
-                💎 Agency Bonus Program
-              </Typography>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="h6" gutterBottom>
-                    Current Status
-                  </Typography>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 2,
-                      mb: 2,
-                    }}
-                  >
-                    <Chip
-                      label={`${creator?.contractDetails?.tier ?? ""} Tier`}
-                      color="primary"
-                      variant="filled"
-                    />
-                    <Chip
-                      label={
-                        agencyBonus?.qualified ? "Qualified" : "Not Qualified"
-                      }
-                      color={agencyBonus?.qualified ? "success" : "error"}
-                      variant="outlined"
-                    />
-                  </Box>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
-                    <strong>Monthly Goal:</strong>{" "}
-                    {creator?.contractDetails?.monthlyDiamondGoal ?? 0} diamonds
-                  </Typography>
-                  <Typography variant="body1" sx={{ mb: 2 }}>
-                    <strong>Current Rate:</strong>{" "}
-                    {(creator?.contractDetails?.rate * 100)?.toFixed?.(2) ??
-                      "0.00"}
-                    % per diamond
-                  </Typography>
-                  <Typography variant="body1">
-                    <strong>Projected Bonus:</strong> €
-                    {agencyBonus?.amount ?? 0}
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  <Typography variant="h6" gutterBottom>
-                    Requirements Progress
-                  </Typography>
-                  <Box sx={{ bgcolor: "#f5f5f5", p: 2, borderRadius: 1 }}>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      Valid Live Days: {creator?.profile?.validLiveDays ?? 0}/
-                      {agencyBonus?.requirements?.minValidDays ?? 20}
-                    </Typography>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      Live Hours: {creator?.liveDuration ?? 0}h/
-                      {agencyBonus?.requirements?.minHours ?? 50}h
-                    </Typography>
-                    <Typography variant="body2">
-                      Diamonds This Month: {creator?.diamondsLastMonth ?? 0}
-                    </Typography>
-                  </Box>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
+    
 
           {/* Sponsorship Earnings */}
-          <Card sx={{ mb: 4 }}>
-            <CardContent>
-              <Typography
-                variant="h5"
-                gutterBottom
-                sx={{ color: "#1976d2", fontWeight: "bold" }}
-              >
-                🤝 Sponsorship Earnings
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={4}>
-                  <Box
-                    sx={{
-                      textAlign: "center",
-                      p: 2,
-                      bgcolor: "#e8f5e8",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography
-                      variant="h4"
-                      sx={{ color: "#4caf50", fontWeight: "bold" }}
-                    >
-                      €
-                      {activeSponsorships.reduce(
-                        (total, sponsor) => total + sponsor.amount,
-                        0
-                      )}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Total Earnings
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Box
-                    sx={{
-                      textAlign: "center",
-                      p: 2,
-                      bgcolor: "#f3e5f5",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography
-                      variant="h4"
-                      sx={{ color: "#9c27b0", fontWeight: "bold" }}
-                    >
-                      {activeSponsorships.length}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Active Sponsorships
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <Box
-                    sx={{
-                      textAlign: "center",
-                      p: 2,
-                      bgcolor: "#fff3e0",
-                      borderRadius: 1,
-                    }}
-                  >
-                    <Typography
-                      variant="h4"
-                      sx={{ color: "#ff9800", fontWeight: "bold" }}
-                    >
-                      {
-                        sponsorships.filter((s) => s.status === "pending")
-                          .length
-                      }
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Pending
-                    </Typography>
-                  </Box>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
+     
 
           {/* Contact & Support */}
           <Card sx={{ mb: 4 }}>
@@ -413,104 +295,91 @@ const CreatorDashboardPage = () => {
           </Card>
 
           {/* Quick Actions */}
-          <Card>
-            <CardContent>
-              <Typography variant="h6" gutterBottom>
-                Quick Actions
-              </Typography>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Button
-                    component={Link}
-                    to="/creator-profile"
-                    variant="outlined"
-                    fullWidth
-                    sx={{ py: 1.5, textTransform: "none" }}
-                  >
-                    View Profile
-                  </Button>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Button
-                    component={Link}
-                    to="/creator-analytics"
-                    variant="outlined"
-                    fullWidth
-                    sx={{ py: 1.5, textTransform: "none" }}
-                  >
-                    Analytics
-                  </Button>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Button
-                    component={Link}
-                    to="/creator-messages"
-                    variant="outlined"
-                    fullWidth
-                    sx={{ py: 1.5, textTransform: "none" }}
-                  >
-                    Messages
-                  </Button>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
+   
 
-          {/* Report Issue Dialog */}
+          {/* Report an Issue Dialog */}
           <Dialog
             open={reportDialogOpen}
             onClose={handleReportDialogClose}
-            maxWidth="sm"
+            maxWidth="md"
             fullWidth
           >
-            <DialogTitle>Report an Issue</DialogTitle>
+            <DialogTitle>Create New Support Ticket</DialogTitle>
             <DialogContent>
-              <Box sx={{ pt: 1 }}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Issue Category"
-                  value={reportData.category}
-                  onChange={handleReportInputChange("category")}
-                  sx={{ mb: 2 }}
-                >
-                  <MenuItem value="technical">Technical Issue</MenuItem>
-                  <MenuItem value="payment">Payment Issue</MenuItem>
-                  <MenuItem value="contract">Contract Issue</MenuItem>
-                  <MenuItem value="other">Other</MenuItem>
-                </TextField>
-
-                <TextField
-                  fullWidth
-                  label="Issue Title"
-                  value={reportData.title}
-                  onChange={handleReportInputChange("title")}
-                  sx={{ mb: 2 }}
-                />
-
-                <TextField
-                  fullWidth
-                  multiline
-                  rows={4}
-                  label="Description"
-                  value={reportData.description}
-                  onChange={handleReportInputChange("description")}
-                  placeholder="Please describe the issue in detail..."
-                />
-              </Box>
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Subject"
+                fullWidth
+                variant="outlined"
+                value={reportData.subject}
+                onChange={handleReportInputChange("subject")}
+              />
+              <TextField
+                margin="dense"
+                label="Description"
+                fullWidth
+                multiline
+                rows={4}
+                variant="outlined"
+                value={reportData.description}
+                onChange={handleReportInputChange("description")}
+              />
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                <Grid item xs={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Category</InputLabel>
+                    <Select
+                      value={reportData.category}
+                      onChange={handleReportInputChange("category")}
+                      label="Category"
+                    >
+                      <MenuItem value="general">General</MenuItem>
+                      <MenuItem value="match_planning">Match Planning</MenuItem>
+                      <MenuItem value="bug_report">Bug Report</MenuItem>
+                      <MenuItem value="ban_report">Ban Report</MenuItem>
+                      <MenuItem value="departure_request">Departure Request</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={6}>
+                  <FormControl fullWidth>
+                    <InputLabel>Priority</InputLabel>
+                    <Select
+                      value={reportData.priority}
+                      onChange={handleReportInputChange("priority")}
+                      label="Priority"
+                    >
+                      <MenuItem value="low">Low</MenuItem>
+                      <MenuItem value="medium">Medium</MenuItem>
+                      <MenuItem value="high">High</MenuItem>
+                      <MenuItem value="urgent">Urgent</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+              {reportError && (
+                <Typography color="error" sx={{ mt: 2 }}>
+                  {reportError}
+                </Typography>
+              )}
             </DialogContent>
             <DialogActions>
-              <Button onClick={handleReportDialogClose}>Cancel</Button>
+              <Button onClick={handleReportDialogClose} disabled={submitLoading}>
+                Cancel
+              </Button>
               <Button
                 onClick={handleReportSubmit}
                 variant="contained"
-                disabled={!reportData.title || submitLoading}
+                disabled={
+                  !reportData.subject ||
+                  !reportData.description ||
+                  !reportData.category ||
+                  !reportData.priority ||
+                  submitLoading
+                }
               >
-                {submitLoading ? (
-                  <CircularProgress size={20} />
-                ) : (
-                  "Submit Report"
-                )}
+                {submitLoading ? "Submitting..." : "Create Ticket"}
               </Button>
             </DialogActions>
           </Dialog>

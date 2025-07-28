@@ -20,6 +20,8 @@ import {
   Alert,
   Snackbar,
   Stack,
+  Divider,
+  InputAdornment,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -38,6 +40,9 @@ import {
   Diamond as DiamondIcon,
   MonetizationOn as MoneyIcon,
   AccountBalance as AccountBalanceIcon,
+  Visibility,
+  VisibilityOff,
+  Security,
 } from '@mui/icons-material';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProfile } from '../features/authSlice';
@@ -56,6 +61,12 @@ const CreatorProfilePage = () => {
   const [editMode, setEditMode] = useState(false);
   const [saving, setSaving] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Check if current user can edit this profile
   const canEdit = user?.role === "creator" && user?._id === profile?._id;
@@ -134,11 +145,50 @@ const CreatorProfilePage = () => {
         creatorId: profile._id,
       });
     }
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
   };
 
   const handleSave = async () => {
     if (!canEdit) return;
-    
+
+    // Password validation if changing password
+    if (newPassword || currentPassword) {
+      if (!currentPassword) {
+        setSnackbar({
+          open: true,
+          message: "Current password is required to change password",
+          severity: "error"
+        });
+        return;
+      }
+      if (!newPassword) {
+        setSnackbar({
+          open: true,
+          message: "New password is required",
+          severity: "error"
+        });
+        return;
+      }
+      if (newPassword.length < 6) {
+        setSnackbar({
+          open: true,
+          message: "New password must be at least 6 characters long",
+          severity: "error"
+        });
+        return;
+      }
+      if (newPassword !== confirmPassword) {
+        setSnackbar({
+          open: true,
+          message: "New passwords do not match",
+          severity: "error"
+        });
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       // Prepare update data (exclude tikTokId as it should not be editable)
@@ -152,7 +202,10 @@ const CreatorProfilePage = () => {
         firstName: editData.displayName.split(' ')[0] || "",
         lastName: editData.displayName.split(' ').slice(1).join(' ') || "",
       };
-
+      if (newPassword) {
+        updateData.currentPassword = currentPassword;
+        updateData.password = newPassword;
+      }
       // Remove empty fields
       Object.keys(updateData).forEach(key => {
         if (!updateData[key]) delete updateData[key];
@@ -171,6 +224,9 @@ const CreatorProfilePage = () => {
         severity: "success"
       });
       setEditMode(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (error) {
       console.error("Profile update error:", error);
       console.error("Error details:", {
@@ -481,6 +537,87 @@ const CreatorProfilePage = () => {
                     />
                   </Grid>
                 </Grid>
+                <Divider sx={{ my: 4 }} />
+                <Typography variant="h6" sx={{ mb: 2 }}>
+                  <Security sx={{ mr: 1, verticalAlign: "middle" }} />
+                  Change Password
+                </Typography>
+                <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Current Password"
+                      type={showPassword ? "text" : "password"}
+                      value={currentPassword}
+                      onChange={e => setCurrentPassword(e.target.value)}
+                      disabled={!editMode}
+                      variant="outlined"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowPassword(!showPassword)}
+                              edge="end"
+                            >
+                              {showPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="New Password"
+                      type={showNewPassword ? "text" : "password"}
+                      value={newPassword}
+                      onChange={e => setNewPassword(e.target.value)}
+                      disabled={!editMode}
+                      variant="outlined"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowNewPassword(!showNewPassword)}
+                              edge="end"
+                            >
+                              {showNewPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      fullWidth
+                      label="Confirm New Password"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={e => setConfirmPassword(e.target.value)}
+                      disabled={!editMode}
+                      variant="outlined"
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <IconButton
+                              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                              edge="end"
+                            >
+                              {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                            </IconButton>
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+                <Alert severity="info" sx={{ mt: 3 }}>
+                  <Typography variant="body2">
+                    <strong>Note:</strong> Leave password fields empty if you don't want to change your password.
+                  </Typography>
+                </Alert>
               </Paper>
             )}
 

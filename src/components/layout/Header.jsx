@@ -606,36 +606,38 @@ const Header = () => {
             </Tooltip>
 
             {/* Events Button */}
-            <Tooltip title="Events">
-              <Button
-                color="inherit"
-                component={Link}
-                to="/events"
-                sx={{
-                  minWidth: "auto",
-                  px: { md: 1.5, lg: 2 },
-                  py: 0.5,
-                  borderRadius: 1,
-                  textTransform: "none",
-                  fontSize: { md: "0.85rem", lg: "0.9rem" },
-                  bgcolor:
-                    location.pathname === "/events"
-                      ? "rgba(255,255,255,0.1)"
-                      : "transparent",
-                  "&:hover": {
-                    bgcolor: "rgba(255,255,255,0.1)",
-                  },
-                }}
-                startIcon={<EventIcon sx={{ fontSize: "1.1rem" }} />}
-              >
-                {isTablet ? "" : "Events"}
-              </Button>
-            </Tooltip>
+            {(user.role === UserRole.MANAGER ||
+              user.role === UserRole.SUB_MANAGER) && (
+              <Tooltip title="Events">
+                <Button
+                  color="inherit"
+                  component={Link}
+                  to="/events"
+                  sx={{
+                    minWidth: "auto",
+                    px: { md: 1.5, lg: 2 },
+                    py: 0.5,
+                    borderRadius: 1,
+                    textTransform: "none",
+                    fontSize: { md: "0.85rem", lg: "0.9rem" },
+                    bgcolor:
+                      location.pathname === "/events"
+                        ? "rgba(255,255,255,0.1)"
+                        : "transparent",
+                    "&:hover": {
+                      bgcolor: "rgba(255,255,255,0.1)",
+                    },
+                  }}
+                  startIcon={<EventIcon sx={{ fontSize: "1.1rem" }} />}
+                >
+                  {isTablet ? "" : "Events"}
+                </Button>
+              </Tooltip>
+            )}
 
             {/* Creators Button - Only for managers and admins */}
             {(user.role === UserRole.MANAGER ||
-              user.role === UserRole.SUB_MANAGER ||
-              user.role === UserRole.ADMIN) && (
+              user.role === UserRole.SUB_MANAGER) && (
               <Tooltip title="Creators">
                 <Button
                   color="inherit"
@@ -692,32 +694,34 @@ const Header = () => {
               </Tooltip>
             )}
 
-            {/* Contact Button */}
-            <Tooltip title="Contact">
-              <Button
-                color="inherit"
-                component={Link}
-                to="/contact"
-                sx={{
-                  minWidth: "auto",
-                  px: { md: 1.5, lg: 2 },
-                  py: 0.5,
-                  borderRadius: 1,
-                  textTransform: "none",
-                  fontSize: { md: "0.85rem", lg: "0.9rem" },
-                  bgcolor:
-                    location.pathname === "/contact"
-                      ? "rgba(255,255,255,0.1)"
-                      : "transparent",
-                  "&:hover": {
-                    bgcolor: "rgba(255,255,255,0.1)",
-                  },
-                }}
-                startIcon={<ContactIcon sx={{ fontSize: "1.1rem" }} />}
-              >
-                {isTablet ? "" : "Contact"}
-              </Button>
-            </Tooltip>
+            {(user.role === UserRole.MANAGER ||
+              user.role === UserRole.SUB_MANAGER) && (
+              <Tooltip title="Contact">
+                <Button
+                  color="inherit"
+                  component={Link}
+                  to="/contact"
+                  sx={{
+                    minWidth: "auto",
+                    px: { md: 1.5, lg: 2 },
+                    py: 0.5,
+                    borderRadius: 1,
+                    textTransform: "none",
+                    fontSize: { md: "0.85rem", lg: "0.9rem" },
+                    bgcolor:
+                      location.pathname === "/contact"
+                        ? "rgba(255,255,255,0.1)"
+                        : "transparent",
+                    "&:hover": {
+                      bgcolor: "rgba(255,255,255,0.1)",
+                    },
+                  }}
+                  startIcon={<ContactIcon sx={{ fontSize: "1.1rem" }} />}
+                >
+                  {isTablet ? "" : "Contact"}
+                </Button>
+              </Tooltip>
+            )}
           </Box>
         )}
 
@@ -906,7 +910,7 @@ const Header = () => {
                     color="primary"
                     sx={{ fontSize: "0.7rem", fontWeight: "bold" }}
                   >
-                    ID: {user?.tiktokId || "N/A"}
+                    ID: {user?.tikTokId || "N/A"}
                   </Typography>
                 )}
               </Box>
@@ -914,7 +918,16 @@ const Header = () => {
           </Box>
 
           {/* Profile Menu Items */}
-          <MenuItem component={Link} to="/profile" onClick={handleMenuClose}>
+          {console.log(user)}
+          <MenuItem
+            component={Link}
+            to={
+              user?.role === UserRole.CREATOR && user?.tikTokId
+                ? `/profile/${user.tikTokId}`
+                : "/profile"
+            }
+            onClick={handleMenuClose}
+          >
             <ListItemIcon>
               <ProfileIcon fontSize="small" />
             </ListItemIcon>
@@ -956,15 +969,6 @@ const Header = () => {
                 </ListItemText>
               </MenuItem>
             </>
-          ) : user?.role !== UserRole.ADMIN ? (
-            <MenuItem component={Link} to="/resume" onClick={handleMenuClose}>
-              <ListItemIcon>
-                <ResumeIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>
-                <Typography variant="body2">My Resume</Typography>
-              </ListItemText>
-            </MenuItem>
           ) : null}
 
           {/* Mobile-only theme toggle */}
