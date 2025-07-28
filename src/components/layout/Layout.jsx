@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Container, CssBaseline } from '@mui/material';
+import { Box, Container, CssBaseline, Link, Typography } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import Header from './Header';
 
 const Layout = ({ children }) => {
@@ -41,7 +42,19 @@ const Layout = ({ children }) => {
         >
           <Container maxWidth="sm">
             <Box sx={{ textAlign: 'center' }}>
-              © {new Date().getFullYear()} TikTok Agency Platform
+              <Typography variant="body2" color="text.secondary">
+                © {new Date().getFullYear()} TikTok Agency Platform
+              </Typography>
+              <Box sx={{ mt: 1 }}>
+                <Link
+                  component={RouterLink}
+                  to="/privacy"
+                  color="text.secondary"
+                  sx={{ textDecoration: 'none', '&:hover': { textDecoration: 'underline' } }}
+                >
+                  Privacy Policy & Terms of Service
+                </Link>
+              </Box>
             </Box>
           </Container>
         </Box>

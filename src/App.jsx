@@ -32,6 +32,7 @@ import ProfilePage from "./pages/ProfilePage";
 import CreatorProfilePage from "./pages/CreatorProfilePage";
 import CreatorResumePage from "./pages/CreatorResumePage";
 import SupportPage from "./pages/SupportPage";
+import PrivacyPage from "./pages/PrivacyPage";
 import { store, persistor } from "./app/store";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
@@ -192,6 +193,14 @@ function App() {
                     <Route
                       path="/auth/tiktok/callback"
                       element={<TikTokCallbackPage />}
+                    />
+                    <Route
+                      path="/privacy"
+                      element={
+                        <PublicRoute>
+                          <PrivacyPage />
+                        </PublicRoute>
+                      }
                     />
 
                     {/* Creator Routes */}
