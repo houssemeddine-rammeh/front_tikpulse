@@ -231,7 +231,7 @@ function App() {
                     <Route
                       path="/profile/:id"
                       element={
-                        <ProtectedRoute allowedRoles={["creator"]}>
+                        <ProtectedRoute allowedRoles={["creator","manager"]}>
                           <CreatorProfilePage />
                         </ProtectedRoute>
                       }

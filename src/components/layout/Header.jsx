@@ -607,7 +607,7 @@ const Header = () => {
 
             {/* Events Button */}
             {(user.role === UserRole.MANAGER ||
-              user.role === UserRole.SUB_MANAGER) && (
+              user.role === UserRole.CREATOR) && (
               <Tooltip title="Events">
                 <Button
                   color="inherit"
@@ -695,7 +695,7 @@ const Header = () => {
             )}
 
             {(user.role === UserRole.MANAGER ||
-              user.role === UserRole.SUB_MANAGER) && (
+              user.role === UserRole.CREATOR) && (
               <Tooltip title="Contact">
                 <Button
                   color="inherit"
