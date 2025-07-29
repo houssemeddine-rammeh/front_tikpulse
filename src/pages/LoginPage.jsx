@@ -138,46 +138,6 @@ const LoginPage = () => {
     window.location.href = url;
   };
 
-  const demoUsers = [
-    {
-      role: "super_admin",
-      email: "superadmin@example.com",
-      password: "password",
-      label: "Super Admin Console",
-      icon: <Security />,
-      color: "#9f7aea",
-    },
-    {
-      role: "admin",
-      email: "admin@example.com",
-      password: "password",
-      label: "Admin Dashboard",
-      icon: <Analytics />,
-      color: "#e53e3e",
-    },
-    {
-      role: "manager",
-      email: "manager@example.com",
-      password: "password",
-      label: "Manager Portal",
-      icon: <Groups />,
-      color: "#3182ce",
-    },
-    {
-      role: "creator",
-      email: "creator@example.com",
-      password: "password",
-      label: "Creator Studio",
-      icon: <Star />,
-      color: "#38a169",
-    },
-  ];
-
-  const selectDemoUser = (demoUser) => {
-    setEmail(demoUser.email);
-    setPassword(demoUser.password);
-    setSelectedDemo(demoUser.role);
-  };
 
   const features = [
     {

@@ -29,7 +29,7 @@ const TikTokCallbackPage = () => {
 
         // Send code to backend
         const codeVerifier = sessionStorage.getItem('tiktok_code_verifier');
-        const url = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'}/api/v1/auth/tiktok/callback?code=${encodeURIComponent(code)}${codeVerifier ? `&code_verifier=${encodeURIComponent(codeVerifier)}` : ''}`;
+        const url = `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'}/auth/tiktok/callback?code=${encodeURIComponent(code)}${codeVerifier ? `&code_verifier=${encodeURIComponent(codeVerifier)}` : ''}`;
         const response = await fetch(url, {
           method: 'GET',
           headers: { 'Accept': 'application/json' },
