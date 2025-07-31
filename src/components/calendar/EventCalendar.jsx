@@ -33,16 +33,20 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
     }
   };
   const eventStyleGetter = (event) => {
+    const backgroundColor = getEventTypeColor(event.type);
     return {
       style: {
-        backgroundColor: getEventTypeColor(event.type),
-        borderRadius: "5px",
-        opacity: 0.8,
+        backgroundColor: backgroundColor,
+        borderRadius: "6px",
+        opacity: 0.9,
         color: "white",
         border: "0px",
         display: "block",
         fontSize: "13px",
-        fontWeight: "bold",
+        fontWeight: "600",
+        boxShadow: `0 2px 6px ${backgroundColor}80`,
+        padding: "2px 6px",
+        textShadow: "0 1px 2px rgba(0,0,0,0.2)",
       },
     };
   };
@@ -152,7 +156,7 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
           startAccessor="start"
           endAccessor="end"
           titleAccessor={eventTitleAccessor}
-          style={{ height: 500 }}
+          style={{ height: 550, fontFamily: "'Inter', -apple-system, sans-serif" }}
           onSelectEvent={handleSelectEvent}
           onSelectSlot={handleSelectSlot}
           selectable={true}
