@@ -8,7 +8,13 @@ import {
   Chip, 
   Alert,
   Skeleton,
-  Grid
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper
 } from '@mui/material';
 import { 
   Star as StarIcon,
@@ -90,101 +96,102 @@ const CreatorBonusCard = ({ tikTokId }) => {
   return (
     <Card>
       <CardContent>
-        <Box display="flex" alignItems="center" mb={2}>
+        <Box display="flex" alignItems="center" mb={3}>
           <TrendingUpIcon sx={{ mr: 1, color: 'primary.main' }} />
           <Typography variant="h6" component="h3">
             Programme de Bonus
           </Typography>
         </Box>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <Box display="flex" alignItems="center" mb={1}>
-              <DiamondIcon sx={{ mr: 1, color: 'primary.main' }} />
-              <Typography variant="body2" color="text.secondary">
-                Diamants:
-              </Typography>
-              <Typography variant="body1" fontWeight="bold" sx={{ ml: 1 }}>
-                {bonus.diamonds?.toLocaleString() || 0}
-              </Typography>
-            </Box>
-          </Grid>
+        <TableContainer component={Paper} elevation={2}>
+          <Table>
+            <TableHead>
+              <TableRow sx={{ bgcolor: 'primary.light' }}>
+                <TableCell align="center" sx={{ fontWeight: 'bold', color: 'white' }}>
+                  <Box display="flex" alignItems="center" justifyContent="center">
+                    <DiamondIcon sx={{ mr: 1 }} />
+                    Diamant
+                  </Box>
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold', color: 'white' }}>
+                  <Box display="flex" alignItems="center" justifyContent="center">
+                    <ScheduleIcon sx={{ mr: 1 }} />
+                    Valide day
+                  </Box>
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold', color: 'white' }}>
+                  <Box display="flex" alignItems="center" justifyContent="center">
+                    <ScheduleIcon sx={{ mr: 1 }} />
+                    Hours
+                  </Box>
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold', color: 'white' }}>
+                  <Box display="flex" alignItems="center" justifyContent="center">
+                    <StarIcon sx={{ mr: 1 }} />
+                    Programme
+                  </Box>
+                </TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold', color: 'white' }}>
+                  <Box display="flex" alignItems="center" justifyContent="center">
+                    <TrendingUpIcon sx={{ mr: 1 }} />
+                    Taux
+                  </Box>
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              <TableRow hover>
+                <TableCell align="center">
+                  <Typography variant="h6" fontWeight="bold" color="primary.main">
+                    {bonus.diamonds?.toLocaleString() || 0}
+                  </Typography>
+                </TableCell>
+                <TableCell align="center">
+                  <Typography variant="h6" fontWeight="bold" color="secondary.main">
+                    {bonus.validDays || 0}
+                  </Typography>
+                </TableCell>
+                <TableCell align="center">
+                  <Typography variant="h6" fontWeight="bold" color="info.main">
+                    {bonus.hoursFormatted || (bonus.hours + 'h') || '0h'}
+                  </Typography>
+                </TableCell>
+                <TableCell align="center">
+                  <Box display="flex" alignItems="center" justifyContent="center">
+                    {getProgramIcon(bonus.program)}
+                    <Chip 
+                      label={bonus.program || 'Aucun'} 
+                      color={getProgramColor(bonus.program)}
+                      size="small"
+                      sx={{ ml: 1 }}
+                    />
+                  </Box>
+                </TableCell>
+                <TableCell align="center">
+                  <Typography variant="h6" fontWeight="bold" color="success.main">
+                    {bonus.rateFormatted || bonus.ratePercentage || '0%'}
+                  </Typography>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-          <Grid item xs={12} sm={6}>
-            <Box display="flex" alignItems="center" mb={1}>
-              <ScheduleIcon sx={{ mr: 1, color: 'secondary.main' }} />
-              <Typography variant="body2" color="text.secondary">
-                Jours Valides:
-              </Typography>
-              <Typography variant="body1" fontWeight="bold" sx={{ ml: 1 }}>
-                {bonus.validDays || 0}
-              </Typography>
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Box display="flex" alignItems="center" mb={1}>
-              <ScheduleIcon sx={{ mr: 1, color: 'info.main' }} />
-              <Typography variant="body2" color="text.secondary">
-                Heures:
-              </Typography>
-              <Typography variant="body1" fontWeight="bold" sx={{ ml: 1 }}>
-                {bonus.hoursFormatted || (bonus.hours + 'h') || '0h'}
-              </Typography>
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Box display="flex" alignItems="center" mb={1}>
-              {getProgramIcon(bonus.program)}
-              <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                Programme:
-              </Typography>
-              <Chip 
-                label={bonus.program} 
-                color={getProgramColor(bonus.program)}
-                size="small"
-                sx={{ ml: 1 }}
-              />
-            </Box>
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Box display="flex" alignItems="center" mb={1}>
-              <TrendingUpIcon sx={{ mr: 1, color: 'success.main' }} />
-              <Typography variant="body2" color="text.secondary">
-                Taux:
-              </Typography>
-              <Chip 
-                label={bonus.rateFormatted || bonus.ratePercentage || ''} 
-                color="success"
-                variant="outlined"
-                size="small"
-                sx={{ ml: 1 }}
-              />
-            </Box>
-          </Grid>
-
-          <Grid item xs={12}>
-            <Box 
-              display="flex" 
-              alignItems="center" 
-              justifyContent="center"
-              sx={{ 
-                mt: 2, 
-                p: 2, 
-                bgcolor: 'success.light', 
-                borderRadius: 1,
-                color: 'white'
-              }}
-            >
-              <MoneyIcon sx={{ mr: 1 }} />
-              <Typography variant="h6" fontWeight="bold">
-                Bonus Actuel: {bonus.bonusAmountFormatted}
-              </Typography>
-            </Box>
-          </Grid>
-        </Grid>
+        {/* Bonus Actuel */}
+        <Box 
+          sx={{ 
+            mt: 3, 
+            p: 2, 
+            bgcolor: 'success.light', 
+            borderRadius: 2,
+            textAlign: 'center'
+          }}
+        >
+          <Typography variant="h5" fontWeight="bold" sx={{ color: 'white' }}>
+            <MoneyIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+            Bonus actuel : {bonus.bonusAmountFormatted || '0 $'}
+          </Typography>
+        </Box>
       </CardContent>
     </Card>
   );

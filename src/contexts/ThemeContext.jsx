@@ -25,16 +25,16 @@ export const ThemeProvider = ({ children }) => {
     palette: {
       mode,
       primary: {
-        main: '#A259FF', // Purple (buttons and primary elements)
-        dark: '#8B5CF6',
-        light: alpha('#A259FF', 0.8),
+        main: mode === 'light' ? '#A259FF' : '#FF0050', // Purple for light, TikTok Pink for dark
+        dark: mode === 'light' ? '#8B5CF6' : '#CC003D',
+        light: mode === 'light' ? alpha('#A259FF', 0.8) : '#FF3366',
         contrastText: '#ffffff',
       },
       secondary: {
-        main: '#7C3AED', // Dark Purple (secondary highlight/text)
-        dark: '#6D28D9',
-        light: alpha('#7C3AED', 0.8),
-        contrastText: '#ffffff',
+        main: mode === 'light' ? '#7C3AED' : '#25F4EE', // Purple for light, TikTok Cyan for dark
+        dark: mode === 'light' ? '#6D28D9' : '#1DC4BE',
+        light: mode === 'light' ? alpha('#7C3AED', 0.8) : '#4DF5F1',
+        contrastText: mode === 'light' ? '#ffffff' : '#000000',
       },
       success: {
         main: '#10B981', // Light Green (positive percentage)
@@ -66,8 +66,8 @@ export const ThemeProvider = ({ children }) => {
         disabled: mode === 'light' ? 'rgba(0, 0, 0, 0.38)' : 'rgba(255, 255, 255, 0.5)',
       },
       background: {
-        default: mode === 'light' ? '#F9FAFB' : '#111827', // Light Gray (background) for light mode, dark for dark mode
-        paper: mode === 'light' ? '#FFFFFF' : '#1F2937', // White for cards in light mode, dark gray in dark mode
+        default: mode === 'light' ? '#F9FAFB' : '#000000', // Light Gray for light mode, TikTok Black for dark mode
+        paper: mode === 'light' ? '#FFFFFF' : '#161823', // White for cards in light mode, TikTok Dark Paper for dark mode
       },
       divider: mode === 'light' ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.12)',
     },
@@ -200,11 +200,39 @@ export const ThemeProvider = ({ children }) => {
             },
           },
           containedPrimary: {
-            background: `linear-gradient(to right, #A259FF, #8B5CF6)`,
+            background: mode === 'light' 
+              ? `linear-gradient(to right, #A259FF, #8B5CF6)`
+              : `linear-gradient(to right, #FF0050, #CC003D)`,
             color: '#ffffff',
             '&:hover': {
-              background: `linear-gradient(to right, #8B5CF6, #7C3AED)`,
+              background: mode === 'light'
+                ? `linear-gradient(to right, #8B5CF6, #7C3AED)`
+                : `linear-gradient(to right, #CC003D, #AA0040)`,
             },
+          },
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: {
+            borderRadius: 12,
+            boxShadow: mode === 'light' 
+              ? '0 2px 12px rgba(0, 0, 0, 0.08)'
+              : '0 4px 20px rgba(0, 0, 0, 0.4)',
+            transition: 'all 0.2s ease-in-out',
+            '&:hover': {
+              transform: 'translateY(-2px)',
+              boxShadow: mode === 'light'
+                ? '0 4px 20px rgba(0, 0, 0, 0.12)'
+                : '0 8px 32px rgba(0, 0, 0, 0.6)',
+            },
+          },
+        },
+      },
+      MuiPaper: {
+        styleOverrides: {
+          root: {
+            backgroundImage: 'none', // Remove default MUI paper gradient
           },
         },
       },
