@@ -7,10 +7,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import {
-  createTheme,
-  ThemeProvider as MuiThemeProvider,
-} from "@mui/material/styles";
+// Material-UI theme imports removed - using ThemeContext instead
 import { connectSocket } from "./api/socketInstance";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -50,66 +47,7 @@ import NotificationPrompt from "./notificationPrompt";
 import DataManagementPage from "./pages/DataManagementPage";
 import PWAInstallPrompt from "./components/PWA/InstallPrompt";
 import PWABadge from "./badge";
-// TikTok Theme Colors
-const theme = createTheme({
-  palette: {
-    mode: "dark",
-    primary: {
-      main: "#FF0050", // TikTok Pink
-      light: "#FF3366",
-      dark: "#CC003D",
-      contrastText: "#FFFFFF",
-    },
-    secondary: {
-      main: "#25F4EE", // TikTok Cyan
-      light: "#4DF5F1",
-      dark: "#1DC4BE",
-      contrastText: "#000000",
-    },
-    background: {
-      default: "#000000",
-      paper: "#161823",
-    },
-    text: {
-      primary: "#FFFFFF",
-      secondary: "#A8A8A8",
-    },
-  },
-  typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
-    h1: {
-      fontWeight: 700,
-      fontSize: "2.5rem",
-    },
-    h2: {
-      fontWeight: 600,
-      fontSize: "2rem",
-    },
-    h3: {
-      fontWeight: 600,
-      fontSize: "1.75rem",
-    },
-  },
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          textTransform: "none",
-          fontWeight: 600,
-        },
-      },
-    },
-    MuiCard: {
-      styleOverrides: {
-        root: {
-          borderRadius: 12,
-          boxShadow: "0 4px 20px rgba(0, 0, 0, 0.3)",
-        },
-      },
-    },
-  },
-});
+// Removed conflicting TikTok theme - using ThemeContext instead
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -166,12 +104,11 @@ function App() {
       <NotificationPrompt></NotificationPrompt>
       <PWAInstallPrompt />
       <PersistGate loading={<div>Loading...</div>} persistor={persistor}>
-        <MuiThemeProvider theme={theme}>
+        <ThemeProvider>
           <CssBaseline />
-          <ThemeProvider>
-            <Router>
-              <AuthProvider>
-                <NotificationProvider>
+          <Router>
+            <AuthProvider>
+              <NotificationProvider>
                   <Routes>
                     {/* Public Routes */}
                     <Route
@@ -504,8 +441,7 @@ function App() {
               </AuthProvider>
             </Router>
           </ThemeProvider>
-        </MuiThemeProvider>
-      </PersistGate>
+        </PersistGate>
     </Provider>
   );
 }
