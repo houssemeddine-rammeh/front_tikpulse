@@ -567,9 +567,26 @@ const CreatorManagementPage = () => {
                           color: "#374151",
                           fontSize: "0.9rem",
                           py: 2.5,
+                          cursor: "pointer",
+                          userSelect: "none",
+                          alignItems: "center",
+                          gap: 0.5,
                         }}
+                          onClick={() => handleSort("liveDuration")}
                       >
                         Live Duration
+                        {sortField === "liveDuration" &&
+                          (sortDirection === "asc" ? (
+                            <ArrowUpwardIcon
+                              fontSize="small"
+                              sx={{ ml: 0.5 }}
+                            />
+                          ) : (
+                            <ArrowDownwardIcon
+                              fontSize="small"
+                              sx={{ ml: 0.5 }}
+                            />
+                          ))}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -577,19 +594,54 @@ const CreatorManagementPage = () => {
                           color: "#374151",
                           fontSize: "0.9rem",
                           py: 2.5,
+                          cursor: "pointer",
+                          userSelect: "none",
+                          alignItems: "center",
+                          gap: 0.5,
                         }}
+                        onClick={() => handleSort("validLiveDays")}
                       >
                         Valid Live Days
-                      </TableCell>
+                        
+                        {sortField === "validLiveDays" &&
+                          (sortDirection === "asc" ? (
+                            <ArrowUpwardIcon
+                              fontSize="small"
+                              sx={{ ml: 0.5 }}
+                            />
+                          ) : (
+                            <ArrowDownwardIcon
+                              fontSize="small"
+                              sx={{ ml: 0.5 }}
+                            />
+                          ))}
+                        </TableCell>
                       <TableCell
                         sx={{
                           fontWeight: 700,
                           color: "#374151",
                           fontSize: "0.9rem",
                           py: 2.5,
-                        }}
+                          cursor: "pointer",
+                          userSelect: "none",
+                          alignItems: "center",
+                          gap: 0.5,
+                          }}
+                        onClick={() => handleSort("matches")}
                       >
                         Matches
+                        {sortField === "matches" &&
+                          (sortDirection === "asc" ? (
+                            <ArrowUpwardIcon
+                              fontSize="small"
+                              sx={{ ml: 0.5 }}
+                            />
+                          ) : (
+                            <ArrowDownwardIcon
+                              fontSize="small"
+                              sx={{ ml: 0.5 }}
+                            />
+                          ))}
                       </TableCell>
                       <TableCell
                         sx={{
