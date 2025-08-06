@@ -39,6 +39,7 @@ import {
   getUsersEvents,
 } from "../features/eventsSlice";
 import moment from "moment";
+import { useNotifications } from "../contexts/NotificationContext";
 
 const EventsPage = () => {
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
@@ -48,6 +49,7 @@ const EventsPage = () => {
   const [viewMode, setViewMode] = useState("calendar");
   const user = useSelector((state) => state.auth.user); // Get user from auth state
   const [error, setError] = useState(null); // Define error state
+  const { addNotification } = useNotifications();
 
   const dispatch = useDispatch();
   const { events, loading, partcipants } = useSelector((state) => state.events);
@@ -57,6 +59,10 @@ const EventsPage = () => {
       await dispatch(getEvents());
       if (user?.role === "manager") {
         await dispatch(getUsersEvents()); // Fetch user's events if needed
+      }
+      // Creators should also see all public events created by managers
+      if (user?.role === "creator") {
+        console.log("📅 Fetching events for creator:", user.username);
       }
     } catch (err) {
       console.error("❌ Error fetching events:", err);
@@ -83,6 +89,14 @@ const EventsPage = () => {
       await dispatch(createEvent(data)); // Wait for the dispatch to complete
       console.log("✅ Event created/updated successfully");
       closeDialogs();
+      
+      // Trigger real-time refresh for all users (especially creators)
+      if (user?.role === "manager") {
+        console.log("📅 Manager created event, notifying all users...");
+        localStorage.setItem('new_event_notification', Date.now().toString());
+        setTimeout(() => localStorage.removeItem('new_event_notification'), 2000);
+      }
+      
       await fetchEvents(); // Refresh the events list
     } catch (err) {
       console.error("❌ Error creating/updating event:", err);
@@ -123,6 +137,49 @@ const EventsPage = () => {
   useEffect(() => {
     fetchEvents();
   }, [dispatch]);
+
+  // Real-time event updates for creators
+  useEffect(() => {
+    if (user?.role === "creator") {
+      const handleEventCreated = () => {
+        console.log("📅 New event detected, refreshing for creator...");
+        fetchEvents();
+        
+        // Show notification to creator
+        addNotification({
+          title: "New Event Available",
+          message: "A new event has been created by the manager. Check your calendar!",
+          type: "info",
+          link: "/events"
+        });
+      };
+
+      // Listen for localStorage changes (cross-tab communication)
+      const handleStorageChange = (e) => {
+        if (e.key === 'new_event_notification') {
+          handleEventCreated();
+        }
+      };
+
+      // Listen for local storage changes in the same tab
+      const checkForNewEvents = () => {
+        const newEventFlag = localStorage.getItem('new_event_notification');
+        if (newEventFlag) {
+          console.log('📅 New event flag detected for creator...');
+          localStorage.removeItem('new_event_notification');
+          handleEventCreated();
+        }
+      };
+
+      window.addEventListener('storage', handleStorageChange);
+      const interval = setInterval(checkForNewEvents, 1000);
+
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+        clearInterval(interval);
+      };
+    }
+  }, [user, addNotification]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -282,6 +339,7 @@ const EventsPage = () => {
             events={events}
             onEventSelect={handleEventSelect}
             onEventCreate={handleSlotSelect}
+            userRole={user?.role}
           />
         ) : /* List View */
         events.length === 0 ? (

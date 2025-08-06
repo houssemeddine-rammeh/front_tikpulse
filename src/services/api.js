@@ -326,7 +326,7 @@ const api = {
   // Notification endpoints
   async getNotifications(userId) {
     try {
-      const response = await axiosInstance.get(`/notifications/${userId}`);
+      const response = await axiosInstance.get(`/users/notifications/${userId}`);
       return response.data;
     } catch (error) {
       console.warn("Backend not available, returning empty notifications");
@@ -350,7 +350,7 @@ const api = {
   async markNotificationAsRead(notificationId) {
     try {
       const response = await axiosInstance.put(
-        `/notifications/${notificationId}/read`
+        `/users/notifications/${notificationId}/read`
       );
       return response.data;
     } catch (error) {
@@ -363,7 +363,7 @@ const api = {
 
   async clearNotifications(userId) {
     try {
-      const response = await axiosInstance.delete(`/notifications/${userId}`);
+      const response = await axiosInstance.delete(`/users/notifications/${userId}`);
       return response.data;
     } catch (error) {
       console.warn("Backend not available, cannot clear notifications");

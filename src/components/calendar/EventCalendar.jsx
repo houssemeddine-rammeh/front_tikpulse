@@ -7,7 +7,7 @@ import { buildApiUrl, getApiHeaders } from "../../config/api";
 
 const localizer = momentLocalizer(moment);
 
-const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
+const EventCalendar = ({ onEventSelect, onEventCreate, events, loading, userRole = null }) => {
   const getEventTypeColor = (type) => {
     switch (type?.toLowerCase()) {
       case "live stream":
@@ -58,8 +58,11 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
   };
 
   const handleSelectSlot = (slotInfo) => {
-    if (onEventCreate) {
+    // Only managers can create events, creators can only view
+    if (onEventCreate && userRole === "manager") {
       onEventCreate(slotInfo);
+    } else if (userRole === "creator") {
+      console.log("📅 Creator clicked on calendar - view only mode");
     }
   };
 
@@ -96,6 +99,19 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
     <div className="event-calendar-container">
       <div className="calendar-header">
         <h2>📅 Events Calendar</h2>
+        {userRole === "creator" && (
+          <div style={{ 
+            background: 'rgba(255, 255, 255, 0.1)', 
+            padding: '8px 16px', 
+            borderRadius: '8px',
+            marginBottom: '16px',
+            color: 'rgba(255, 255, 255, 0.9)',
+            fontSize: '14px',
+            textAlign: 'center'
+          }}>
+            📋 View-only mode: You can see events created by managers
+          </div>
+        )}
         <div className="calendar-legend">
           <div className="legend-item">
             <span
@@ -140,6 +156,12 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading }) => {
             {events.filter((e) => e.type === "challenge").length}
           </span>
           <span className="stat-label">Challenges</span>
+        </div>
+        <div className="stat-item">
+          <span className="stat-number">
+            {events.filter((e) => e.type === "match").length}
+          </span>
+          <span className="stat-label">Meeting</span>
         </div>
         <div className="stat-item">
           <span className="stat-number">

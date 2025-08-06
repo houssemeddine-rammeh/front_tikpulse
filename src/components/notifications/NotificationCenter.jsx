@@ -27,6 +27,19 @@ import { useNotifications } from '../../contexts/NotificationContext';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+// Safe timestamp formatting function
+const formatTimeAgo = (timestamp) => {
+  try {
+    if (!timestamp) return 'Just now';
+    const date = new Date(timestamp);
+    if (isNaN(date.getTime())) return 'Just now';
+    return formatDistanceToNow(date, { addSuffix: true, locale: fr });
+  } catch (error) {
+    console.warn('Invalid timestamp for formatting:', timestamp, error);
+    return 'Just now';
+  }
+};
+
 const getNotificationIcon = (type) => {
   switch (type) {
     case 'info':
@@ -81,7 +94,7 @@ const NotificationItem = ({ notification, onClose }) => {
               {notification.message}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {formatDistanceToNow(new Date(notification.timestamp), { addSuffix: true, locale: fr })}
+              {formatTimeAgo(notification.timestamp)}
             </Typography>
           </>
         }

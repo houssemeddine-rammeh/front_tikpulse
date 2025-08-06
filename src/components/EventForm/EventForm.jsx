@@ -274,11 +274,10 @@ const EventForm = ({
               <option value="" disabled>
                 Select an event type
               </option>
-              <option value="Live Stream">Live Stream</option>
-              <option value="Workshop">Workshop</option>
-              <option value="Meet & Greet">Meet & Greet</option>
-              <option value="Training">Training</option>
-              <option value="Contest">Contest</option>
+              <option value="Tournaments">Tournaments</option>
+              <option value="Challenges">Challenges</option>
+              <option value="Matches">Matches</option>
+              
             </select>
             {errors.type && <span className="error">{errors.type}</span>}
           </div>

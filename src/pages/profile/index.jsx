@@ -54,7 +54,7 @@ import LoadingScreen from "../../components/LoadingScreen";
 export default function ProfileWrapper() {
   const { id: tikTokId } = useParams();
   const dispatch = useDispatch();
-  const { profile, loading, error } = useSelector((state) => state.auth);
+  const { profile, isLoading: loading, error } = useSelector((state) => state.auth);
   const { user } = useAuth();
 
   console.log("ProfileWrapper - tikTokId:", tikTokId);
@@ -72,7 +72,7 @@ export default function ProfileWrapper() {
 
   if (loading) return <LoadingScreen />;
   
-  if (error || !profile) {
+  if (error && !loading) {
     return (
       <Container maxWidth="md" sx={{ py: 10 }}>
         <Typography variant="h4" align="center" color="error" fontWeight="bold">
@@ -83,6 +83,10 @@ export default function ProfileWrapper() {
         </Typography>
       </Container>
     );
+  }
+  
+  if (!profile && !loading) {
+    return <LoadingScreen />;
   }
 
   return <Profile creator={profile} />;

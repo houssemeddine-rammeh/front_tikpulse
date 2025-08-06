@@ -55,7 +55,7 @@ import CreatorBonusCard from '../components/CreatorBonusCard';
 const CreatorProfilePage = () => {
   const { id: tikTokId } = useParams();
   const dispatch = useDispatch();
-  const { profile, loading, error } = useSelector((state) => state.auth);
+  const { profile, isLoading: loading, error } = useSelector((state) => state.auth);
   const { user } = useAuth();
   const [editData, setEditData] = useState(null);
   const [editMode, setEditMode] = useState(false);
@@ -271,7 +271,7 @@ const CreatorProfilePage = () => {
   );
 
   if (loading) return <LoadingScreen />;
-  if (error || !editData) {
+  if (error && !loading) {
     return (
       <Layout>
         <Container maxWidth="md" sx={{ py: 10 }}>
@@ -281,6 +281,9 @@ const CreatorProfilePage = () => {
         </Container>
       </Layout>
     );
+  }
+  if (!editData && !loading) {
+    return <LoadingScreen />;
   }
 
   return (

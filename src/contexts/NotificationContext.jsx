@@ -15,6 +15,18 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
   
+  // Safe timestamp utility function
+  const safeTimestamp = (timestamp) => {
+    try {
+      if (!timestamp) return new Date().toISOString();
+      const date = new Date(timestamp);
+      return isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
+    } catch (error) {
+      console.warn('Invalid timestamp provided:', timestamp);
+      return new Date().toISOString();
+    }
+  };
+  
   // Safely get auth context with error handling
   let authContext;
   try {
@@ -27,15 +39,137 @@ export const NotificationProvider = ({ children }) => {
   const { user } = authContext;
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?._id || user?.id) {
       fetchNotifications();
     } else {
       setNotifications([]);
     }
-  }, [user?.id]);
+  }, [user?._id, user?.id]);
+
+  // Initialize WebSocket connection for real-time notifications
+  useEffect(() => {
+    let wsService = null;
+    
+    const initializeWebSocket = async () => {
+      try {
+        const userId = user?._id || user?.id;
+        if (!userId) return;
+
+        // Import WebSocket service dynamically
+        const { default: WebSocketService } = await import('../services/websocket');
+        wsService = new WebSocketService();
+        
+        // Listen for notification events
+        wsService.on('notification', (data) => {
+          console.log('📨 New notification received:', data);
+          const newNotification = {
+            id: data.id || Date.now().toString(),
+            title: data.title,
+            message: data.message || data.body,
+            type: data.type || 'info',
+            timestamp: safeTimestamp(data.timestamp),
+            read: false,
+            link: data.actionUrl || data.link
+          };
+          
+          // Add notification to the beginning of the list
+          setNotifications(prev => [newNotification, ...prev]);
+        });
+
+        wsService.on('event_notification', (data) => {
+          console.log('📅 New event notification received:', data);
+          const eventNotification = {
+            id: data.id || `event-${Date.now()}`,
+            title: data.title || 'Nouvel événement',
+            message: data.message || data.body,
+            type: 'info',
+            timestamp: safeTimestamp(data.timestamp),
+            read: false,
+            link: data.actionUrl || '/events'
+          };
+          
+          setNotifications(prev => [eventNotification, ...prev]);
+        });
+
+        // Listen for manager-created events (specifically for creators)
+        wsService.on('manager_event_created', (data) => {
+          console.log('📅 Manager created new event for creators:', data);
+          const eventNotification = {
+            id: `manager-event-${Date.now()}`,
+            title: 'New Event Available',
+            message: `Manager created a new ${data.eventType || 'event'}: ${data.eventTitle || 'Untitled Event'}`,
+            type: 'info',
+            timestamp: safeTimestamp(data.timestamp),
+            read: false,
+            link: '/events',
+            metadata: {
+              eventId: data.eventId,
+              eventType: data.eventType,
+              eventTitle: data.eventTitle,
+              eventStart: data.eventStart,
+              createdBy: data.createdBy
+            }
+          };
+          
+          setNotifications(prev => [eventNotification, ...prev]);
+          
+          // Show browser notification if permission is granted
+          if (Notification.permission === 'granted') {
+            new Notification(eventNotification.title, {
+              body: eventNotification.message,
+              icon: '/favicon.ico',
+              tag: `event-${data.eventId}`,
+              requireInteraction: false
+            });
+          }
+        });
+
+        wsService.on('message_notification', (data) => {
+          console.log('💬 New message notification received:', data);
+          const messageNotification = {
+            id: data.id || `msg-${Date.now()}`,
+            title: data.title || 'Nouveau message',
+            message: data.message || data.body,
+            type: 'info',
+            timestamp: safeTimestamp(data.timestamp),
+            read: false,
+            link: data.actionUrl || `/tickets/${data.ticketId}`
+          };
+          
+          setNotifications(prev => [messageNotification, ...prev]);
+        });
+
+        wsService.on('connected', () => {
+          console.log('🔌 WebSocket connected for notifications');
+        });
+
+        wsService.on('error', (error) => {
+          console.warn('❌ WebSocket error in notifications:', error);
+        });
+
+        // Connect to WebSocket
+        wsService.connect(userId, user.role);
+        
+      } catch (error) {
+        console.warn('Failed to initialize WebSocket for notifications:', error);
+      }
+    };
+
+    if (user) {
+      initializeWebSocket();
+    }
+
+    // Cleanup function
+    return () => {
+      if (wsService) {
+        wsService.disconnect();
+      }
+    };
+  }, [user]);
 
   const fetchNotifications = async () => {
-    if (!user?.id) {
+    const userId = user?._id || user?.id;
+    if (!userId) {
       setNotifications([]);
       return;
     }
@@ -44,7 +178,7 @@ export const NotificationProvider = ({ children }) => {
       setLoading(true);
       // Lazy import to avoid initialization issues
       const api = await import('../services/api');
-      const response = await api.default.getNotifications(user.id);
+      const response = await api.default.getNotifications(userId);
       setNotifications(response.notifications || []);
     } catch (error) {
       console.warn('Failed to fetch notifications, using empty state:', error);
@@ -58,7 +192,7 @@ export const NotificationProvider = ({ children }) => {
     try {
       const newNotification = {
         id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
+        timestamp: safeTimestamp(notification.timestamp),
         read: false,
         ...notification
       };
@@ -67,7 +201,8 @@ export const NotificationProvider = ({ children }) => {
       setNotifications(prev => [newNotification, ...prev]);
 
       // Try to save to API in background
-      if (user?.id) {
+      const userId = user?._id || user?.id;
+      if (userId) {
         try {
           const api = await import('../services/api');
           await api.default.createNotification(newNotification);
@@ -92,7 +227,8 @@ export const NotificationProvider = ({ children }) => {
       );
 
       // Try to update API in background
-      if (user?.id) {
+      const userId = user?._id || user?.id;
+      if (userId) {
         try {
           const api = await import('../services/api');
           await api.default.markNotificationAsRead(notificationId);
@@ -105,16 +241,45 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  const markAllAsRead = async () => {
+    try {
+      // Update all notifications to read locally immediately
+      setNotifications(prev =>
+        prev.map(notification => ({ ...notification, read: true }))
+      );
+
+      // Try to update API in background
+      const userId = user?._id || user?.id;
+      if (userId) {
+        try {
+          const api = await import('../services/api');
+          // Mark all notifications as read for this user
+          const unreadNotifications = notifications.filter(n => !n.read);
+          await Promise.all(
+            unreadNotifications.map(notification =>
+              api.default.markNotificationAsRead(notification.id)
+            )
+          );
+        } catch (error) {
+          console.warn('Failed to mark all notifications as read in API:', error);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to mark all notifications as read:', error);
+    }
+  };
+
   const clearNotifications = async () => {
     try {
       // Clear locally immediately
       setNotifications([]);
 
       // Try to clear API in background
-      if (user?.id) {
+      const userId = user?._id || user?.id;
+      if (userId) {
         try {
           const api = await import('../services/api');
-          await api.default.clearNotifications(user.id);
+          await api.default.clearNotifications(userId);
         } catch (error) {
           console.warn('Failed to clear notifications in API:', error);
         }
@@ -124,11 +289,16 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  // Compute unread count
+  const unreadCount = notifications.filter(notification => !notification.read).length;
+
   const value = {
     notifications,
     loading,
+    unreadCount,
     addNotification,
     markAsRead,
+    markAllAsRead,
     clearNotifications,
     fetchNotifications
   };
