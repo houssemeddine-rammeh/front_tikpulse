@@ -133,11 +133,22 @@ const ticketsSlice = createSlice({
     },
     addMessage: (state, action) => {
       const { ticketId, message } = action.payload;
+      
+      // Helper function to check if message already exists
+      const messageExists = (messages, newMessage) => {
+        return messages.some(existingMsg => 
+          existingMsg._id === newMessage._id || 
+          (existingMsg.content === newMessage.content && 
+           existingMsg.createdAt === newMessage.createdAt)
+        );
+      };
+      
       const ticket = state.tickets.find(t => t._id === ticketId);
-      if (ticket) {
+      if (ticket && !messageExists(ticket.messages, message)) {
         ticket.messages.push(message);
       }
-      if (state.ticket && state.ticket._id === ticketId) {
+      
+      if (state.ticket && state.ticket._id === ticketId && !messageExists(state.ticket.messages, message)) {
         state.ticket.messages.push(message);
       }
     },
@@ -193,13 +204,24 @@ const ticketsSlice = createSlice({
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         state.messageStatus = "success";
-        // Add message to the current ticket if it matches
-        if (state.ticket) {
+        
+        // Helper function to check if message already exists
+        const messageExists = (messages, newMessage) => {
+          return messages.some(existingMsg => 
+            existingMsg._id === newMessage._id || 
+            (existingMsg.content === newMessage.content && 
+             existingMsg.createdAt === newMessage.createdAt)
+          );
+        };
+        
+        // Add message to the current ticket if it matches and doesn't exist
+        if (state.ticket && !messageExists(state.ticket.messages, action.payload)) {
           state.ticket.messages.push(action.payload);
         }
-        // Also add to the tickets list if it exists there
+        
+        // Also add to the tickets list if it exists there and doesn't exist
         const ticketInList = state.tickets.find(t => t._id === state.ticket?._id);
-        if (ticketInList) {
+        if (ticketInList && !messageExists(ticketInList.messages, action.payload)) {
           ticketInList.messages.push(action.payload);
         }
       })

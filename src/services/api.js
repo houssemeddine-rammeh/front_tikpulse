@@ -386,7 +386,7 @@ export const authAPI = {
   },
   loginWithTikTok: async (authCode) => {
     try {
-      const response = await axiosInstance.post("/auth/tiktok", { authCode });
+      const response = await axiosInstance.post("/api/v1/auth/tiktok", { authCode });
       return response.data;
     } catch (error) {
       console.warn("Backend not available, TikTok login failed");

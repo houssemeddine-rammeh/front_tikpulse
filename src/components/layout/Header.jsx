@@ -227,8 +227,8 @@ const Header = () => {
       roles: [UserRole.ADMIN],
     },
     {
-      title: "Tickets",
-      path: "/admin/tickets",
+      title: "Contact",
+      path: "/admin/contact",
       icon: <ContactIcon />,
       roles: [UserRole.ADMIN],
     },
@@ -315,36 +315,28 @@ const Header = () => {
 
       {/* Main Navigation */}
       <List sx={{ py: 0 }}>
-        {filteredMainNavItems.map((item) => (
-          <ListItemButton
-            component={Link}
-            to={item.path}
-            key={item.title}
-            onClick={() => toggleDrawer(false)}
-            sx={{
-              py: 1.5,
-              bgcolor:
-                location.pathname === item.path
-                  ? "primary.light"
-                  : "transparent",
-              color:
-                location.pathname === item.path
-                  ? "primary.contrastText"
-                  : "inherit",
-              "&:hover": {
-                bgcolor:
-                  location.pathname === item.path
-                    ? "primary.light"
-                    : "grey.100",
-              },
-            }}
-          >
+        {filteredMainNavItems.map((item) => {
+          const itemPath = item.title === "Contact" && user?.role === UserRole.ADMIN ? "/admin/contact" : item.path;
+          const isActive = location.pathname === itemPath;
+          
+          return (
+            <ListItemButton
+              component={Link}
+              to={itemPath}
+              key={item.title}
+              onClick={() => toggleDrawer(false)}
+              sx={{
+                py: 1.5,
+                bgcolor: isActive ? "primary.light" : "transparent",
+                color: isActive ? "primary.contrastText" : "inherit",
+                "&:hover": {
+                  bgcolor: isActive ? "primary.light" : "grey.100",
+                },
+              }}
+            >
             <ListItemIcon
               sx={{
-                color:
-                  location.pathname === item.path
-                    ? "primary.contrastText"
-                    : "inherit",
+                color: isActive ? "primary.contrastText" : "inherit",
                 minWidth: 40,
               }}
             >
@@ -354,11 +346,12 @@ const Header = () => {
               primary={item.title}
               primaryTypographyProps={{
                 fontSize: "0.95rem",
-                fontWeight: location.pathname === item.path ? "bold" : "normal",
+                fontWeight: isActive ? "bold" : "normal",
               }}
             />
           </ListItemButton>
-        ))}
+        );
+        })}
       </List>
 
       {/* Management Section */}
@@ -607,12 +600,13 @@ const Header = () => {
 
             {/* Events Button */}
             {(user.role === UserRole.MANAGER ||
-              user.role === UserRole.CREATOR) && (
+              user.role === UserRole.CREATOR ||
+              user.role === UserRole.ADMIN) && (
               <Tooltip title="Events">
                 <Button
                   color="inherit"
                   component={Link}
-                  to="/events"
+                  to={user.role === UserRole.ADMIN ? "/admin/events" : "/events"}
                   sx={{
                     minWidth: "auto",
                     px: { md: 1.5, lg: 2 },
@@ -621,7 +615,7 @@ const Header = () => {
                     textTransform: "none",
                     fontSize: { md: "0.85rem", lg: "0.9rem" },
                     bgcolor:
-                      location.pathname === "/events"
+                      (user.role === UserRole.ADMIN ? location.pathname === "/admin/events" : location.pathname === "/events")
                         ? "rgba(255,255,255,0.1)"
                         : "transparent",
                     "&:hover": {
@@ -695,12 +689,13 @@ const Header = () => {
             )}
 
             {(user.role === UserRole.MANAGER ||
-              user.role === UserRole.CREATOR) && (
+              user.role === UserRole.CREATOR ||
+              user.role === UserRole.ADMIN) && (
               <Tooltip title="Contact">
                 <Button
                   color="inherit"
                   component={Link}
-                  to="/contact"
+                  to={user.role === UserRole.ADMIN ? "/admin/contact" : "/contact"}
                   sx={{
                     minWidth: "auto",
                     px: { md: 1.5, lg: 2 },
@@ -709,7 +704,7 @@ const Header = () => {
                     textTransform: "none",
                     fontSize: { md: "0.85rem", lg: "0.9rem" },
                     bgcolor:
-                      location.pathname === "/contact"
+                      (user.role === UserRole.ADMIN ? location.pathname === "/admin/contact" : location.pathname === "/contact")
                         ? "rgba(255,255,255,0.1)"
                         : "transparent",
                     "&:hover": {
