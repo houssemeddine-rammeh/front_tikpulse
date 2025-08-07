@@ -134,7 +134,7 @@ const LoginPage = () => {
     // Ensure no double /api/v1 in the URL
     let apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002';
     apiBase = apiBase.replace(/\/?api\/v1\/?$/, ''); // Remove trailing /api/v1 if present
-    const url = `${apiBase}/api/v1/auth/tiktok?code_challenge=${code_challenge}&code_challenge_method=S256`;
+    const url = `${apiBase}/auth/tiktok?code_challenge=${code_challenge}&code_challenge_method=S256`;
     window.location.href = url;
   };
 
