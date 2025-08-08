@@ -33,7 +33,7 @@ const TikTokCallbackPage = () => {
 
         setStatus("loading");
 
-        // Send code to backend to get authCode
+        // Send code to backend
         const codeVerifier = sessionStorage.getItem("tiktok_code_verifier");
         const url = `${
           import.meta.env.VITE_API_BASE_URL
@@ -51,8 +51,7 @@ const TikTokCallbackPage = () => {
           throw new Error(data.error || data.message || "TikTok login failed");
         }
         const data = await response.json();
-        
-        // Use the token as authCode for the new login endpoint
+        // Login or register user with TikTok data
         await loginWithTikTok(data.token);
         setStatus("success");
         setTimeout(() => {
