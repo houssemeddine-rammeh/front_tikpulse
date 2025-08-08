@@ -55,7 +55,7 @@ const TikTokCallbackPage = () => {
         await loginWithTikTok(data.token);
         setStatus("success");
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate("/creator/dashboard");
         }, 2000);
       } catch (error) {
         console.error("TikTok OAuth callback error:", error);
