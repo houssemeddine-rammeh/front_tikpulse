@@ -58,21 +58,17 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-
-      const { authAPI } = await import("../services/api");
-      const response = await authAPI.loginWithTikTok(authCode);
-
-      if (response.user && response.token) {
-        // Optionally: dispatch to Redux if you want TikTok login to also populate state
-        dispatch({
-          type: "auth/setUserFromTikTok", // depends on your slice
-          payload: response,
-        });
-
-        return response.user;
-      } else {
+      console.log("Starting TikTok login with authCode:", authCode);
+      const resultAction = await dispatch(signInWithTikTok(authCode));
+      console.log("TikTok login resultAction:", resultAction);
+      const { payload } = resultAction;
+      console.log("TikTok login payload:", payload);
+      if (!payload?.user || !payload?.token) {
         throw new Error("Invalid TikTok login response");
       }
+
+      console.log("TikTok login successful, user:", payload.user);
+      return payload.user;
     } catch (err) {
       console.error("TikTok login failed:", err);
       setError("TikTok login failed - please try again later");
