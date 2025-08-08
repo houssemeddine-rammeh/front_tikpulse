@@ -47,6 +47,8 @@ const RealTimeChat = ({ ticket }) => {
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
+    console.log('RealTimeChat ticket updated:', ticket);
+    console.log('Messages count:', ticket?.messages?.length);
     scrollToBottom();
   }, [ticket]);
 
@@ -109,7 +111,7 @@ const RealTimeChat = ({ ticket }) => {
 
             return (
               <ListItem
-                key={index}
+                key={message._id || `message-${index}-${message.createdAt}`}
                 sx={{
                   display: "flex",
                   flexDirection: isOwnMessage ? "row-reverse" : "row",

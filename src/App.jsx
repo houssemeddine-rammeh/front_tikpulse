@@ -33,6 +33,8 @@ import CreatorProfilePage from "./pages/CreatorProfilePage";
 import CreatorResumePage from "./pages/CreatorResumePage";
 import SupportPage from "./pages/SupportPage";
 import PrivacyPage from "./pages/PrivacyPage";
+import AdminContactPage from "./pages/AdminContactPage";
+import AdminEventsPage from "./pages/AdminEventsPage";
 import { store, persistor } from "./app/store";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
@@ -366,6 +368,22 @@ function App() {
                       element={
                         <ProtectedRoute allowedRoles={["admin"]}>
                           <CreatorAnalyticsPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/contact"
+                      element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                          <AdminContactPage />
+                        </ProtectedRoute>
+                      }
+                    />
+                    <Route
+                      path="/admin/events"
+                      element={
+                        <ProtectedRoute allowedRoles={["admin"]}>
+                          <AdminEventsPage />
                         </ProtectedRoute>
                       }
                     />
