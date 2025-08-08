@@ -56,6 +56,28 @@ export const signUp = createAsyncThunk(
   }
 );
 
+// TikTok login logic
+export const signInWithTikTok = createAsyncThunk(
+  "auth/signInWithTikTok",
+  async (authCode, { dispatch, rejectWithValue }) => {
+    try {
+      dispatch(setLoading(true));
+      const response = await axiosInstance.post("/auth/tiktok", {
+        authCode
+      });
+      const { token } = response.data;
+      setToken(token); // Save token to localStorage
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error?.response?.data?.message || "TikTok login failed"
+      );
+    } finally {
+      dispatch(setLoading(false));
+    }
+  }
+);
+
 export const subscribeToNotifications = createAsyncThunk(
   "auth/subscribeToNotifications",
   async (subscription, { rejectWithValue }) => {
@@ -162,6 +184,19 @@ const authSlice = createSlice({
         state.error = null;
       })
       .addCase(getProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(signInWithTikTok.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(signInWithTikTok.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+        state.error = null;
+      })
+      .addCase(signInWithTikTok.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

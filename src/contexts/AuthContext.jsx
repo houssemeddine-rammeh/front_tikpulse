@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { signIn, logout as reduxLogout } from "../features/authSlice";
+import { signIn, signInWithTikTok, logout as reduxLogout } from "../features/authSlice";
 
 const UserRole = {
   ADMIN: "admin",
@@ -58,21 +58,13 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       setError(null);
-
-      const { authAPI } = await import("../services/api");
-      const response = await authAPI.loginWithTikTok(authCode);
-
-      if (response.user && response.token) {
-        // Optionally: dispatch to Redux if you want TikTok login to also populate state
-        dispatch({
-          type: "auth/setUserFromTikTok", // depends on your slice
-          payload: response,
-        });
-
-        return response.user;
-      } else {
+      const resultAction = await dispatch(signInWithTikTok(authCode));
+      const { payload } = resultAction;
+      if (!payload?.user || !payload?.token) {
         throw new Error("Invalid TikTok login response");
       }
+
+      return payload.user;
     } catch (err) {
       console.error("TikTok login failed:", err);
       setError("TikTok login failed - please try again later");
