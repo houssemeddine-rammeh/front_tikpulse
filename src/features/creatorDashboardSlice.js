@@ -122,29 +122,9 @@ export const getAvailableCampaigns = createAsyncThunk(
 
 // Initial state
 const initialState = {
-  creator: null,
-  stats: null,
-  availableEvents: [],
-  joinedEvents: [],
-  availableCampaigns: [],
-  joinedCampaigns: [],
-  loading: {
-    profile: false,
-    stats: false,
-    events: false,
-    campaigns: false,
-    joining: false,
-  },
-  error: {
-    profile: null,
-    stats: null,
-    events: null,
-    campaigns: null,
-    joining: null,
-  },
-  selectedTab: 0,
-  showJoinModal: false,
-  selectedItem: null,
+  creator: {},
+  loading: false,
+  error: null,
 };
 
 // Creator Dashboard Slice
@@ -178,8 +158,8 @@ const creatorDashboardSlice = createSlice({
 
     // Clear profile data (for logout)
     clearProfile: (state) => {
-      state.creator = null;
-      state.stats = null;
+      state.profile = null;
+      state.stats = initialState.stats;
       state.availableEvents = [];
       state.joinedEvents = [];
       state.availableCampaigns = [];
@@ -188,7 +168,7 @@ const creatorDashboardSlice = createSlice({
 
     // Update profile locally
     updateProfile: (state, action) => {
-      state.creator = { ...state.creator, ...action.payload };
+      state.profile = { ...state.profile, ...action.payload };
     },
 
     // Update stats locally
@@ -201,33 +181,33 @@ const creatorDashboardSlice = createSlice({
     // Get Creator Profile
     builder
       .addCase(getCreatorProfile.pending, (state) => {
-        state.loading.profile = true;
-        state.error.profile = null;
+        state.loading = true;
+        state.error = null;
       })
       .addCase(getCreatorProfile.fulfilled, (state, action) => {
-        state.loading.profile = false;
+        state.loading = false;
         state.creator = action.payload.user;
-        state.error.profile = null;
+        state.error = null;
       })
       .addCase(getCreatorProfile.rejected, (state, action) => {
-        state.loading.profile = false;
-        state.error.profile = action.payload;
+        state.loading = false;
+        state.error = action.payload;
       });
 
     // Update Creator Profile
     builder
       .addCase(updateCreatorProfile.pending, (state) => {
-        state.loading.profile = true;
-        state.error.profile = null;
+        state.loading = true;
+        state.error = null;
       })
       .addCase(updateCreatorProfile.fulfilled, (state, action) => {
-        state.loading.profile = false;
+        state.loading = false;
         state.creator = { ...state.creator, ...action.payload.user };
-        state.error.profile = null;
+        state.error = null;
       })
       .addCase(updateCreatorProfile.rejected, (state, action) => {
-        state.loading.profile = false;
-        state.error.profile = action.payload;
+        state.loading = false;
+        state.error = action.payload;
       });
 
     // Get Creator Stats
@@ -333,7 +313,7 @@ export const {
 export default creatorDashboardSlice.reducer;
 
 // Selectors
-export const selectCreatorProfile = (state) => state.creatorDashboard.creator;
+export const selectCreatorProfile = (state) => state.creatorDashboard.profile;
 export const selectCreatorStats = (state) => state.creatorDashboard.stats;
 export const selectAvailableEvents = (state) =>
   state.creatorDashboard.availableEvents;
