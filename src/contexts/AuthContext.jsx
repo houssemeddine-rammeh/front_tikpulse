@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { signIn, logout as reduxLogout } from "../features/authSlice";
+import { signIn, signInWithTikTok, logout as reduxLogout } from "../features/authSlice";
 
 const UserRole = {
   ADMIN: "admin",
