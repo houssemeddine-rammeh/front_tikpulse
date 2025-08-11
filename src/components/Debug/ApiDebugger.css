@@ -1,0 +1,269 @@
+.api-debugger {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.debugger-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.debugger-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 1.8rem;
+}
+
+.config-info {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+  margin-top: 15px;
+}
+
+.config-info p {
+  margin: 5px 0;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.debugger-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.test-button, .clear-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.test-button {
+  background: #4CAF50;
+  color: white;
+}
+
+.test-button:hover:not(:disabled) {
+  background: #45a049;
+  transform: translateY(-2px);
+}
+
+.test-button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+}
+
+.clear-button {
+  background: #f44336;
+  color: white;
+}
+
+.clear-button:hover {
+  background: #da190b;
+  transform: translateY(-2px);
+}
+
+.quick-tests {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.quick-tests h3 {
+  margin: 0 0 15px 0;
+  color: #333;
+}
+
+.test-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.test-buttons button {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.test-buttons button:hover {
+  background: #e3f2fd;
+  border-color: #2196F3;
+  color: #1976D2;
+}
+
+.responses {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.responses h3 {
+  background: #333;
+  color: white;
+  margin: 0;
+  padding: 15px 20px;
+  font-size: 1.2rem;
+}
+
+.no-responses {
+  padding: 40px 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.response-item {
+  border-bottom: 1px solid #eee;
+  padding: 15px 20px;
+}
+
+.response-item.success {
+  border-left: 4px solid #4CAF50;
+}
+
+.response-item.error {
+  border-left: 4px solid #f44336;
+}
+
+.response-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  min-width: 40px;
+  text-align: center;
+}
+
+.status-badge.success {
+  background: #4CAF50;
+  color: white;
+}
+
+.status-badge.error {
+  background: #f44336;
+  color: white;
+}
+
+.method-badge {
+  padding: 4px 8px;
+  background: #2196F3;
+  color: white;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  min-width: 50px;
+  text-align: center;
+}
+
+.url {
+  font-family: monospace;
+  background: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.timestamp {
+  color: #666;
+  font-size: 0.8rem;
+  margin-left: auto;
+}
+
+.error-message {
+  background: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #ffcdd2;
+  margin: 10px 0;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.response-data {
+  margin-top: 10px;
+}
+
+.response-data details {
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+}
+
+.response-data summary {
+  padding: 10px 15px;
+  cursor: pointer;
+  font-weight: 600;
+  background: #e9ecef;
+  border-bottom: 1px solid #dee2e6;
+  user-select: none;
+}
+
+.response-data summary:hover {
+  background: #dee2e6;
+}
+
+.response-data pre {
+  margin: 0;
+  padding: 15px;
+  background: white;
+  overflow-x: auto;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  border-radius: 0 0 4px 4px;
+}
+
+@media (max-width: 768px) {
+  .api-debugger {
+    padding: 10px;
+  }
+  
+  .debugger-controls {
+    flex-direction: column;
+  }
+  
+  .test-buttons {
+    justify-content: center;
+  }
+  
+  .response-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+  }
+  
+  .url {
+    min-width: 100%;
+    word-break: break-all;
+  }
+  
+  .timestamp {
+    margin-left: 0;
+  }
+} 
