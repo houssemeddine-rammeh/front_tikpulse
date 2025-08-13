@@ -41,10 +41,12 @@ import {
   getManagerStats,
 } from "../features/managerDashboardSlice";
 import Header from "../components/layout/Header";
-import { Add, Edit, Delete, Person, Search } from "@mui/icons-material";
+import { Add, Edit, Delete, Person, Search, Refresh as RefreshIcon, Download as DownloadIcon } from "@mui/icons-material";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import axiosInstance from "../api/axiosInstance";
 
 // Constants
 const CATEGORIES = [
@@ -83,6 +85,8 @@ const ROWS_PER_PAGE = 10;
 
 const CreatorManagementPage = () => {
   const dispatch = useDispatch();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Redux state
   const { creators = [], stats = {} } = useSelector(
@@ -92,7 +96,14 @@ const CreatorManagementPage = () => {
     (state) => state.managerDashboard.loading || false
   );
   const error = useSelector((state) => state.managerDashboard.error || null);
-  const navigate = useNavigate();
+
+  // Admin-specific state for all creators
+  const [allCreators, setAllCreators] = useState([]);
+  const [adminLoading, setAdminLoading] = useState(false);
+  const [adminError, setAdminError] = useState(null);
+  
+  // Export functionality
+  const [isExporting, setIsExporting] = useState(false);
   // Local state
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -106,35 +117,78 @@ const CreatorManagementPage = () => {
   const [sortField, setSortField] = useState(null); // "followers" or "diamonds"
   const [sortDirection, setSortDirection] = useState("desc"); // "asc" or "desc"
 
+  // Admin function to fetch all creators
+  const fetchAllCreators = async () => {
+    try {
+      setAdminLoading(true);
+      setAdminError(null);
+      
+      // Fetch managers with their creators for admin
+      const response = await axiosInstance.get('/agency/managers-with-creators');
+      
+      if (response.data.success) {
+        // Flatten the managers with creators data to get all creators
+        const flatCreators = [];
+        response.data.data.forEach(({ manager, creators: managerCreators }) => {
+          managerCreators.forEach(creator => {
+            flatCreators.push({
+              ...creator,
+              managerInfo: {
+                _id: manager._id,
+                username: manager.username,
+                email: manager.email
+              }
+            });
+          });
+        });
+        setAllCreators(flatCreators);
+      }
+    } catch (error) {
+      console.error('Error fetching all creators:', error);
+      setAdminError(error.response?.data?.message || 'Failed to fetch creators');
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
   // Fetch data on mount
   useEffect(() => {
-    dispatch(getManagerStats());
-  }, [dispatch]);
+    if (user?.role === 'admin') {
+      fetchAllCreators();
+    } else {
+      dispatch(getManagerStats());
+    }
+  }, [dispatch, user?.role]);
 
   // Memoized filtered and sorted creators
   const filteredCreators = useMemo(() => {
-    if (!creators) return [];
-    let result = creators.filter(
+    // Use admin data if user is admin, otherwise use manager data
+    const creatorData = user?.role === 'admin' ? allCreators : creators;
+    if (!creatorData) return [];
+    
+    let result = creatorData.filter(
       (creator) =>
         creator.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        creator.category?.toLowerCase().includes(searchTerm.toLowerCase())
+        creator.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        creator.managerInfo?.username?.toLowerCase().includes(searchTerm.toLowerCase())
     );
+    
     if (sortField) {
       result = [...result].sort((a, b) => {
         const aValue =
           sortField === "followers"
             ? Number(a.profile?.followers || 0)
-            : Number(a.profile?.diamonds || 0);
+            : Number(a.diamonds || 0);
         const bValue =
           sortField === "followers"
             ? Number(b.profile?.followers || 0)
-            : Number(b.profile?.diamonds || 0);
+            : Number(b.diamonds || 0);
         if (sortDirection === "asc") return aValue - bValue;
         return bValue - aValue;
       });
     }
     return result;
-  }, [creators, searchTerm, sortField, sortDirection]);
+  }, [creators, allCreators, searchTerm, sortField, sortDirection, user?.role]);
 
   // Reset page to 1 when search term changes
   useEffect(() => {
@@ -234,7 +288,11 @@ const CreatorManagementPage = () => {
       }
 
       handleDialogClose();
-      dispatch(getManagerStats());
+      if (user?.role === 'admin') {
+        fetchAllCreators();
+      } else {
+        dispatch(getManagerStats());
+      }
     } catch (error) {
       console.error("Error saving creator:", error);
     } finally {
@@ -251,13 +309,17 @@ const CreatorManagementPage = () => {
       ) {
         try {
           await dispatch(deleteCreator(creatorId)).unwrap();
-          dispatch(getCreators());
+          if (user?.role === 'admin') {
+            fetchAllCreators();
+          } else {
+            dispatch(getCreators());
+          }
         } catch (error) {
           console.error("Error deleting creator:", error);
         }
       }
     },
-    [dispatch]
+    [dispatch, user?.role, fetchAllCreators]
   );
 
   // Sort handler
@@ -269,6 +331,139 @@ const CreatorManagementPage = () => {
       setSortDirection("desc");
     }
   };
+
+  // Export to CSV function
+  const handleExportToCSV = () => {
+    setIsExporting(true);
+    
+    try {
+      // Use the current filtered creators data
+      const dataToExport = user?.role === 'admin' ? allCreators : creators;
+      
+      if (!dataToExport || dataToExport.length === 0) {
+        alert('No data to export');
+        setIsExporting(false);
+        return;
+      }
+
+      // Prepare CSV headers
+      const headers = [
+        'Username',
+        'Email',
+        'Phone',
+        'Category',
+        'Followers',
+        'Diamonds',
+        'Valid Live Days',
+        'Live Duration',
+        'Bonus Amount',
+        'Status'
+      ];
+
+      // Add Manager column for admin export
+      if (user?.role === 'admin') {
+        headers.splice(4, 0, 'Manager'); // Insert after Category
+      }
+
+      // Prepare CSV rows
+      const rows = dataToExport.map(creator => {
+        const row = [
+          creator.username || '',
+          creator.email || '',
+          creator.phone || '',
+          creator.category || '',
+          creator.profile?.followers || creator.followers || 0,
+          creator.profile?.diamonds || creator.diamonds || 0,
+          creator.validLiveDays || creator.profile?.validLiveDays || 0,
+          creator.liveDuration || creator.profile?.liveDuration || '0h 0m',
+          creator.bonus?.bonusAmountFormatted || creator.bonus?.bonusAmount || '0',
+          creator.status || 'Active'
+        ];
+
+        // Add manager info for admin export
+        if (user?.role === 'admin') {
+          row.splice(4, 0, creator.managerInfo?.username || 'N/A');
+        }
+
+        return row;
+      });
+
+      // Create CSV content
+      const csvContent = [headers, ...rows]
+        .map(row => row.map(field => `"${field}"`).join(','))
+        .join('\n');
+
+      // Create and download the file
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `creators_data_${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+    } catch (error) {
+      console.error('Error exporting to CSV:', error);
+      alert('Error exporting data. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  // Determine loading and error states based on user role
+  const isLoadingData = user?.role === 'admin' ? adminLoading : loading;
+  const errorData = user?.role === 'admin' ? adminError : error;
+
+  // If loading
+  if (isLoadingData) {
+    return (
+      <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
+        <Header />
+        <Container maxWidth="lg">
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            minHeight="60vh"
+          >
+            <CircularProgress />
+          </Box>
+        </Container>
+      </Box>
+    );
+  }
+
+  // If error
+  if (errorData) {
+    return (
+      <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
+        <Header />
+        <Container maxWidth="lg">
+          <Box sx={{ mt: 4 }}>
+            <Alert severity="error">{errorData}</Alert>
+            <Button
+              variant="contained"
+              onClick={() => {
+                if (user?.role === 'admin') {
+                  fetchAllCreators();
+                } else {
+                  dispatch(getManagerStats());
+                }
+              }}
+              sx={{ mt: 2 }}
+            >
+              <RefreshIcon sx={{ mr: 1 }} />
+              Retry
+            </Button>
+          </Box>
+        </Container>
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ bgcolor: "background.default", minHeight: "100vh" }}>
@@ -293,40 +488,71 @@ const CreatorManagementPage = () => {
                 component="h1"
                 sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}
               >
-                Creator Management
+                {user?.role === 'admin' ? 'All Creators Management' : 'Creator Management'}
               </Typography>
               <Typography
                 variant="body1"
                 color="text.secondary"
                 sx={{ fontSize: "1rem" }}
               >
-                Manage and monitor your TikTok creators
+                {user?.role === 'admin' 
+                  ? 'Manage and monitor all TikTok creators across the platform' 
+                  : 'Manage and monitor your TikTok creators'
+                }
               </Typography>
             </Box>
-            <Button
-              variant="contained"
-              startIcon={<Add />}
-              onClick={() => handleDialogOpen()}
-              size="large"
-              sx={{
-                bgcolor: "#667eea",
-                px: 4,
-                py: 1.5,
-                borderRadius: 2,
-                textTransform: "none",
-                fontWeight: 600,
-                fontSize: "1rem",
-                boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
-                "&:hover": {
-                  bgcolor: "#5a6fd8",
-                  transform: "translateY(-1px)",
-                  boxShadow: "0 6px 16px rgba(102, 126, 234, 0.4)",
-                },
-                transition: "all 0.2s ease",
-              }}
-            >
-              Add Creator
-            </Button>
+            <Box sx={{ display: 'flex', gap: 2 }}>
+              <Button
+                variant="contained"
+                startIcon={<DownloadIcon />}
+                onClick={handleExportToCSV}
+                disabled={isExporting}
+                size="large"
+                sx={{
+                  bgcolor: "#4caf50",
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: "1rem",
+                  boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
+                  "&:hover": {
+                    bgcolor: "#45a049",
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 6px 16px rgba(76, 175, 80, 0.4)",
+                  },
+                  transition: "all 0.2s ease",
+                }}
+              >
+                {isExporting ? "Exporting..." : "Export CSV"}
+              </Button>
+              
+              <Button
+                variant="contained"
+                startIcon={<Add />}
+                onClick={() => handleDialogOpen()}
+                size="large"
+                sx={{
+                  bgcolor: "#667eea",
+                  px: 4,
+                  py: 1.5,
+                  borderRadius: 2,
+                  textTransform: "none",
+                  fontWeight: 600,
+                  fontSize: "1rem",
+                  boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+                  "&:hover": {
+                    bgcolor: "#5a6fd8",
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 6px 16px rgba(102, 126, 234, 0.4)",
+                  },
+                  transition: "all 0.2s ease",
+                }}
+              >
+                Add Creator
+              </Button>
+            </Box>
           </Box>
 
           {/* Search and Stats Row */}
@@ -343,7 +569,10 @@ const CreatorManagementPage = () => {
               >
                 <TextField
                   fullWidth
-                  placeholder="Search creators by name or category..."
+                  placeholder={user?.role === 'admin' 
+                    ? "Search creators by name, category, or manager..." 
+                    : "Search creators by name or category..."
+                  }
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   InputProps={{
@@ -507,6 +736,18 @@ const CreatorManagementPage = () => {
                       >
                         Category
                       </TableCell>
+                      {user?.role === 'admin' && (
+                        <TableCell
+                          sx={{
+                            fontWeight: 700,
+                            color: "#374151",
+                            fontSize: "0.9rem",
+                            py: 2.5,
+                          }}
+                        >
+                          Manager
+                        </TableCell>
+                      )}
                       <TableCell
                         sx={{
                           fontWeight: 700,
@@ -733,6 +974,17 @@ const CreatorManagementPage = () => {
                             }}
                           />
                         </TableCell>
+                        {user?.role === 'admin' && (
+                          <TableCell sx={{ py: 2.5 }}>
+                            <Typography
+                              variant="body2"
+                              fontWeight={600}
+                              color="#374151"
+                            >
+                              {creator.managerInfo?.username || "N/A"}
+                            </Typography>
+                          </TableCell>
+                        )}
                         <TableCell sx={{ py: 2.5 }}>
                           <Typography
                             variant="body2"

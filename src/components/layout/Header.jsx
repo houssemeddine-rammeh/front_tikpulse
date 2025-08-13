@@ -171,18 +171,7 @@ const Header = () => {
         UserRole.ADMIN,
       ],
     },
-    {
-      title: "Standing",
-      path: "/standing",
-      icon: <StandingIcon />,
-      roles: [UserRole.MANAGER, UserRole.SUB_MANAGER, UserRole.ADMIN],
-    },
-    {
-      title: "Bonus Rules",
-      path: "/bonus-rules",
-      icon: <SponsorshipIcon />,
-      roles: [UserRole.MANAGER, UserRole.SUB_MANAGER, UserRole.ADMIN],
-    },
+
     {
       title: "Wiki",
       path: "/wiki",
@@ -207,8 +196,9 @@ const Header = () => {
     {
       title: "Creators",
       path: "/creators",
-      icon: <ProfileIcon />,
+      icon: <GroupIcon />,
       roles: [UserRole.ADMIN, UserRole.MANAGER, UserRole.SUB_MANAGER],
+      adminPath: "/admin/creators", // Special path for admin users
     },
     {
       title: "Tickets",
@@ -373,46 +363,41 @@ const Header = () => {
           </ListItemButton>
           <Collapse in={managementOpen} timeout="auto" unmountOnExit>
             <List component="div" disablePadding>
-              {filteredManagementNavItems.map((item) => (
-                <ListItemButton
-                  component={Link}
-                  to={item.path}
-                  key={item.title}
-                  onClick={() => toggleDrawer(false)}
-                  sx={{
-                    pl: 4,
-                    py: 1,
-                    bgcolor:
-                      location.pathname === item.path
-                        ? "primary.light"
-                        : "transparent",
-                    color:
-                      location.pathname === item.path
-                        ? "primary.contrastText"
-                        : "inherit",
-                  }}
-                >
-                  <ListItemIcon
+              {filteredManagementNavItems.map((item) => {
+                const itemPath = (user?.role === UserRole.ADMIN && item.adminPath) ? item.adminPath : item.path;
+                const isActive = location.pathname === itemPath;
+                
+                return (
+                  <ListItemButton
+                    component={Link}
+                    to={itemPath}
+                    key={item.title}
+                    onClick={() => toggleDrawer(false)}
                     sx={{
-                      color:
-                        location.pathname === item.path
-                          ? "primary.contrastText"
-                          : "inherit",
-                      minWidth: 40,
+                      pl: 4,
+                      py: 1,
+                      bgcolor: isActive ? "primary.light" : "transparent",
+                      color: isActive ? "primary.contrastText" : "inherit",
                     }}
                   >
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.title}
-                    primaryTypographyProps={{
-                      fontSize: "0.9rem",
-                      fontWeight:
-                        location.pathname === item.path ? "bold" : "normal",
-                    }}
-                  />
-                </ListItemButton>
-              ))}
+                    <ListItemIcon
+                      sx={{
+                        color: isActive ? "primary.contrastText" : "inherit",
+                        minWidth: 40,
+                      }}
+                    >
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.title}
+                      primaryTypographyProps={{
+                        fontSize: "0.9rem",
+                        fontWeight: isActive ? "bold" : "normal",
+                      }}
+                    />
+                  </ListItemButton>
+                );
+              })}
             </List>
           </Collapse>
         </>
@@ -629,14 +614,15 @@ const Header = () => {
               </Tooltip>
             )}
 
-            {/* Creators Button - Only for managers and admins */}
+            {/* Creators Button - For managers and admins */}
             {(user.role === UserRole.MANAGER ||
-              user.role === UserRole.SUB_MANAGER) && (
+              user.role === UserRole.SUB_MANAGER ||
+              user.role === UserRole.ADMIN) && (
               <Tooltip title="Creators">
                 <Button
                   color="inherit"
                   component={Link}
-                  to="/creators"
+                  to={user.role === UserRole.ADMIN ? "/admin/creators" : "/creators"}
                   sx={{
                     minWidth: "auto",
                     px: { md: 1.5, lg: 2 },
@@ -645,7 +631,7 @@ const Header = () => {
                     textTransform: "none",
                     fontSize: { md: "0.85rem", lg: "0.9rem" },
                     bgcolor:
-                      location.pathname === "/creators"
+                      (user.role === UserRole.ADMIN ? location.pathname === "/admin/creators" : location.pathname === "/creators")
                         ? "rgba(255,255,255,0.1)"
                         : "transparent",
                     "&:hover": {
