@@ -202,7 +202,7 @@ const LandingPage = () => {
       {/* DASHTRACER Logo - Top Left */}
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           top: 20,
           left: 20,
           zIndex: 1000,
@@ -219,7 +219,7 @@ const LandingPage = () => {
             filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))',
             cursor: 'pointer',
           }}
-          onClick={() => navigate('/')}
+          onClick={() => navigate('/')} 
         />
       </Box>
 

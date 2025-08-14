@@ -179,7 +179,7 @@ const LoginPage = () => {
       {/* DASHTRACER Logo - Top Left */}
       <Box
         sx={{
-          position: 'fixed',
+          position: 'absolute',
           top: 20,
           left: 20,
           zIndex: 1000,

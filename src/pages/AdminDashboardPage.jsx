@@ -308,493 +308,703 @@ const AdminDashboardPage = () => {
 
   return (
     <Layout>
-      <Container maxWidth="xl">
-        <Box sx={{ my: 4 }}>
-          {/* Header */}
-          <Box sx={{ mb: 4 }}>
-            <Typography variant="h4" sx={{ fontWeight: "bold", mb: 1 }}>
-              Admin Dashboard
-            </Typography>
-            <Typography variant="body1" color="text.secondary">
-              Welcome back, {user?.name || "Admin"}! Here's your platform
-              overview.
-            </Typography>
-          </Box>
+      <Box sx={{ 
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        py: 2
+      }}>
+        <Container maxWidth="xl">
+          <Box sx={{ py: 4 }}>
+            {/* Modern Header */}
+            <Box sx={{ 
+              mb: 6, 
+              p: 4, 
+              borderRadius: 3,
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+            }}>
+              <Typography variant="h3" sx={{ 
+                fontWeight: 700, 
+                mb: 2,
+                fontSize: { xs: '2rem', md: '2.5rem' }
+              }}>
+                Admin Dashboard
+              </Typography>
+              <Typography variant="h6" sx={{ 
+                opacity: 0.9,
+                fontWeight: 400
+              }}>
+                Welcome back, {user?.name || "Admin"}! 🚀 Manage your platform overview
+              </Typography>
+            </Box>
 
-          {/* Platform Overview */}
-          <Typography variant="h5" sx={{ mb: 3 }}>
-            Platform Overview
-          </Typography>
+            {/* Modern Stats Cards */}
+            <Grid container spacing={3} sx={{ mb: 6 }}>
+              <Grid item xs={12} sm={6} md={4}>
+                <Card sx={{ 
+                  p: 3, 
+                  borderRadius: 3,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  boxShadow: '0 8px 25px rgba(102, 126, 234, 0.2)',
+                  border: 'none',
+                  transition: 'transform 0.2s ease',
+                  "&:hover": {
+                    transform: 'translateY(-4px)'
+                  }
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                      <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+                        {uploadStats.totalCreators}
+                      </Typography>
+                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                        Total Creators
+                      </Typography>
+                    </Box>
+                    <CreatorsIcon sx={{ fontSize: 40, opacity: 0.8 }} />
+                  </Box>
+                </Card>
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={4}>
+                <Card sx={{ 
+                  p: 3, 
+                  borderRadius: 3,
+                  background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                  color: 'white',
+                  boxShadow: '0 8px 25px rgba(240, 147, 251, 0.2)',
+                  border: 'none',
+                  transition: 'transform 0.2s ease',
+                  "&:hover": {
+                    transform: 'translateY(-4px)'
+                  }
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                      <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+                        {uploadStats.totalManagers}
+                      </Typography>
+                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                        Total Managers
+                      </Typography>
+                    </Box>
+                    <AdminPanelSettingsOutlined sx={{ fontSize: 40, opacity: 0.8 }} />
+                  </Box>
+                </Card>
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={4}>
+                <Card sx={{ 
+                  p: 3, 
+                  borderRadius: 3,
+                  background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                  color: 'white',
+                  boxShadow: '0 8px 25px rgba(79, 172, 254, 0.2)',
+                  border: 'none',
+                  transition: 'transform 0.2s ease',
+                  "&:hover": {
+                    transform: 'translateY(-4px)'
+                  }
+                }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <Box>
+                      <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+                        98.5%
+                      </Typography>
+                      <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                        Platform Health
+                      </Typography>
+                    </Box>
+                    <TrendingUpIcon sx={{ fontSize: 40, opacity: 0.8 }} />
+                  </Box>
+                </Card>
+              </Grid>
+            </Grid>
 
-          {/* Editable Bonus Rules Section */}
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              mb: 2,
-            }}
-          >
-            <Typography
-              variant="h5"
-              sx={{ fontWeight: "bold", color: "#1976d2" }}
-            >
-              💎 Bonus Rules Management
-            </Typography>
-            <Button
-              variant="contained"
-              startIcon={<AddIcon />}
-              onClick={() => setShowAddDialog(true)}
-              sx={{ bgcolor: "#4caf50", "&:hover": { bgcolor: "#45a049" } }}
-            >
-              Add New Rule
-            </Button>
-          </Box>
-
-          <TableContainer
-            component={Paper}
-            sx={{ mb: 4, boxShadow: "0 4px 6px rgba(0,0,0,0.1)" }}
-          >
-            <Table>
-              <TableHead>
-                <TableRow sx={{ bgcolor: "#f5f5f5" }}>
-                  <TableCell sx={{ fontWeight: "bold" }}>Program</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Valid Days</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>
-                    Hours Required
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Rate</TableCell>
-                  <TableCell sx={{ fontWeight: "bold" }}>Actions</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {bonusRules.map((rule) => (
-                  <TableRow
-                    key={rule.id}
-                    sx={{ "&:hover": { bgcolor: "#f9f9f9" } }}
+                         {/* Modern Bonus Rules Card */}
+             <Card sx={{ 
+               mb: 4, 
+               borderRadius: 3,
+               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+               border: 'none',
+               overflow: 'hidden'
+             }}>
+               <Box sx={{ 
+                 p: 4,
+                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                 color: 'white'
+               }}>
+                 <Box
+                   sx={{
+                     display: "flex",
+                     justifyContent: "space-between",
+                     alignItems: "center",
+                   }}
+                 >
+                                <Box>
+                    <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
+                      💎 Bonus Rules Management
+                    </Typography>
+                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                      Configure and manage creator bonus programs
+                    </Typography>
+                  </Box>
+                  <Button
+                    variant="contained"
+                    startIcon={<AddIcon />}
+                    onClick={() => setShowAddDialog(true)}
+                    sx={{ 
+                      bgcolor: "rgba(255, 255, 255, 0.2)", 
+                      color: 'white',
+                      backdropFilter: 'blur(10px)',
+                      border: '1px solid rgba(255, 255, 255, 0.3)',
+                      "&:hover": { 
+                        bgcolor: "rgba(255, 255, 255, 0.3)",
+                        transform: 'translateY(-1px)',
+                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+                      },
+                      transition: 'all 0.2s ease'
+                    }}
                   >
-                    <TableCell>
-                      {editingRule === rule.id ? (
-                        <TextField
-                          value={editedRule?.program || ""}
-                          onChange={(e) =>
-                            setEditedRule({
-                              ...editedRule,
-                              program: e.target.value,
-                            })
-                          }
-                          size="small"
-                          fullWidth
-                        />
-                      ) : (
-                        <Chip
-                          label={rule.program}
-                          color={getProgramColor(rule.program)}
-                          sx={{ fontWeight: "bold" }}
-                        />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editingRule === rule.id ? (
-                        <TextField
-                          value={editedRule?.validDay || ""}
-                          onChange={(e) =>
-                            setEditedRule({
-                              ...editedRule,
-                              validDay: e.target.value,
-                            })
-                          }
-                          size="small"
-                          fullWidth
-                        />
-                      ) : (
-                        rule.validDay
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editingRule === rule.id ? (
-                        <TextField
-                          value={editedRule?.hours || ""}
-                          onChange={(e) =>
-                            setEditedRule({
-                              ...editedRule,
-                              hours: e.target.value,
-                            })
-                          }
-                          size="small"
-                          fullWidth
-                        />
-                      ) : (
-                        rule.hours
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editingRule === rule.id ? (
-                        <TextField
-                          value={editedRule?.rate || ""}
-                          onChange={(e) =>
-                            setEditedRule({
-                              ...editedRule,
-                              rate: e.target.value,
-                            })
-                          }
-                          size="small"
-                          fullWidth
-                        />
-                      ) : (
-                        <Typography
-                          sx={{ color: "#2e7d32", fontWeight: "bold" }}
-                        >
-                          {rule.rate}
-                        </Typography>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {editingRule === rule.id ? (
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                          <IconButton
-                            onClick={handleSaveRule}
-                            color="primary"
-                            size="small"
-                          >
-                            <SaveIcon />
-                          </IconButton>
-                          <IconButton
-                            onClick={handleCancelEdit}
-                            color="secondary"
-                            size="small"
-                          >
-                            <CancelIcon />
-                          </IconButton>
-                        </Box>
-                      ) : (
-                        <Box sx={{ display: "flex", gap: 1 }}>
-                          <IconButton
-                            onClick={() => handleEditRule(rule)}
-                            color="primary"
-                            size="small"
-                          >
-                            <EditIcon />
-                          </IconButton>
-                          <IconButton
-                            onClick={() => handleDeleteRule(rule.id)}
-                            color="error"
-                            size="small"
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Box>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                    Add New Rule
+                  </Button>
+                 </Box>
+               </Box>
 
-          {/* Managers & Creators Table */}
-          <Box sx={{ mt: 6 }}>
-            <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-              Managers & Their Creators
-            </Typography>
-            {loadingManagers ? (
-              <Box sx={{ textAlign: "center", py: 4 }}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              <Paper sx={{ mb: 4 }}>
-                <TableContainer>
-                  <Table>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>
-                          <TableSortLabel
-                            active={managerOrderBy === "username"}
-                            direction={
-                              managerOrderBy === "username"
-                                ? managerOrder
-                                : "asc"
+              <TableContainer sx={{ background: 'white' }}>
+              <Table>
+                <TableHead>
+                  <TableRow sx={{ 
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                  }}>
+                    <TableCell sx={{ 
+                      fontWeight: "bold", 
+                      color: 'white',
+                      fontSize: '0.95rem'
+                    }}>Program</TableCell>
+                    <TableCell sx={{ 
+                      fontWeight: "bold", 
+                      color: 'white',
+                      fontSize: '0.95rem'
+                    }}>Valid Days</TableCell>
+                    <TableCell sx={{ 
+                      fontWeight: "bold", 
+                      color: 'white',
+                      fontSize: '0.95rem'
+                    }}>
+                      Hours Required
+                    </TableCell>
+                    <TableCell sx={{ 
+                      fontWeight: "bold", 
+                      color: 'white',
+                      fontSize: '0.95rem'
+                    }}>Rate</TableCell>
+                    <TableCell sx={{ 
+                      fontWeight: "bold", 
+                      color: 'white',
+                      fontSize: '0.95rem'
+                    }}>Actions</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {bonusRules.map((rule) => (
+                    <TableRow
+                      key={rule.id}
+                      sx={{ 
+                        "&:hover": { 
+                          bgcolor: "rgba(102, 126, 234, 0.04)",
+                          transform: 'translateY(-1px)',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+                          transition: 'all 0.2s ease'
+                        },
+                        borderBottom: '1px solid #f0f0f0'
+                      }}
+                    >
+                      <TableCell>
+                        {editingRule === rule.id ? (
+                          <TextField
+                            value={editedRule?.program || ""}
+                            onChange={(e) =>
+                              setEditedRule({
+                                ...editedRule,
+                                program: e.target.value,
+                              })
                             }
-                            onClick={() => handleManagerSort("username")}
+                            size="small"
+                            fullWidth
+                          />
+                        ) : (
+                          <Chip
+                            label={rule.program}
+                            color={getProgramColor(rule.program)}
+                            sx={{ fontWeight: "bold" }}
+                          />
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingRule === rule.id ? (
+                          <TextField
+                            value={editedRule?.validDay || ""}
+                            onChange={(e) =>
+                              setEditedRule({
+                                ...editedRule,
+                                validDay: e.target.value,
+                              })
+                            }
+                            size="small"
+                            fullWidth
+                          />
+                        ) : (
+                          rule.validDay
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingRule === rule.id ? (
+                          <TextField
+                            value={editedRule?.hours || ""}
+                            onChange={(e) =>
+                              setEditedRule({
+                                ...editedRule,
+                                hours: e.target.value,
+                              })
+                            }
+                            size="small"
+                            fullWidth
+                          />
+                        ) : (
+                          rule.hours
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingRule === rule.id ? (
+                          <TextField
+                            value={editedRule?.rate || ""}
+                            onChange={(e) =>
+                              setEditedRule({
+                                ...editedRule,
+                                rate: e.target.value,
+                              })
+                            }
+                            size="small"
+                            fullWidth
+                          />
+                        ) : (
+                          <Typography
+                            sx={{ color: "#2e7d32", fontWeight: "bold" }}
                           >
-                            Manager Username
-                          </TableSortLabel>
-                        </TableCell>
-                        <TableCell>Email</TableCell>
-                        <TableCell>Phone</TableCell>
-                        <TableCell>Creators</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {paginatedManagers.map(({ manager, creators }) => (
-                        <React.Fragment key={manager._id}>
-                          <TableRow sx={{ bgcolor: "#f5f5f5" }}>
-                            <TableCell sx={{ fontWeight: "bold" }}>
-                              {manager.username}
-                            </TableCell>
-                            <TableCell>{manager.email}</TableCell>
-                            <TableCell>{manager.phone}</TableCell>
-                            <TableCell>
-                              <Typography
-                                variant="body2"
-                                color="text.secondary"
-                              >
-                                {creators.length} creators
-                              </Typography>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell colSpan={4} sx={{ p: 0, border: 0 }}>
-                              <Table
-                                size="small"
-                                sx={{ bgcolor: "#fafafa", ml: 2 }}
-                              >
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell>
-                                      <TableSortLabel
-                                        active={creatorOrderBy === "username"}
-                                        direction={creatorOrder}
-                                        onClick={() =>
-                                          handleCreatorSort(
-                                            manager._id,
-                                            "username"
-                                          )
-                                        }
-                                      >
-                                        Creator Username
-                                      </TableSortLabel>
-                                    </TableCell>
-                                    <TableCell>Email</TableCell>
-                                    <TableCell>Phone</TableCell>
-                                    <TableCell>Live Days</TableCell>
-                                    <TableCell>Diamonds</TableCell>
-                                    <TableCell>Hours</TableCell>
-                                    <TableCell>Bonus</TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {creators
-                                    .slice()
-                                    .sort((a, b) => {
-                                      const aValue =
-                                        a[creatorOrderBy]?.toLowerCase?.() ||
-                                        a[creatorOrderBy] ||
-                                        "";
-                                      const bValue =
-                                        b[creatorOrderBy]?.toLowerCase?.() ||
-                                        b[creatorOrderBy] ||
-                                        "";
-                                      if (creatorOrder === "asc")
-                                        return aValue > bValue ? 1 : -1;
-                                      return aValue < bValue ? 1 : -1;
-                                    })
-                                    .slice(
-                                      creatorPage[manager._id] ||
-                                        0 *
-                                          (creatorRowsPerPage[manager._id] ||
-                                            5),
-                                      (creatorPage[manager._id] || 0) *
-                                        (creatorRowsPerPage[manager._id] || 5) +
-                                        (creatorRowsPerPage[manager._id] || 5)
-                                    )
-                                    .map((creator) => (
-                                      <TableRow key={creator._id}>
-                                        <TableCell>
-                                          {creator.username}
-                                        </TableCell>
-                                        <TableCell>{creator.email}</TableCell>
-                                        <TableCell>{creator.phone}</TableCell>
-                                        <TableCell>
-                                          {creator.validLiveDays}
-                                        </TableCell>
-                                        <TableCell>
-                                          {creator.diamonds}
-                                        </TableCell>
-                                        <TableCell>
-                                          {creator.bonus?.hoursFormatted ||
-                                            creator.liveDuration}
-                                        </TableCell>
-                                        <TableCell>
-                                          {creator.bonus
-                                            ?.bonusAmountFormatted || "-"}
-                                        </TableCell>
-                                      </TableRow>
-                                    ))}
-                                </TableBody>
-                              </Table>
-                              <TablePagination
-                                component="div"
-                                count={creators.length}
-                                page={creatorPage[manager._id] || 0}
-                                onPageChange={(_, newPage) =>
-                                  handleCreatorPageChange(manager._id, newPage)
-                                }
-                                rowsPerPage={
-                                  creatorRowsPerPage[manager._id] || 5
-                                }
-                                onRowsPerPageChange={(e) =>
-                                  handleCreatorRowsPerPageChange(manager._id, e)
-                                }
-                                rowsPerPageOptions={[5, 10, 25]}
-                                labelRowsPerPage="Creators per page"
-                              />
-                            </TableCell>
-                          </TableRow>
-                        </React.Fragment>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <TablePagination
-                  component="div"
-                  count={managersWithCreators.length}
-                  page={managerPage}
-                  onPageChange={handleManagerPageChange}
-                  rowsPerPage={managerRowsPerPage}
-                  onRowsPerPageChange={handleManagerRowsPerPageChange}
-                  rowsPerPageOptions={[5, 10, 25]}
+                            {rule.rate}
+                          </Typography>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {editingRule === rule.id ? (
+                          <Box sx={{ display: "flex", gap: 1 }}>
+                            <IconButton
+                              onClick={handleSaveRule}
+                              color="primary"
+                              size="small"
+                            >
+                              <SaveIcon />
+                            </IconButton>
+                            <IconButton
+                              onClick={handleCancelEdit}
+                              color="secondary"
+                              size="small"
+                            >
+                              <CancelIcon />
+                            </IconButton>
+                          </Box>
+                        ) : (
+                          <Box sx={{ display: "flex", gap: 1 }}>
+                            <IconButton
+                              onClick={() => handleEditRule(rule)}
+                              color="primary"
+                              size="small"
+                            >
+                              <EditIcon />
+                            </IconButton>
+                            <IconButton
+                              onClick={() => handleDeleteRule(rule.id)}
+                              color="error"
+                              size="small"
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              </TableContainer>
+            </Card>
+
+            {/* Modern Managers & Creators Section */}
+            <Card sx={{ 
+              mb: 4, 
+              borderRadius: 3,
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              border: 'none',
+              overflow: 'hidden'
+            }}>
+              <Box sx={{ 
+                p: 4,
+                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                color: 'white'
+              }}>
+                <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
+                  👥 Managers & Their Creators
+                </Typography>
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Overview of all managers and their assigned creators
+                </Typography>
+              </Box>
+              {loadingManagers ? (
+                <Box sx={{ textAlign: "center", py: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <Box sx={{ background: 'white' }}>
+                  <TableContainer>
+                    <Table>
+                      <TableHead>
+                        <TableRow>
+                          <TableCell>
+                            <TableSortLabel
+                              active={managerOrderBy === "username"}
+                              direction={
+                                managerOrderBy === "username"
+                                  ? managerOrder
+                                  : "asc"
+                              }
+                              onClick={() => handleManagerSort("username")}
+                            >
+                              Manager Username
+                            </TableSortLabel>
+                          </TableCell>
+                          <TableCell>Email</TableCell>
+                          <TableCell>Phone</TableCell>
+                          <TableCell>Creators</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {paginatedManagers.map(({ manager, creators }) => (
+                          <React.Fragment key={manager._id}>
+                            <TableRow sx={{ bgcolor: "#f5f5f5" }}>
+                              <TableCell sx={{ fontWeight: "bold" }}>
+                                {manager.username}
+                              </TableCell>
+                              <TableCell>{manager.email}</TableCell>
+                              <TableCell>{manager.phone}</TableCell>
+                              <TableCell>
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                >
+                                  {creators.length} creators
+                                </Typography>
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell colSpan={4} sx={{ p: 0, border: 0 }}>
+                                <Table
+                                  size="small"
+                                  sx={{ bgcolor: "#fafafa", ml: 2 }}
+                                >
+                                  <TableHead>
+                                    <TableRow>
+                                      <TableCell>
+                                        <TableSortLabel
+                                          active={creatorOrderBy === "username"}
+                                          direction={creatorOrder}
+                                          onClick={() =>
+                                            handleCreatorSort(
+                                              manager._id,
+                                              "username"
+                                            )
+                                          }
+                                        >
+                                          Creator Username
+                                        </TableSortLabel>
+                                      </TableCell>
+                                      <TableCell>Email</TableCell>
+                                      <TableCell>Phone</TableCell>
+                                      <TableCell>Live Days</TableCell>
+                                      <TableCell>Diamonds</TableCell>
+                                      <TableCell>Hours</TableCell>
+                                      <TableCell>Bonus</TableCell>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    {creators
+                                      .slice()
+                                      .sort((a, b) => {
+                                        const aValue =
+                                          a[creatorOrderBy]?.toLowerCase?.() ||
+                                          a[creatorOrderBy] ||
+                                          "";
+                                        const bValue =
+                                          b[creatorOrderBy]?.toLowerCase?.() ||
+                                          b[creatorOrderBy] ||
+                                          "";
+                                        if (creatorOrder === "asc")
+                                          return aValue > bValue ? 1 : -1;
+                                        return aValue < bValue ? 1 : -1;
+                                      })
+                                      .slice(
+                                        creatorPage[manager._id] ||
+                                          0 *
+                                            (creatorRowsPerPage[manager._id] ||
+                                              5),
+                                        (creatorPage[manager._id] || 0) *
+                                          (creatorRowsPerPage[manager._id] || 5) +
+                                          (creatorRowsPerPage[manager._id] || 5)
+                                      )
+                                      .map((creator) => (
+                                        <TableRow key={creator._id}>
+                                          <TableCell>
+                                            {creator.username}
+                                          </TableCell>
+                                          <TableCell>{creator.email}</TableCell>
+                                          <TableCell>{creator.phone}</TableCell>
+                                          <TableCell>
+                                            {creator.validLiveDays}
+                                          </TableCell>
+                                          <TableCell>
+                                            {creator.diamonds}
+                                          </TableCell>
+                                          <TableCell>
+                                            {creator.bonus?.hoursFormatted ||
+                                              creator.liveDuration}
+                                          </TableCell>
+                                          <TableCell>
+                                            {creator.bonus
+                                              ?.bonusAmountFormatted || "-"}
+                                          </TableCell>
+                                        </TableRow>
+                                      ))}
+                                  </TableBody>
+                                </Table>
+                                <TablePagination
+                                  component="div"
+                                  count={creators.length}
+                                  page={creatorPage[manager._id] || 0}
+                                  onPageChange={(_, newPage) =>
+                                    handleCreatorPageChange(manager._id, newPage)
+                                  }
+                                  rowsPerPage={
+                                    creatorRowsPerPage[manager._id] || 5
+                                  }
+                                  onRowsPerPageChange={(e) =>
+                                    handleCreatorRowsPerPageChange(manager._id, e)
+                                  }
+                                  rowsPerPageOptions={[5, 10, 25]}
+                                  labelRowsPerPage="Creators per page"
+                                />
+                              </TableCell>
+                            </TableRow>
+                          </React.Fragment>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <TablePagination
+                    component="div"
+                    count={managersWithCreators.length}
+                    page={managerPage}
+                    onPageChange={handleManagerPageChange}
+                    rowsPerPage={managerRowsPerPage}
+                    onRowsPerPageChange={handleManagerRowsPerPageChange}
+                                      rowsPerPageOptions={[5, 10, 25]}
                   labelRowsPerPage="Managers per page"
                 />
-              </Paper>
-            )}
-          </Box>
+                </Box>
+              )}
+            </Card>
 
-          {/* Excel Upload Dropzone */}
-          <Box sx={{ my: 4 }}>
-            <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }}>
-              Upload Creator Data (Excel)
-            </Typography>
-            <Box
-              {...getRootProps()}
-              sx={{
-                border: "2px dashed #1976d2",
-                borderRadius: 2,
+            {/* Modern Excel Upload Section */}
+            <Card sx={{ 
+              mb: 4, 
+              borderRadius: 3,
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              border: 'none',
+              overflow: 'hidden'
+            }}>
+              <Box sx={{ 
                 p: 4,
-                textAlign: "center",
-                bgcolor: isDragActive ? "#e3f2fd" : "#fafafa",
-                cursor: "pointer",
-                mb: 2,
-              }}
-            >
-              <input {...getInputProps()} />
-              {isDragActive ? (
-                <Typography>Drop the Excel file here...</Typography>
-              ) : (
-                <Typography>
-                  Drag & drop an Excel file here, or click to select file (.xlsx, .xls)
+                background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                color: 'white'
+              }}>
+                <Typography variant="h5" sx={{ mb: 1, fontWeight: "bold" }}>
+                  📊 Upload Creator Data
                 </Typography>
-              )}
-              {uploading && <CircularProgress sx={{ mt: 2 }} />}
-              {uploadResult && (
-                <Alert severity={uploadResult.success ? "success" : "error"} sx={{ mt: 2 }}>
-                  {uploadResult.message}
-                </Alert>
-              )}
-            </Box>
-          </Box>
-
-          {/* Upload Confirmation Dialog */}
-          <Dialog open={showUploadDialog} onClose={handleUploadCancel} maxWidth="sm" fullWidth>
-            <DialogTitle>Confirm Upload</DialogTitle>
-            <DialogContent>
-              <Box sx={{ pt: 1 }}>
-                <Typography variant="body1" gutterBottom>
-                  Are you sure you want to upload this file?
+                <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                  Import creator data from Excel files (.xlsx, .xls)
                 </Typography>
-                {selectedFile && (
-                  <Box sx={{ mt: 2, p: 2, bgcolor: "#f5f5f5", borderRadius: 1 }}>
-                    <Typography variant="body2" sx={{ fontWeight: "bold" }}>
-                      File Details:
+              </Box>
+              
+              <Box sx={{ p: 4 }}>
+                <Box
+                  {...getRootProps()}
+                  sx={{
+                    border: "2px dashed #667eea",
+                    borderRadius: 3,
+                    p: 6,
+                    textAlign: "center",
+                    bgcolor: isDragActive ? "rgba(102, 126, 234, 0.08)" : "rgba(102, 126, 234, 0.04)",
+                    cursor: "pointer",
+                    mb: 2,
+                    transition: 'all 0.3s ease',
+                    "&:hover": {
+                      bgcolor: "rgba(102, 126, 234, 0.08)",
+                      transform: 'translateY(-2px)',
+                      boxShadow: '0 8px 25px rgba(102, 126, 234, 0.15)'
+                    }
+                  }}
+                >
+                <input {...getInputProps()} />
+                {isDragActive ? (
+                  <Typography sx={{ 
+                    color: '#667eea', 
+                    fontWeight: 'bold', 
+                    fontSize: '1.1rem' 
+                  }}>
+                    📁 Drop the Excel file here...
+                  </Typography>
+                ) : (
+                  <Box>
+                    <Upload sx={{ fontSize: 48, color: '#667eea', mb: 2 }} />
+                    <Typography sx={{ 
+                      color: '#667eea', 
+                      fontWeight: 'bold', 
+                      fontSize: '1.1rem', 
+                      mb: 1 
+                    }}>
+                      Drag & drop an Excel file here, or click to select
                     </Typography>
-                    <Typography variant="body2">Name: {selectedFile.name}</Typography>
-                    <Typography variant="body2">Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB</Typography>
-                    <Typography variant="body2">Type: {selectedFile.type}</Typography>
+                    <Typography sx={{ 
+                      color: '#64748b', 
+                      fontSize: '0.9rem' 
+                    }}>
+                      Supported formats: .xlsx, .xls
+                    </Typography>
                   </Box>
                 )}
+                {uploading && <CircularProgress sx={{ mt: 2 }} />}
+                {uploadResult && (
+                  <Alert severity={uploadResult.success ? "success" : "error"} sx={{ mt: 2 }}>
+                    {uploadResult.message}
+                  </Alert>
+                )}
+                </Box>
               </Box>
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleUploadCancel}>Cancel</Button>
-              <Button onClick={handleUploadConfirm} variant="contained" disabled={uploading}>
-                {uploading ? <CircularProgress size={20} /> : "Upload"}
-              </Button>
-            </DialogActions>
-          </Dialog>
-        </Box>
+            </Card>
 
-        {/* Add Rule Dialog */}
-        <Dialog
-          open={showAddDialog}
-          onClose={() => setShowAddDialog(false)}
-          maxWidth="sm"
-          fullWidth
-        >
-          <DialogTitle>Add New Bonus Rule</DialogTitle>
-          <DialogContent>
-            <Box
-              sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}
+            {/* Upload Confirmation Dialog */}
+            <Dialog open={showUploadDialog} onClose={handleUploadCancel} maxWidth="sm" fullWidth>
+              <DialogTitle>Confirm Upload</DialogTitle>
+              <DialogContent>
+                <Box sx={{ pt: 1 }}>
+                  <Typography variant="body1" gutterBottom>
+                    Are you sure you want to upload this file?
+                  </Typography>
+                  {selectedFile && (
+                    <Box sx={{ mt: 2, p: 2, bgcolor: "#f5f5f5", borderRadius: 1 }}>
+                      <Typography variant="body2" sx={{ fontWeight: "bold" }}>
+                        File Details:
+                      </Typography>
+                      <Typography variant="body2">Name: {selectedFile.name}</Typography>
+                      <Typography variant="body2">Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB</Typography>
+                      <Typography variant="body2">Type: {selectedFile.type}</Typography>
+                    </Box>
+                  )}
+                </Box>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleUploadCancel}>Cancel</Button>
+                <Button onClick={handleUploadConfirm} variant="contained" disabled={uploading}>
+                  {uploading ? <CircularProgress size={20} /> : "Upload"}
+                </Button>
+              </DialogActions>
+            </Dialog>
+
+            {/* Add Rule Dialog */}
+            <Dialog
+              open={showAddDialog}
+              onClose={() => setShowAddDialog(false)}
+              maxWidth="sm"
+              fullWidth
             >
-              <TextField
-                label="Program Name"
-                value={newRule.program}
-                onChange={(e) =>
-                  setNewRule({ ...newRule, program: e.target.value })
-                }
-                fullWidth
-              />
-              <TextField
-                label="Valid Days Required"
-                value={newRule.validDay}
-                onChange={(e) =>
-                  setNewRule({ ...newRule, validDay: e.target.value })
-                }
-                fullWidth
-                placeholder="e.g., ≥7"
-              />
-              <TextField
-                label="Hours Required"
-                value={newRule.hours}
-                onChange={(e) =>
-                  setNewRule({ ...newRule, hours: e.target.value })
-                }
-                fullWidth
-                placeholder="e.g., ≥15"
-              />
-              <TextField
-                label="Rate"
-                value={newRule.rate}
-                onChange={(e) =>
-                  setNewRule({ ...newRule, rate: e.target.value })
-                }
-                fullWidth
-                placeholder="e.g., 0.03%"
-              />
-            </Box>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={() => setShowAddDialog(false)}>Cancel</Button>
-            <Button onClick={handleAddRule} variant="contained">
-              Add Rule
-            </Button>
-          </DialogActions>
-        </Dialog>
+              <DialogTitle>Add New Bonus Rule</DialogTitle>
+              <DialogContent>
+                <Box
+                  sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}
+                >
+                  <TextField
+                    label="Program Name"
+                    value={newRule.program}
+                    onChange={(e) =>
+                      setNewRule({ ...newRule, program: e.target.value })
+                    }
+                    fullWidth
+                  />
+                  <TextField
+                    label="Valid Days Required"
+                    value={newRule.validDay}
+                    onChange={(e) =>
+                      setNewRule({ ...newRule, validDay: e.target.value })
+                    }
+                    fullWidth
+                    placeholder="e.g., ≥7"
+                  />
+                  <TextField
+                    label="Hours Required"
+                    value={newRule.hours}
+                    onChange={(e) =>
+                      setNewRule({ ...newRule, hours: e.target.value })
+                    }
+                    fullWidth
+                    placeholder="e.g., ≥15"
+                  />
+                  <TextField
+                    label="Rate"
+                    value={newRule.rate}
+                    onChange={(e) =>
+                      setNewRule({ ...newRule, rate: e.target.value })
+                    }
+                    fullWidth
+                    placeholder="e.g., 0.03%"
+                  />
+                </Box>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setShowAddDialog(false)}>Cancel</Button>
+                <Button onClick={handleAddRule} variant="contained">
+                  Add Rule
+                </Button>
+              </DialogActions>
+            </Dialog>
 
-        {/* Snackbar for notifications */}
-        <Snackbar
-          open={snackbar.open}
-          autoHideDuration={6000}
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-        >
-          <Alert
-            onClose={() => setSnackbar({ ...snackbar, open: false })}
-            severity={snackbar.severity}
-            sx={{ width: "100%" }}
-          >
-            {snackbar.message}
-          </Alert>
-        </Snackbar>
-      </Container>
+            {/* Snackbar for notifications */}
+            <Snackbar
+              open={snackbar.open}
+              autoHideDuration={6000}
+              onClose={() => setSnackbar({ ...snackbar, open: false })}
+            >
+              <Alert
+                onClose={() => setSnackbar({ ...snackbar, open: false })}
+                severity={snackbar.severity}
+                sx={{ width: "100%" }}
+              >
+                {snackbar.message}
+              </Alert>
+            </Snackbar>
+          </Box>
+        </Container>
+      </Box>
     </Layout>
   );
 };
