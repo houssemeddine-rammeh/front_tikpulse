@@ -199,15 +199,17 @@ const LandingPage = () => {
 
   return (
     <Box sx={{ minHeight: '100vh' }}>
-      {/* DASHTRACER Logo - Top Left */}
+      {/* DASHTRACER Logo - Fixed Top Left */}
       <Box
         sx={{
           position: 'absolute',
-          top: 20,
-          left: 20,
-          zIndex: 1000,
-          width: { xs: 120, sm: 150, md: 180 },
+          top: { xs: 0, sm: 12, md: 16, lg: 20 }, // Progressive responsive positioning
+          left: { xs: 8, sm: 12, md: 16, lg: 20 }, // Progressive responsive positioning
+          zIndex: 9999, // High z-index to stay above everything
+          width: { xs: 90, sm: 110, md: 140, lg: 160, xl: 180 }, // Progressive sizing
           height: 'auto',
+          maxWidth: { xs: '20vw', sm: '22vw', md: '25vw' }, // Responsive max width
+          minWidth: { xs: '80px', sm: '100px' }, // Minimum size for readability
         }}
       >
         <img
@@ -216,10 +218,12 @@ const LandingPage = () => {
           style={{
             width: '100%',
             height: 'auto',
-            filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))',
+            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
             cursor: 'pointer',
+            display: 'block',
+            objectFit: 'contain', // Ensure proper scaling
           }}
-          onClick={() => navigate('/')} 
+          onClick={() => navigate('/')}
         />
       </Box>
 
