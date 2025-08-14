@@ -116,7 +116,7 @@ const PWAInstallPrompt = () => {
           mb={2}
         >
           <Typography variant="h6">
-            {isIOS ? "Install Tik Pulse" : "Add Tik Pulse to your home screen"}
+            {isIOS ? "Install DashTracer" : "Add DashTracer to your home screen"}
           </Typography>
           <IconButton onClick={handleClose}>
             <CloseIcon />
