@@ -23,7 +23,7 @@ export const UpdatePrompt = ({
                 Update Available
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                A new version of TikPluse is ready
+                A new version of DASHTRACER is ready
               </p>
             </div>
           </div>

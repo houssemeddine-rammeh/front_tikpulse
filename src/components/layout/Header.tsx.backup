@@ -221,7 +221,7 @@ const Header: React.FC = () => {
     <Box onClick={() => toggleDrawer(false)} sx={{ width: 250 }}>
       <Box sx={{ p: 2 }}>
         <Typography variant="h6" component="div">
-          TikTok Agency
+          DASHTRACER
         </Typography>
       </Box>
       <Divider />
@@ -301,7 +301,7 @@ const Header: React.FC = () => {
             alignItems: 'center'
           }}
         >
-          TikTok Agency
+          DASHTRACER
         </Typography>
 
         {!isMobile && user && (

@@ -77,8 +77,8 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>TikPluse Dashboard</h1>
-        <p>Welcome to your TikTok agency management platform</p>
+        <h1>DASHTRACER Dashboard</h1>
+        <p>Welcome to your DASHTRACER management platform</p>
       </div>
 
       <div className="dashboard-tabs">

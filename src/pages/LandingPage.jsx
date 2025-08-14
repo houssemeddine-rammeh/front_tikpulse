@@ -40,7 +40,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
-// Icon for TikTok (using a generic video icon as substitute)
+// Icon for DASHTRACER (using a generic video icon as substitute)
 const TikTokIcon = () => <VideoCall />;
 
 // Animation keyframes
@@ -103,7 +103,7 @@ const LandingPage = () => {
     {
       icon: <GroupIcon sx={{ fontSize: 40, color: '#25F4EE' }} />,
       title: 'Creator Ecosystem',
-      description: 'Connect with top-tier TikTok creators worldwide and manage collaborations effortlessly.',
+      description: 'Connect with top-tier DASHTRACER creators worldwide and manage collaborations effortlessly.',
       gradient: 'linear-gradient(135deg, #25F4EE, #00D9FF)',
     },
     {
@@ -142,10 +142,10 @@ const LandingPage = () => {
   const testimonials = [
     {
       name: 'Sarah Chen',
-      role: 'Top TikTok Creator • 2.3M Followers',
+      role: 'Top DASHTRACER Creator • 2.3M Followers',
       avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
       rating: 5,
-      text: 'TikPluse completely transformed my content strategy. My engagement rate jumped from 3% to 12% in just 6 weeks! The AI recommendations are incredibly accurate.',
+      text: 'DASHTRACER completely transformed my content strategy. My engagement rate jumped from 3% to 12% in just 6 weeks! The AI recommendations are incredibly accurate.',
       verified: true,
     },
     {
@@ -153,7 +153,7 @@ const LandingPage = () => {
       role: 'Agency CEO • 50+ Creators',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
       rating: 5,
-      text: 'Managing 50+ creators was a nightmare before TikPluse. Now everything is automated and our revenue has increased by 340%. Best investment we ever made!',
+      text: 'Managing 50+ creators was a nightmare before DASHTRACER. Now everything is automated and our revenue has increased by 340%. Best investment we ever made!',
       verified: true,
     },
     {
@@ -199,6 +199,30 @@ const LandingPage = () => {
 
   return (
     <Box sx={{ minHeight: '100vh' }}>
+      {/* DASHTRACER Logo - Top Left */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 20,
+          left: 20,
+          zIndex: 1000,
+          width: { xs: 120, sm: 150, md: 180 },
+          height: 'auto',
+        }}
+      >
+        <img
+          src="/Dashly2.png"
+          alt="DASHTRACER"
+          style={{
+            width: '100%',
+            height: 'auto',
+            filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))',
+            cursor: 'pointer',
+          }}
+          onClick={() => navigate('/')}
+        />
+      </Box>
+
       {/* Hero Section */}
       <Box
         sx={{
@@ -260,7 +284,7 @@ const LandingPage = () => {
               <Fade in={isVisible} timeout={1000}>
                 <Box sx={{ animation: `${slideInFromLeft} 1s ease-out` }}>
                   <Chip
-                    label="🚀 Now Supporting TikTok Shop Integration"
+                    label="🚀 Now Supporting DASHTRACER Shop Integration"
                     sx={{
                       mb: 3,
                       bgcolor: 'rgba(255, 0, 80, 0.1)',
@@ -285,7 +309,7 @@ const LandingPage = () => {
                   >
                     The Future of
                     <br />
-                    TikTok Agencies
+                      DASHTRACER
                   </Typography>
                   <Typography
                     variant="h5"
@@ -298,7 +322,7 @@ const LandingPage = () => {
                       maxWidth: '500px',
                     }}
                   >
-                    Harness AI-powered analytics, automate creator management, and scale your agency to new heights with the most advanced TikTok management platform.
+                    Harness AI-powered analytics, automate creator management, and scale your agency to new heights with the most advanced DASHTRACER management platform.
                   </Typography>
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ mb: 6 }}>
                     <Button
@@ -399,7 +423,7 @@ const LandingPage = () => {
                     }}
                   >
                     <Typography variant="h4" sx={{ color: 'white', textAlign: 'center' }}>
-                      TikPluse
+                    DASHTRACER
                       <br />
                       Dashboard Preview
                     </Typography>
@@ -419,7 +443,7 @@ const LandingPage = () => {
               Powerful Features for Modern Agencies
             </Typography>
             <Typography variant="h6" sx={{ color: '#64748b', maxWidth: '600px', mx: 'auto' }}>
-              Everything you need to manage, grow, and optimize your TikTok creator agency
+              Everything you need to manage, grow, and optimize your DASHTRACER creator agency
             </Typography>
           </Box>
           <Grid container spacing={4}>
@@ -457,58 +481,7 @@ const LandingPage = () => {
       </Box>
 
       {/* Testimonials Section */}
-      <Box sx={{ py: 12, bgcolor: 'white' }}>
-        <Container maxWidth="lg">
-          <Box sx={{ textAlign: 'center', mb: 8 }}>
-            <Typography variant="h2" component="h2" sx={{ fontWeight: 'bold', mb: 3, color: '#1a202c' }}>
-              Trusted by Top Creators
-            </Typography>
-            <Typography variant="h6" sx={{ color: '#64748b', maxWidth: '600px', mx: 'auto' }}>
-              See what our community of creators and agencies have to say
-            </Typography>
-          </Box>
-          <Grid container spacing={4}>
-            {testimonials.map((testimonial, index) => (
-              <Grid item xs={12} md={4} key={index}>
-                <Card
-                  sx={{
-                    height: '100%',
-                    borderRadius: 3,
-                    border: '1px solid #e2e8f0',
-                    boxShadow: 'none',
-                    transition: 'all 0.3s ease',
-                    '&:hover': {
-                      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
-                    },
-                  }}
-                >
-                  <CardContent sx={{ p: 4 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                      <Avatar src={testimonial.avatar} sx={{ width: 50, height: 50, mr: 2 }} />
-                      <Box>
-                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1a202c' }}>
-                          {testimonial.name}
-                        </Typography>
-                        <Typography variant="body2" sx={{ color: '#64748b' }}>
-                          {testimonial.role}
-                        </Typography>
-                      </Box>
-                    </Box>
-                    <Box sx={{ display: 'flex', mb: 2 }}>
-                      {[...Array(testimonial.rating)].map((_, i) => (
-                        <Star key={i} sx={{ color: '#fbbf24', fontSize: 20 }} />
-                      ))}
-                    </Box>
-                    <Typography variant="body1" sx={{ color: '#374151', lineHeight: 1.6, fontStyle: 'italic' }}>
-                      "{testimonial.text}"
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Container>
-      </Box>
+      
 
       {/* CTA Section */}
       <Box
@@ -524,7 +497,7 @@ const LandingPage = () => {
             Ready to Transform Your Agency?
           </Typography>
           <Typography variant="h6" sx={{ mb: 6, opacity: 0.9 }}>
-            Join thousands of successful creators and agencies already using TikPluse
+            Join thousands of successful creators and agencies already using DASHTRACER
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} justifyContent="center">
             <Button

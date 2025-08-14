@@ -176,6 +176,29 @@ const LoginPage = () => {
         overflow: "hidden",
       }}
     >
+      {/* DASHTRACER Logo - Top Left */}
+      <Box
+        sx={{
+          position: 'fixed',
+          top: 20,
+          left: 20,
+          zIndex: 1000,
+          width: { xs: 120, sm: 150, md: 180 },
+          height: 'auto',
+        }}
+      >
+        <img
+          src="/Dashly2.png"
+          alt="DASHTRACER"
+          style={{
+            width: '100%',
+            height: 'auto',
+            filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))',
+            cursor: 'pointer',
+          }}
+          onClick={() => navigate('/')}
+        />
+      </Box>
       {/* Animated Background Elements */}
       <Box
         sx={{
@@ -234,7 +257,7 @@ const LoginPage = () => {
                     WebkitTextFillColor: "transparent",
                   }}
                 >
-                  TikPluse
+                  DASHTRACER
                 </Typography>
                 <Typography
                   variant="h5"

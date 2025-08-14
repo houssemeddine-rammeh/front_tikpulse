@@ -41,7 +41,7 @@ import {
   getManagerStats,
 } from "../features/managerDashboardSlice";
 import Header from "../components/layout/Header";
-import { Add, Edit, Delete, Person, Search, Refresh as RefreshIcon, Download as DownloadIcon } from "@mui/icons-material";
+import { Add, Edit, Delete, Person, Search, Refresh as RefreshIcon } from "@mui/icons-material";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { useNavigate } from "react-router-dom";
@@ -101,9 +101,6 @@ const CreatorManagementPage = () => {
   const [allCreators, setAllCreators] = useState([]);
   const [adminLoading, setAdminLoading] = useState(false);
   const [adminError, setAdminError] = useState(null);
-  
-  // Export functionality
-  const [isExporting, setIsExporting] = useState(false);
   // Local state
   const [openDialog, setOpenDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -332,88 +329,6 @@ const CreatorManagementPage = () => {
     }
   };
 
-  // Export to CSV function
-  const handleExportToCSV = () => {
-    setIsExporting(true);
-    
-    try {
-      // Use the current filtered creators data
-      const dataToExport = user?.role === 'admin' ? allCreators : creators;
-      
-      if (!dataToExport || dataToExport.length === 0) {
-        alert('No data to export');
-        setIsExporting(false);
-        return;
-      }
-
-      // Prepare CSV headers
-      const headers = [
-        'Username',
-        'Email',
-        'Phone',
-        'Category',
-        'Followers',
-        'Diamonds',
-        'Valid Live Days',
-        'Live Duration',
-        'Bonus Amount',
-        'Status'
-      ];
-
-      // Add Manager column for admin export
-      if (user?.role === 'admin') {
-        headers.splice(4, 0, 'Manager'); // Insert after Category
-      }
-
-      // Prepare CSV rows
-      const rows = dataToExport.map(creator => {
-        const row = [
-          creator.username || '',
-          creator.email || '',
-          creator.phone || '',
-          creator.category || '',
-          creator.profile?.followers || creator.followers || 0,
-          creator.profile?.diamonds || creator.diamonds || 0,
-          creator.validLiveDays || creator.profile?.validLiveDays || 0,
-          creator.liveDuration || creator.profile?.liveDuration || '0h 0m',
-          creator.bonus?.bonusAmountFormatted || creator.bonus?.bonusAmount || '0',
-          creator.status || 'Active'
-        ];
-
-        // Add manager info for admin export
-        if (user?.role === 'admin') {
-          row.splice(4, 0, creator.managerInfo?.username || 'N/A');
-        }
-
-        return row;
-      });
-
-      // Create CSV content
-      const csvContent = [headers, ...rows]
-        .map(row => row.map(field => `"${field}"`).join(','))
-        .join('\n');
-
-      // Create and download the file
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement('a');
-      const url = URL.createObjectURL(blob);
-      
-      link.setAttribute('href', url);
-      link.setAttribute('download', `creators_data_${new Date().toISOString().split('T')[0]}.csv`);
-      link.style.visibility = 'hidden';
-      
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-    } catch (error) {
-      console.error('Error exporting to CSV:', error);
-      alert('Error exporting data. Please try again.');
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
   // Determine loading and error states based on user role
   const isLoadingData = user?.role === 'admin' ? adminLoading : loading;
   const errorData = user?.role === 'admin' ? adminError : error;
@@ -501,58 +416,30 @@ const CreatorManagementPage = () => {
                 }
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', gap: 2 }}>
-              <Button
-                variant="contained"
-                startIcon={<DownloadIcon />}
-                onClick={handleExportToCSV}
-                disabled={isExporting}
-                size="large"
-                sx={{
-                  bgcolor: "#4caf50",
-                  px: 4,
-                  py: 1.5,
-                  borderRadius: 2,
-                  textTransform: "none",
-                  fontWeight: 600,
-                  fontSize: "1rem",
-                  boxShadow: "0 4px 12px rgba(76, 175, 80, 0.3)",
-                  "&:hover": {
-                    bgcolor: "#45a049",
-                    transform: "translateY(-1px)",
-                    boxShadow: "0 6px 16px rgba(76, 175, 80, 0.4)",
-                  },
-                  transition: "all 0.2s ease",
-                }}
-              >
-                {isExporting ? "Exporting..." : "Export CSV"}
-              </Button>
-              
-              <Button
-                variant="contained"
-                startIcon={<Add />}
-                onClick={() => handleDialogOpen()}
-                size="large"
-                sx={{
-                  bgcolor: "#667eea",
-                  px: 4,
-                  py: 1.5,
-                  borderRadius: 2,
-                  textTransform: "none",
-                  fontWeight: 600,
-                  fontSize: "1rem",
-                  boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
-                  "&:hover": {
-                    bgcolor: "#5a6fd8",
-                    transform: "translateY(-1px)",
-                    boxShadow: "0 6px 16px rgba(102, 126, 234, 0.4)",
-                  },
-                  transition: "all 0.2s ease",
-                }}
-              >
-                Add Creator
-              </Button>
-            </Box>
+            <Button
+              variant="contained"
+              startIcon={<Add />}
+              onClick={() => handleDialogOpen()}
+              size="large"
+              sx={{
+                bgcolor: "#667eea",
+                px: 4,
+                py: 1.5,
+                borderRadius: 2,
+                textTransform: "none",
+                fontWeight: 600,
+                fontSize: "1rem",
+                boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+                "&:hover": {
+                  bgcolor: "#5a6fd8",
+                  transform: "translateY(-1px)",
+                  boxShadow: "0 6px 16px rgba(102, 126, 234, 0.4)",
+                },
+                transition: "all 0.2s ease",
+              }}
+            >
+              Add Creator
+            </Button>
           </Box>
 
           {/* Search and Stats Row */}

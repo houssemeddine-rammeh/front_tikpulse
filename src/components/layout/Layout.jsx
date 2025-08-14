@@ -43,7 +43,7 @@ const Layout = ({ children }) => {
           <Container maxWidth="sm">
             <Box sx={{ textAlign: 'center' }}>
               <Typography variant="body2" color="text.secondary">
-                © {new Date().getFullYear()} TikTok Agency Platform
+                © {new Date().getFullYear()} DASHTRACER Platform
               </Typography>
               <Box sx={{ mt: 1 }}>
                 <Link

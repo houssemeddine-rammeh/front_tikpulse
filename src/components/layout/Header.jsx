@@ -1,4 +1,4 @@
-// Header component for TikTok Agency Platform - Enhanced Responsive Design
+// Header component for DASHTRACER Platform - Enhanced Responsive Design
 import React, { useState } from "react";
 import {
   AppBar,
@@ -256,7 +256,7 @@ const Header = () => {
         }}
       >
         <Typography variant="h6" component="div">
-          TikTok Agency
+          DASHTRACER
         </Typography>
         <IconButton
           onClick={() => toggleDrawer(false)}
@@ -536,7 +536,7 @@ const Header = () => {
             fontWeight: "bold",
           }}
         >
-          {isMobile ? "TikTok" : "TikTok Agency"}
+          {isMobile ? "DASHTRACER" : "DASHTRACER"}
         </Typography>
 
         {/* Desktop Navigation - Main Navigation */}

@@ -29,7 +29,7 @@ const LoadingScreen = () => {
           textAlign: 'center',
         }}
       >
-        Loading TikPluse...
+        Loading DASHTRACER...
       </Typography>
     </Box>
   );

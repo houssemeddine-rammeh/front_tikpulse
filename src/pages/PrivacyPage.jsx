@@ -24,7 +24,7 @@ const PrivacyPage = () => {
             Privacy Policy & Terms of Service
           </Typography>
           <Typography variant="h6" color="text.secondary">
-            TikPluse - Altadigit
+          DASHTRACER - Altadigit
           </Typography>
           <Chip 
             label="Effective Date: July 22, 2025" 
@@ -42,7 +42,7 @@ const PrivacyPage = () => {
           </Box>
           
           <Typography variant="body1" paragraph>
-            Altadigit operates the TikPluse application and platform. This Privacy Policy explains how we collect, use, and protect your personal information when you use TikPluse.
+            Altadigit operates the DASHTRACER application and platform. This Privacy Policy explains how we collect, use, and protect your personal information when you use DASHTRACER.
           </Typography>
 
           <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mt: 3, mb: 2 }}>
@@ -53,7 +53,7 @@ const PrivacyPage = () => {
           </Typography>
           <List sx={{ pl: 4 }}>
             <ListItem>
-              <ListItemText primary="TikTok public profile data (followers, likes, videos, diamonds)" />
+              <ListItemText primary="DASHTRACER public profile data (followers, likes, videos, diamonds)" />
             </ListItem>
             <ListItem>
               <ListItemText primary="Contact details (email, phone number)" />
@@ -137,8 +137,8 @@ const PrivacyPage = () => {
           </List>
           <Typography variant="body1" paragraph>
             Please contact us at{' '}
-            <Link href="mailto:contact@tikpluse.info" color="primary">
-              contact@tikpluse.info
+            <Link href="mailto:contact@dashtracer.info" color="primary">
+              contact@dashtracer.info
             </Link>{' '}
             to exercise these rights.
           </Typography>
@@ -167,21 +167,21 @@ const PrivacyPage = () => {
           </Box>
 
           <Typography variant="body1" paragraph>
-            These Terms of Service ("Terms") apply to your access and use of the TikPluse application and platform, operated by Altadigit, based in Tunisia. By using TikPluse, you agree to be bound by these Terms and our Privacy Policy.
+            These Terms of Service ("Terms") apply to your access and use of the DASHTRACER application and platform, operated by Altadigit, based in Tunisia. By using DASHTRACER, you agree to be bound by these Terms and our Privacy Policy.
           </Typography>
 
           <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mt: 3, mb: 2 }}>
             1. Acceptance of Terms
           </Typography>
           <Typography variant="body1" paragraph>
-            By registering for or using TikPluse, you confirm that you have read, understood, and agreed to be bound by these Terms and the Privacy Policy. If you do not agree, do not use the platform.
+            By registering for or using DASHTRACER, you confirm that you have read, understood, and agreed to be bound by these Terms and the Privacy Policy. If you do not agree, do not use the platform.
           </Typography>
 
           <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mt: 3, mb: 2 }}>
             2. Eligibility
           </Typography>
           <Typography variant="body1" paragraph>
-            You must be at least 13 years old to use TikPluse. If you are under 18, you must have the consent of a parent or legal guardian. Use of TikPluse may be subject to a valid agency agreement if applicable.
+            You must be at least 13 years old to use DASHTRACER. If you are under 18, you must have the consent of a parent or legal guardian. Use of DASHTRACER may be subject to a valid agency agreement if applicable.
           </Typography>
 
           <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mt: 3, mb: 2 }}>
@@ -209,7 +209,7 @@ const PrivacyPage = () => {
             4. Permitted Use
           </Typography>
           <Typography variant="body1" paragraph>
-            You agree to use TikPluse only for its intended purposes, such as performance tracking, communication with your agency, and managing live session data. You must not:
+            You agree to use DASHTRACER only for its intended purposes, such as performance tracking, communication with your agency, and managing live session data. You must not:
           </Typography>
           <List sx={{ pl: 4 }}>
             <ListItem>
@@ -222,7 +222,7 @@ const PrivacyPage = () => {
               <ListItemText primary="Manipulate analytics or bonus systems" />
             </ListItem>
             <ListItem>
-              <ListItemText primary="Use the app in violation of TikTok's or Altadigit's terms" />
+              <ListItemText primary="Use the app in violation of DASHTRACER's or Altadigit's terms" />
             </ListItem>
           </List>
 
@@ -230,28 +230,28 @@ const PrivacyPage = () => {
             5. Data Usage
           </Typography>
           <Typography variant="body1" paragraph>
-            You grant Altadigit the right to process your TikTok public data, performance statistics, and communications solely for operational and analytics purposes. See our Privacy Policy for full details.
+            You grant Altadigit the right to process your DASHTRACER public data, performance statistics, and communications solely for operational and analytics purposes. See our Privacy Policy for full details.
           </Typography>
 
           <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mt: 3, mb: 2 }}>
             6. Intellectual Property
           </Typography>
           <Typography variant="body1" paragraph>
-            All platform content, software, branding, and materials are the exclusive property of Altadigit. You may not reproduce, distribute, or modify any part of TikPluse without prior written consent.
+            All platform content, software, branding, and materials are the exclusive property of Altadigit. You may not reproduce, distribute, or modify any part of DASHTRACER without prior written consent.
           </Typography>
 
           <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mt: 3, mb: 2 }}>
             7. Third-Party Links and Content
           </Typography>
           <Typography variant="body1" paragraph>
-            TikPluse may include links or integrations with third-party services. Altadigit is not responsible for third-party content, data practices, or service availability.
+            DASHTRACER may include links or integrations with third-party services. Altadigit is not responsible for third-party content, data practices, or service availability.
           </Typography>
 
           <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mt: 3, mb: 2 }}>
             8. Disclaimer of Warranties
           </Typography>
           <Typography variant="body1" paragraph>
-            TikPluse is provided "as is" and "as available." We do not guarantee uninterrupted access, accuracy, or completeness of the platform. Use it at your own risk.
+            DASHTRACER is provided "as is" and "as available." We do not guarantee uninterrupted access, accuracy, or completeness of the platform. Use it at your own risk.
           </Typography>
 
           <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mt: 3, mb: 2 }}>
@@ -268,7 +268,7 @@ const PrivacyPage = () => {
               <ListItemText primary="Loss of data, revenue, or business opportunities" />
             </ListItem>
             <ListItem>
-              <ListItemText primary="Errors or service interruptions caused by third-party platforms (e.g., TikTok)" />
+              <ListItemText primary="Errors or service interruptions caused by third-party platforms (e.g., DASHTRACER)" />
             </ListItem>
           </List>
 
@@ -290,7 +290,7 @@ const PrivacyPage = () => {
             </ListItem>
           </List>
           <Typography variant="body1" paragraph>
-            You may also stop using TikPluse at any time.
+            You may also stop using DASHTRACER at any time.
           </Typography>
 
           <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mt: 3, mb: 2 }}>
@@ -304,7 +304,7 @@ const PrivacyPage = () => {
             12. Updates to These Terms
           </Typography>
           <Typography variant="body1" paragraph>
-            We reserve the right to update these Terms. Any changes will be communicated via email or platform notification. Continued use of TikPluse after changes indicates your acceptance.
+            We reserve the right to update these Terms. Any changes will be communicated via email or platform notification. Continued use of DASHTRACER after changes indicates your acceptance.
           </Typography>
 
           <Typography variant="h5" component="h3" sx={{ fontWeight: 'bold', mt: 3, mb: 2 }}>
@@ -317,8 +317,8 @@ const PrivacyPage = () => {
             <Typography variant="body1" sx={{ mr: 1 }}>
               📧
             </Typography>
-            <Link href="mailto:contact@tikpluse.info" color="primary">
-              contact@tikpluse.info
+            <Link href="mailto:contact@dashtracer.info" color="primary">
+              contact@dashtracer.info
             </Link>
           </Box>
         </Paper>
