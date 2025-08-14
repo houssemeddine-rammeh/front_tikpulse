@@ -176,33 +176,7 @@ const LoginPage = () => {
         overflow: "hidden",
       }}
     >
-      {/* DASHTRACER Logo - Fixed Top Left */}
-      <Box
-        sx={{
-          position: 'absolute',
-          top: { xs: 8, sm: 12, md: 16, lg: 20 }, // Progressive responsive positioning
-          left: { xs: 8, sm: 12, md: 16, lg: 20 }, // Progressive responsive positioning
-          zIndex: 9999, // High z-index to stay above everything
-          width: { xs: 90, sm: 110, md: 140, lg: 160, xl: 180 }, // Progressive sizing
-          height: 'auto',
-          maxWidth: { xs: '20vw', sm: '22vw', md: '25vw' }, // Responsive max width
-          minWidth: { xs: '80px', sm: '100px' }, // Minimum size for readability
-        }}
-      >
-        <img
-          src="/Dashly2.png"
-          alt="DASHTRACER"
-          style={{
-            width: '100%',
-            height: 'auto',
-            filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3))',
-            cursor: 'pointer',
-            display: 'block',
-            objectFit: 'contain', // Ensure proper scaling
-          }}
-          onClick={() => navigate('/')}
-        />
-      </Box>
+
       {/* Animated Background Elements */}
       <Box
         sx={{
@@ -333,24 +307,27 @@ const LoginPage = () => {
                   boxShadow: "0 32px 64px rgba(0,0,0,0.15)",
                 }}
               >
-                {/* Header */}
+                {/* DASHTRACER Logo Header */}
                 <Box sx={{ textAlign: "center", mb: 4 }}>
                   <Box
                     sx={{
                       display: "inline-flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      width: 80,
-                      height: 80,
-                      borderRadius: 3,
-                      background: "linear-gradient(135deg, #667eea, #764ba2)",
                       mb: 3,
-                      boxShadow: "0 16px 32px rgba(102, 126, 234, 0.3)",
                     }}
                   >
-                    <Typography variant="h3" sx={{ color: "white" }}>
-                      🚀
-                    </Typography>
+                    <img
+                      src="/Dashly2.png"
+                      alt="DASHTRACER"
+                      style={{
+                        width: '120px',
+                        height: 'auto',
+                        filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))',
+                        cursor: 'pointer',
+                      }}
+                      onClick={() => navigate('/')}
+                    />
                   </Box>
                   <Typography
                     variant="h4"
