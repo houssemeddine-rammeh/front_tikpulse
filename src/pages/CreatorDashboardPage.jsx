@@ -58,9 +58,11 @@ import moment from "moment";
 import BonusRules from '../components/BonusRules';
 import CreatorBonusCard from '../components/CreatorBonusCard';
 import { createTicket } from '../features/ticketsSlice';
+import { useTranslation } from "react-i18next";
 
 const CreatorDashboardPage = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const theme = useTheme();
   const dispatch = useDispatch();
   const [sponsorships, setSponsorships] = useState([]);
@@ -119,7 +121,7 @@ const CreatorDashboardPage = () => {
 
   const handleReportSubmit = async () => {
     if (!reportData.subject || !reportData.description) {
-      setReportError("Subject and description are required.");
+      setReportError(t('creatorDashboard.subjectDescriptionRequired'));
       return;
     }
     setSubmitLoading(true);
@@ -141,10 +143,10 @@ const CreatorDashboardPage = () => {
       });
       addNotification({
         type: "success",
-        message: "Ticket created successfully!",
+        message: t('creatorDashboard.ticketCreatedSuccess'),
       });
     } catch (error) {
-      setReportError(error?.message || "Failed to create ticket.");
+      setReportError(error?.message || t('creatorDashboard.ticketCreatedFailed'));
     } finally {
       setSubmitLoading(false);
     }
@@ -173,7 +175,7 @@ const CreatorDashboardPage = () => {
       <Container maxWidth="xl">
         <Box sx={{ my: 4, textAlign: "center" }}>
           <Typography variant="h6" color="error">
-            Creator data not found
+            {t('creatorDashboard.creatorDataNotFound')}
           </Typography>
         </Box>
       </Container>
@@ -197,11 +199,10 @@ const CreatorDashboardPage = () => {
           >
             <Box>
               <Typography variant="h4" component="h1" gutterBottom>
-                Creator Dashboard
+                {t('creatorDashboard.title')}
               </Typography>
               <Typography variant="body1" color="text.secondary">
-                Welcome back, {creator?.username}! Here&apos;s your performance
-                overview.
+                {t('creatorDashboard.welcome', { username: creator?.username })}
               </Typography>
             </Box>
             <Button
@@ -211,7 +212,7 @@ const CreatorDashboardPage = () => {
               onClick={handleReportDialogOpen}
               sx={{ textTransform: "none" }}
             >
-              Report Issue
+              {t('creatorDashboard.reportIssue')}
             </Button>
           </Box>
 
@@ -239,12 +240,12 @@ const CreatorDashboardPage = () => {
                 gutterBottom
                 sx={{ color: "#1976d2", fontWeight: "bold" }}
               >
-                📞 Contact Information
+                {t('creatorDashboard.contactInformation')}
               </Typography>
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6" gutterBottom>
-                    Creator Details
+                    {t('creatorDashboard.creatorDetails')}
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                     <Email sx={{ mr: 1, color: "#1976d2" }} />
@@ -261,14 +262,14 @@ const CreatorDashboardPage = () => {
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <CalendarToday sx={{ mr: 1, color: "#1976d2" }} />
                     <Typography variant="body1">
-                      Joined{" "}
+                      {t('creatorDashboard.joined')}{" "}
                       {moment(creator?.joinedDate).format("MMM D, YYYY h:mm A")}
                     </Typography>
                   </Box>
                 </Grid>
                 <Grid item xs={12} md={6}>
                   <Typography variant="h6" gutterBottom>
-                    Agency Support
+                    {t('creatorDashboard.agencySupport')}
                   </Typography>
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                     <Business sx={{ mr: 1, color: "#1976d2" }} />
@@ -280,7 +281,7 @@ const CreatorDashboardPage = () => {
                   <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
                     <Person sx={{ mr: 1, color: "#1976d2" }} />
                     <Typography variant="body1">
-                      Manager: {creator?.manager?.username}
+                      {t('creatorDashboard.manager')} {creator?.manager?.username}
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -304,12 +305,12 @@ const CreatorDashboardPage = () => {
             maxWidth="md"
             fullWidth
           >
-            <DialogTitle>Create New Support Ticket</DialogTitle>
+            <DialogTitle>{t('creatorDashboard.createTicketTitle')}</DialogTitle>
             <DialogContent>
               <TextField
                 autoFocus
                 margin="dense"
-                label="Subject"
+                label={t('creatorDashboard.subject')}
                 fullWidth
                 variant="outlined"
                 value={reportData.subject}
@@ -317,7 +318,7 @@ const CreatorDashboardPage = () => {
               />
               <TextField
                 margin="dense"
-                label="Description"
+                label={t('creatorDashboard.description')}
                 fullWidth
                 multiline
                 rows={4}
@@ -328,32 +329,32 @@ const CreatorDashboardPage = () => {
               <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid item xs={6}>
                   <FormControl fullWidth>
-                    <InputLabel>Category</InputLabel>
+                    <InputLabel>{t('creatorDashboard.category')}</InputLabel>
                     <Select
                       value={reportData.category}
                       onChange={handleReportInputChange("category")}
-                      label="Category"
+                      label={t('creatorDashboard.category')}
                     >
-                      <MenuItem value="general">General</MenuItem>
-                      <MenuItem value="match_planning">Match Planning</MenuItem>
-                      <MenuItem value="bug_report">Bug Report</MenuItem>
-                      <MenuItem value="ban_report">Ban Report</MenuItem>
-                      <MenuItem value="departure_request">Departure Request</MenuItem>
+                      <MenuItem value="general">{t('creatorDashboard.categories.general')}</MenuItem>
+                      <MenuItem value="match_planning">{t('creatorDashboard.categories.matchPlanning')}</MenuItem>
+                      <MenuItem value="bug_report">{t('creatorDashboard.categories.bugReport')}</MenuItem>
+                      <MenuItem value="ban_report">{t('creatorDashboard.categories.banReport')}</MenuItem>
+                      <MenuItem value="departure_request">{t('creatorDashboard.categories.departureRequest')}</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
                 <Grid item xs={6}>
                   <FormControl fullWidth>
-                    <InputLabel>Priority</InputLabel>
+                    <InputLabel>{t('creatorDashboard.priority')}</InputLabel>
                     <Select
                       value={reportData.priority}
                       onChange={handleReportInputChange("priority")}
-                      label="Priority"
+                      label={t('creatorDashboard.priority')}
                     >
-                      <MenuItem value="low">Low</MenuItem>
-                      <MenuItem value="medium">Medium</MenuItem>
-                      <MenuItem value="high">High</MenuItem>
-                      <MenuItem value="urgent">Urgent</MenuItem>
+                      <MenuItem value="low">{t('creatorDashboard.priorities.low')}</MenuItem>
+                      <MenuItem value="medium">{t('creatorDashboard.priorities.medium')}</MenuItem>
+                      <MenuItem value="high">{t('creatorDashboard.priorities.high')}</MenuItem>
+                      <MenuItem value="urgent">{t('creatorDashboard.priorities.urgent')}</MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -366,7 +367,7 @@ const CreatorDashboardPage = () => {
             </DialogContent>
             <DialogActions>
               <Button onClick={handleReportDialogClose} disabled={submitLoading}>
-                Cancel
+                {t('creatorDashboard.cancel')}
               </Button>
               <Button
                 onClick={handleReportSubmit}
@@ -379,7 +380,7 @@ const CreatorDashboardPage = () => {
                   submitLoading
                 }
               >
-                {submitLoading ? "Submitting..." : "Create Ticket"}
+                {submitLoading ? t('creatorDashboard.submitting') : t('creatorDashboard.createTicket')}
               </Button>
             </DialogActions>
           </Dialog>

@@ -62,9 +62,11 @@ import { useSelector } from "react-redux";
 import { selectAgencyProfile } from "../features/agencyManagerSlice";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import { useTranslation } from 'react-i18next';
 
 const AdminDashboardPage = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [uploadStats] = useState({
     totalCreators: 187,
     totalManagers: 24,
@@ -252,7 +254,7 @@ const AdminDashboardPage = () => {
       setEditedRule(null);
       setSnackbar({
         open: true,
-        message: "Rule updated successfully!",
+        message: t('pages.admin.dashboard.bonusRules.ruleUpdated'),
         severity: "success",
       });
     }
@@ -267,7 +269,7 @@ const AdminDashboardPage = () => {
     setBonusRules((prev) => prev.filter((rule) => rule.id !== id));
     setSnackbar({
       open: true,
-      message: "Rule deleted successfully!",
+      message: t('pages.admin.dashboard.bonusRules.ruleDeleted'),
       severity: "success",
     });
   };
@@ -285,7 +287,7 @@ const AdminDashboardPage = () => {
       setShowAddDialog(false);
       setSnackbar({
         open: true,
-        message: "Rule added successfully!",
+        message: t('pages.admin.dashboard.bonusRules.ruleAdded'),
         severity: "success",
       });
     }
@@ -329,13 +331,13 @@ const AdminDashboardPage = () => {
                 mb: 2,
                 fontSize: { xs: '2rem', md: '2.5rem' }
               }}>
-                Admin Dashboard
+{t('pages.admin.dashboard.title')}
               </Typography>
               <Typography variant="h6" sx={{ 
                 opacity: 0.9,
                 fontWeight: 400
               }}>
-                Welcome back, {user?.name || "Admin"}! 🚀 Manage your platform overview
+{t('pages.admin.dashboard.welcome', { name: user?.name || "Admin" })}
               </Typography>
             </Box>
 
@@ -360,7 +362,7 @@ const AdminDashboardPage = () => {
                         {uploadStats.totalCreators}
                       </Typography>
                       <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Total Creators
+{t('pages.admin.dashboard.totalCreators')}
                       </Typography>
                     </Box>
                     <CreatorsIcon sx={{ fontSize: 40, opacity: 0.8 }} />
@@ -387,7 +389,7 @@ const AdminDashboardPage = () => {
                         {uploadStats.totalManagers}
                       </Typography>
                       <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Total Managers
+{t('pages.admin.dashboard.totalManagers')}
                       </Typography>
                     </Box>
                     <AdminPanelSettingsOutlined sx={{ fontSize: 40, opacity: 0.8 }} />
@@ -414,7 +416,7 @@ const AdminDashboardPage = () => {
                         98.5%
                       </Typography>
                       <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                        Platform Health
+{t('pages.admin.dashboard.platformHealth')}
                       </Typography>
                     </Box>
                     <TrendingUpIcon sx={{ fontSize: 40, opacity: 0.8 }} />
@@ -444,12 +446,12 @@ const AdminDashboardPage = () => {
                    }}
                  >
                                 <Box>
-                    <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
-                      💎 Bonus Rules Management
-                    </Typography>
-                    <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                      Configure and manage creator bonus programs
-                    </Typography>
+                                       <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
+                     {t('pages.admin.dashboard.bonusRules.title')}
+                   </Typography>
+                   <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                     {t('pages.admin.dashboard.bonusRules.description')}
+                   </Typography>
                   </Box>
                   <Button
                     variant="contained"
@@ -468,7 +470,7 @@ const AdminDashboardPage = () => {
                       transition: 'all 0.2s ease'
                     }}
                   >
-                    Add New Rule
+{t('pages.admin.dashboard.bonusRules.addNewRule')}
                   </Button>
                  </Box>
                </Box>
@@ -483,29 +485,29 @@ const AdminDashboardPage = () => {
                       fontWeight: "bold", 
                       color: 'white',
                       fontSize: '0.95rem'
-                    }}>Program</TableCell>
+                    }}>{t('pages.admin.dashboard.bonusRules.program')}</TableCell>
                     <TableCell sx={{ 
                       fontWeight: "bold", 
                       color: 'white',
                       fontSize: '0.95rem'
-                    }}>Valid Days</TableCell>
+                    }}>{t('pages.admin.dashboard.bonusRules.validDays')}</TableCell>
                     <TableCell sx={{ 
                       fontWeight: "bold", 
                       color: 'white',
                       fontSize: '0.95rem'
                     }}>
-                      Hours Required
+                      {t('pages.admin.dashboard.bonusRules.hoursRequired')}
                     </TableCell>
                     <TableCell sx={{ 
                       fontWeight: "bold", 
                       color: 'white',
                       fontSize: '0.95rem'
-                    }}>Rate</TableCell>
+                    }}>{t('pages.admin.dashboard.bonusRules.rate')}</TableCell>
                     <TableCell sx={{ 
                       fontWeight: "bold", 
                       color: 'white',
                       fontSize: '0.95rem'
-                    }}>Actions</TableCell>
+                    }}>{t('pages.admin.dashboard.bonusRules.actions')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -656,10 +658,10 @@ const AdminDashboardPage = () => {
                 color: 'white'
               }}>
                 <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
-                  👥 Managers & Their Creators
+                  {t('pages.admin.dashboard.managersCreators.title')}
                 </Typography>
                 <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Overview of all managers and their assigned creators
+                  {t('pages.admin.dashboard.managersCreators.description')}
                 </Typography>
               </Box>
               {loadingManagers ? (
@@ -682,12 +684,12 @@ const AdminDashboardPage = () => {
                               }
                               onClick={() => handleManagerSort("username")}
                             >
-                              Manager Username
+{t('pages.admin.dashboard.managersCreators.managerUsername')}
                             </TableSortLabel>
                           </TableCell>
-                          <TableCell>Email</TableCell>
-                          <TableCell>Phone</TableCell>
-                          <TableCell>Creators</TableCell>
+                          <TableCell>{t('pages.admin.dashboard.managersCreators.email')}</TableCell>
+                          <TableCell>{t('pages.admin.dashboard.managersCreators.phone')}</TableCell>
+                          <TableCell>{t('pages.admin.dashboard.managersCreators.creators')}</TableCell>
                         </TableRow>
                       </TableHead>
                       <TableBody>
@@ -839,10 +841,10 @@ const AdminDashboardPage = () => {
                 color: 'white'
               }}>
                 <Typography variant="h5" sx={{ mb: 1, fontWeight: "bold" }}>
-                  📊 Upload Creator Data
+                  {t('pages.admin.dashboard.upload.title')}
                 </Typography>
                 <Typography variant="body2" sx={{ opacity: 0.9 }}>
-                  Import creator data from Excel files (.xlsx, .xls)
+                  {t('pages.admin.dashboard.upload.description')}
                 </Typography>
               </Box>
               
@@ -872,7 +874,7 @@ const AdminDashboardPage = () => {
                     fontWeight: 'bold', 
                     fontSize: '1.1rem' 
                   }}>
-                    📁 Drop the Excel file here...
+{t('pages.admin.dashboard.upload.dropping')}
                   </Typography>
                 ) : (
                   <Box>
@@ -883,13 +885,13 @@ const AdminDashboardPage = () => {
                       fontSize: '1.1rem', 
                       mb: 1 
                     }}>
-                      Drag & drop an Excel file here, or click to select
+{t('pages.admin.dashboard.upload.dragDrop')}
                     </Typography>
                     <Typography sx={{ 
                       color: '#64748b', 
                       fontSize: '0.9rem' 
                     }}>
-                      Supported formats: .xlsx, .xls
+{t('pages.admin.dashboard.upload.supportedFormats')}
                     </Typography>
                   </Box>
                 )}
@@ -905,11 +907,11 @@ const AdminDashboardPage = () => {
 
             {/* Upload Confirmation Dialog */}
             <Dialog open={showUploadDialog} onClose={handleUploadCancel} maxWidth="sm" fullWidth>
-              <DialogTitle>Confirm Upload</DialogTitle>
+              <DialogTitle>{t('pages.admin.dashboard.upload.confirmUpload')}</DialogTitle>
               <DialogContent>
                 <Box sx={{ pt: 1 }}>
                   <Typography variant="body1" gutterBottom>
-                    Are you sure you want to upload this file?
+{t('pages.admin.dashboard.upload.confirmMessage')}
                   </Typography>
                   {selectedFile && (
                     <Box sx={{ mt: 2, p: 2, bgcolor: "#f5f5f5", borderRadius: 1 }}>
@@ -938,7 +940,7 @@ const AdminDashboardPage = () => {
               maxWidth="sm"
               fullWidth
             >
-              <DialogTitle>Add New Bonus Rule</DialogTitle>
+              <DialogTitle>{t('pages.admin.dashboard.bonusRules.addRuleDialog')}</DialogTitle>
               <DialogContent>
                 <Box
                   sx={{ display: "flex", flexDirection: "column", gap: 2, pt: 1 }}

@@ -1,3 +1,4 @@
+// EventsPage component with react-i18next integration
 import React, { useState, useEffect } from "react";
 import {
   Box,
@@ -40,6 +41,7 @@ import {
 } from "../features/eventsSlice";
 import moment from "moment";
 import { useNotifications } from "../contexts/NotificationContext";
+import { useTranslation } from "react-i18next";
 
 const EventsPage = () => {
   const [openCreateDialog, setOpenCreateDialog] = useState(false);
@@ -47,9 +49,10 @@ const EventsPage = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [viewMode, setViewMode] = useState("calendar");
-  const user = useSelector((state) => state.auth.user); // Get user from auth state
-  const [error, setError] = useState(null); // Define error state
+  const user = useSelector((state) => state.auth.user);
+  const [error, setError] = useState(null);
   const { addNotification } = useNotifications();
+  const { t } = useTranslation();
 
   const dispatch = useDispatch();
   const { events, loading, partcipants } = useSelector((state) => state.events);
@@ -58,15 +61,14 @@ const EventsPage = () => {
     try {
       await dispatch(getEvents());
       if (user?.role === "manager") {
-        await dispatch(getUsersEvents()); // Fetch user's events if needed
+        await dispatch(getUsersEvents());
       }
-      // Creators should also see all public events created by managers
       if (user?.role === "creator") {
         console.log("📅 Fetching events for creator:", user.username);
       }
     } catch (err) {
       console.error("❌ Error fetching events:", err);
-      setError("Failed to fetch events. Please try again later."); // Set error message
+      setError(t('events.failedToFetch'));
     } finally {
       setRefreshing(false);
     }
@@ -86,21 +88,20 @@ const EventsPage = () => {
   const handleEventCreated = async (data) => {
     console.log("📅 Creating or updating event:", data);
     try {
-      await dispatch(createEvent(data)); // Wait for the dispatch to complete
+      await dispatch(createEvent(data));
       console.log("✅ Event created/updated successfully");
       closeDialogs();
       
-      // Trigger real-time refresh for all users (especially creators)
       if (user?.role === "manager") {
         console.log("📅 Manager created event, notifying all users...");
         localStorage.setItem('new_event_notification', Date.now().toString());
         setTimeout(() => localStorage.removeItem('new_event_notification'), 2000);
       }
       
-      await fetchEvents(); // Refresh the events list
+      await fetchEvents();
     } catch (err) {
       console.error("❌ Error creating/updating event:", err);
-      setError("Failed to create or update the event. Please try again."); // Set error message
+      setError(t('events.failedToCreate'));
     }
   };
 
@@ -145,23 +146,20 @@ const EventsPage = () => {
         console.log("📅 New event detected, refreshing for creator...");
         fetchEvents();
         
-        // Show notification to creator
         addNotification({
-          title: "New Event Available",
-          message: "A new event has been created by the manager. Check your calendar!",
+          title: t('events.newEventAvailable'),
+          message: t('events.newEventMessage'),
           type: "info",
           link: "/events"
         });
       };
 
-      // Listen for localStorage changes (cross-tab communication)
       const handleStorageChange = (e) => {
         if (e.key === 'new_event_notification') {
           handleEventCreated();
         }
       };
 
-      // Listen for local storage changes in the same tab
       const checkForNewEvents = () => {
         const newEventFlag = localStorage.getItem('new_event_notification');
         if (newEventFlag) {
@@ -179,10 +177,10 @@ const EventsPage = () => {
         clearInterval(interval);
       };
     }
-  }, [user, addNotification]);
+  }, [user, addNotification, t]);
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+    return new Date(dateString).toLocaleDateString(undefined, {
       year: "numeric",
       month: "long",
       day: "numeric",
@@ -207,7 +205,7 @@ const EventsPage = () => {
   };
 
   const getEventTypeIcon = (type) => {
-    switch (type) {
+    switch (type?.toLowerCase()) {
       case "tournament":
         return <TrophyIcon />;
       case "challenge":
@@ -222,28 +220,46 @@ const EventsPage = () => {
   };
 
   const getEventTypeColor = (type) => {
-    switch (type?.toLowerCase()) {
-      case "live stream":
-        return "#FF6347"; // Tomato
-      case "workshop":
-        return "#8A2BE2"; // BlueViolet
-      case "meet & greet":
-        return "#FF69B4"; // HotPink
-      case "training":
-        return "#00CED1"; // DarkTurquoise
-      case "contest":
-        return "#FFD700"; // Gold
-      case "tournament":
-        return "#FFD700"; // Gold
-      case "challenge":
-        return "#FF4500"; // OrangeRed
-      case "meeting":
-        return "#1E90FF"; // DodgerBlue
-      case "match":
-        return "#32CD32"; // LimeGreen
-      default:
-        return "#1976d2"; // Default Blue
-    }
+    const typeMap = {
+      "live stream": "#FF6347",
+      "workshop": "#8A2BE2",
+      "meet & greet": "#FF69B4",
+      "training": "#00CED1",
+      "contest": "#FFD700",
+      "tournament": "#FFD700",
+      "challenge": "#FF4500",
+      "meeting": "#1E90FF",
+      "match": "#32CD32",
+    };
+    
+    return typeMap[type?.toLowerCase()] || "#1976d2";
+  };
+
+  const translateEventType = (type) => {
+    const typeTranslations = {
+      'tournament': t('events.types.tournament'),
+      'challenge': t('events.types.challenge'),
+      'meeting': t('events.types.meeting'),
+      'match': t('events.types.match'),
+      'live stream': t('events.types.liveStream'),
+      'workshop': t('events.types.workshop'),
+      'meet & greet': t('events.types.meetGreet'),
+      'training': t('events.types.training'),
+      'contest': t('events.types.contest'),
+    };
+    
+    return typeTranslations[type?.toLowerCase()] || type;
+  };
+
+  const translateStatus = (status) => {
+    const statusTranslations = {
+      'scheduled': t('events.statuses.scheduled'),
+      'active': t('events.statuses.active'),
+      'completed': t('events.statuses.completed'),
+      'cancelled': t('events.statuses.cancelled'),
+    };
+    
+    return statusTranslations[status?.toLowerCase()] || status;
   };
 
   if (loading) {
@@ -282,10 +298,10 @@ const EventsPage = () => {
               gutterBottom
               sx={{ fontWeight: "bold" }}
             >
-              Events & Tournaments
+              {t('events.pageTitle')}
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              Join tournaments, challenges, and community events
+              {t('events.pageSubtitle')}
             </Typography>
           </Box>
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
@@ -297,11 +313,11 @@ const EventsPage = () => {
             >
               <ToggleButton value="calendar">
                 <CalendarIcon sx={{ mr: 1 }} />
-                Calendar
+                {t('events.calendar')}
               </ToggleButton>
               <ToggleButton value="list">
                 <ListIcon sx={{ mr: 1 }} />
-                List
+                {t('events.list')}
               </ToggleButton>
             </ToggleButtonGroup>
 
@@ -309,7 +325,7 @@ const EventsPage = () => {
               onClick={handleRefresh}
               disabled={refreshing}
               color="primary"
-              title="Refresh events"
+              title={t('events.refresh')}
             >
               <RefreshIcon />
             </IconButton>
@@ -320,7 +336,7 @@ const EventsPage = () => {
                 onClick={() => setOpenCreateDialog(true)}
                 size="large"
               >
-                Create Event
+                {t('events.createEvent')}
               </Button>
             )}
           </Box>
@@ -332,6 +348,7 @@ const EventsPage = () => {
             {error}
           </Alert>
         )}
+
         {/* View Content */}
         {viewMode === "calendar" ? (
           <EventCalendar
@@ -346,10 +363,10 @@ const EventsPage = () => {
           <Box sx={{ textAlign: "center", py: 8 }}>
             <EventIcon sx={{ fontSize: 80, color: "text.secondary", mb: 2 }} />
             <Typography variant="h6" gutterBottom>
-              No events yet
+              {t('events.noEvents')}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Create your first event to get started
+              {t('events.noEventsDescription')}
             </Typography>
             {user?.role === "manager" && (
               <Button
@@ -357,7 +374,7 @@ const EventsPage = () => {
                 startIcon={<AddIcon />}
                 onClick={() => setOpenCreateDialog(true)}
               >
-                Create First Event
+                {t('events.createFirstEvent')}
               </Button>
             )}
           </Box>
@@ -396,7 +413,7 @@ const EventsPage = () => {
                         </Typography>
                       </Box>
                       <Chip
-                        label={event.type}
+                        label={translateEventType(event.type)}
                         size="small"
                         sx={{
                           backgroundColor: getEventTypeColor(event.type),
@@ -418,7 +435,7 @@ const EventsPage = () => {
                         sx={{ fontSize: 16, mr: 1, color: "text.secondary" }}
                       />
                       <Typography variant="body2" color="text.secondary">
-                        {moment(event.start).format("MMM D, YYYY h:mm A")}{" "}
+                        {moment(event.start).format("MMM D, YYYY h:mm A")}
                       </Typography>
                     </Box>
 
@@ -434,12 +451,13 @@ const EventsPage = () => {
                         </Typography>
                       </Box>
                     )}
+
                     {event?.participants?.length > 0 && (
                       <Box
                         sx={{ display: "flex", alignItems: "center", mb: 2 }}
                       >
                         <Typography variant="body2" color="text.secondary">
-                          Participants:{" "}
+                          {t('events.participants')}:{" "}
                           {event.participants.map((p) => p.username).join(", ")}
                         </Typography>
                       </Box>
@@ -453,13 +471,13 @@ const EventsPage = () => {
                           sx={{ fontSize: 16, mr: 1, color: "text.secondary" }}
                         />
                         <Typography variant="body2" color="text.secondary">
-                          Prize: {event.prize}
+                          {t('events.prize')}: {event.prize}
                         </Typography>
                       </Box>
                     )}
 
                     <Chip
-                      label={event.status}
+                      label={translateStatus(event.status)}
                       size="small"
                       color={getStatusColor(event.status)}
                     />
@@ -488,7 +506,7 @@ const EventsPage = () => {
               >
                 {selectedEvent.title}
                 <Chip
-                  label={selectedEvent.type}
+                  label={translateEventType(selectedEvent.type)}
                   size="small"
                   sx={{
                     backgroundColor: getEventTypeColor(selectedEvent.type),
@@ -503,7 +521,7 @@ const EventsPage = () => {
 
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="subtitle2" gutterBottom>
-                    📅 Date & Time
+                    📅 {t('events.dateTime')}
                   </Typography>
                   <Typography variant="body2">
                     {formatDate(selectedEvent.start)}
@@ -514,7 +532,7 @@ const EventsPage = () => {
                 {selectedEvent.location && (
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" gutterBottom>
-                      📍 Location
+                      📍 {t('events.location')}
                     </Typography>
                     <Typography variant="body2">
                       {selectedEvent.location}
@@ -525,18 +543,19 @@ const EventsPage = () => {
                 {selectedEvent.prize && (
                   <Box sx={{ mb: 2 }}>
                     <Typography variant="subtitle2" gutterBottom>
-                      🏆 Prize
+                      🏆 {t('events.prize')}
                     </Typography>
                     <Typography variant="body2">
                       {selectedEvent.prize}
                     </Typography>
                   </Box>
                 )}
+
                 {selectedEvent.participants &&
                   selectedEvent.participants.length > 0 && (
                     <Box sx={{ mb: 2 }}>
                       <Typography variant="subtitle2" gutterBottom>
-                        👥 Participants
+                        👥 {t('events.participants')}
                       </Typography>
                       <Typography variant="body2">
                         {selectedEvent.participants
@@ -548,21 +567,25 @@ const EventsPage = () => {
 
                 <Box sx={{ mb: 2 }}>
                   <Typography variant="subtitle2" gutterBottom>
-                    📊 Status
+                    📊 {t('events.status')}
                   </Typography>
                   <Chip
-                    label={selectedEvent.status}
+                    label={translateStatus(selectedEvent.status)}
                     size="small"
                     color={getStatusColor(selectedEvent.status)}
                   />
                 </Box>
               </DialogContent>
               <DialogActions>
-                <Button onClick={() => setOpenEventDialog(false)}>Close</Button>
+                <Button onClick={() => setOpenEventDialog(false)}>
+                  {t('events.close')}
+                </Button>
                 {(selectedEvent.type === "tournament" ||
                   selectedEvent.type === "challenge") && (
                   <Button variant="contained" color="primary">
-                    Join {selectedEvent.type}
+                    {selectedEvent.type === "tournament" 
+                      ? t('events.joinTournament') 
+                      : t('events.joinChallenge')}
                   </Button>
                 )}
               </DialogActions>
@@ -578,7 +601,7 @@ const EventsPage = () => {
           fullWidth
         >
           <DialogTitle>
-            {selectedEvent?._id ? "Edit Event" : "Create New Event"}
+            {selectedEvent?._id ? t('events.editEvent') : t('events.createNewEvent')}
           </DialogTitle>
           <DialogContent>
             <EventForm
@@ -589,7 +612,9 @@ const EventsPage = () => {
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => closeDialogs()}>Cancel</Button>
+            <Button onClick={() => closeDialogs()}>
+              {t('events.cancel')}
+            </Button>
           </DialogActions>
         </Dialog>
       </Container>

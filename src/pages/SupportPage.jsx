@@ -12,9 +12,12 @@ import {
   NavigateNext
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import SupportTicket from '../components/support/SupportTicket';
 
 const SupportPage = () => {
+  const { t } = useTranslation();
+  
   return (
     <Container maxWidth="xl">
       <Box sx={{ mb: 4 }}>
@@ -31,11 +34,11 @@ const SupportPage = () => {
             sx={{ display: 'flex', alignItems: 'center' }}
           >
             <SupportAgent sx={{ mr: 0.5 }} fontSize="inherit" />
-            Dashboard
+{t('navigation.dashboard')}
           </Link>
           <Typography color="text.primary" sx={{ display: 'flex', alignItems: 'center' }}>
             <SupportAgent sx={{ mr: 0.5 }} fontSize="inherit" />
-            Support
+{t('navigation.support')}
           </Typography>
         </Breadcrumbs>
 
@@ -46,11 +49,11 @@ const SupportPage = () => {
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
           }}>
-            Centre de Support
+{t('pages.support.title')}
           </Typography>
           
           <Typography variant="body1" gutterBottom>
-            Besoin d'aide ? Créez un ticket de support et notre équipe vous assistera dans les plus brefs délais.
+{t('pages.support.description')}
           </Typography>
         </Paper>
 

@@ -17,6 +17,7 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 
 const TicketNotificationBadge = ({
@@ -28,6 +29,7 @@ const TicketNotificationBadge = ({
   const [anchorEl, setAnchorEl] = useState(null);
   const { user } = useSelector((state) => state.auth);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const open = Boolean(anchorEl);
 
@@ -119,10 +121,10 @@ const TicketNotificationBadge = ({
     const now = new Date();
     const diffInMinutes = Math.floor((now - date) / (1000 * 60));
     
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
-    return `${Math.floor(diffInMinutes / 1440)}d ago`;
+    if (diffInMinutes < 1) return t('ticketNotifications.justNow');
+    if (diffInMinutes < 60) return t('ticketNotifications.minutesAgo', { count: diffInMinutes });
+    if (diffInMinutes < 1440) return t('ticketNotifications.hoursAgo', { count: Math.floor(diffInMinutes / 60) });
+    return t('ticketNotifications.daysAgo', { count: Math.floor(diffInMinutes / 1440) });
   };
 
   return (
@@ -154,14 +156,14 @@ const TicketNotificationBadge = ({
         <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
           <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Notifications fontSize="small" />
-            Ticket Notifications
+            {t('ticketNotifications.title')}
           </Typography>
         </Box>
 
         {unreadTickets.length === 0 ? (
           <MenuItem disabled>
             <Typography variant="body2" color="text.secondary">
-              No unread notifications
+              {t('ticketNotifications.noUnreadNotifications')}
             </Typography>
           </MenuItem>
         ) : (
@@ -178,11 +180,11 @@ const TicketNotificationBadge = ({
             >
               <Box sx={{ display: 'flex', justifyContent: 'space-between', width: '100%', mb: 0.5 }}>
                 <Typography variant="subtitle2" noWrap sx={{ maxWidth: '70%' }}>
-                  {ticket.subject || 'No Subject'}
+                  {ticket.subject || t('ticketNotifications.noSubject')}
                 </Typography>
                 <Chip
                   icon={<PriorityHigh fontSize="small" />}
-                  label={ticket.priority || 'Medium'}
+                  label={ticket.priority ? t(`ticketNotifications.priority.${ticket.priority.toLowerCase()}`) : t('ticketNotifications.priority.medium')}
                   size="small"
                   color={getPriorityColor(ticket.priority)}
                   variant="outlined"
@@ -209,7 +211,7 @@ const TicketNotificationBadge = ({
             <Divider />
             <MenuItem onClick={handleViewAllTickets}>
               <Typography variant="body2" color="primary">
-                View {unreadTickets.length - 5} more notifications
+                {t('ticketNotifications.viewMoreNotifications', { count: unreadTickets.length - 5 })}
               </Typography>
             </MenuItem>
           </>
@@ -218,7 +220,7 @@ const TicketNotificationBadge = ({
         <Divider />
         <MenuItem onClick={handleViewAllTickets}>
           <Typography variant="body2" color="primary">
-            View All Support Tickets
+            {t('ticketNotifications.viewAllTickets')}
           </Typography>
         </MenuItem>
       </Menu>

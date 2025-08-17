@@ -24,19 +24,30 @@ import {
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useNotifications } from '../../contexts/NotificationContext';
+import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
-import { fr } from 'date-fns/locale';
+import { fr, enUS, ar, it } from 'date-fns/locale';
 
 // Safe timestamp formatting function
-const formatTimeAgo = (timestamp) => {
+const formatTimeAgo = (timestamp, currentLanguage, t) => {
   try {
-    if (!timestamp) return 'Just now';
+    if (!timestamp) return t('notifications.justNow');
     const date = new Date(timestamp);
-    if (isNaN(date.getTime())) return 'Just now';
-    return formatDistanceToNow(date, { addSuffix: true, locale: fr });
+    if (isNaN(date.getTime())) return t('notifications.justNow');
+    
+    // Map language codes to date-fns locales
+    const localeMap = {
+      'en': enUS,
+      'fr': fr,
+      'ar': ar,
+      'it': it
+    };
+    
+    const locale = localeMap[currentLanguage] || enUS;
+    return formatDistanceToNow(date, { addSuffix: true, locale });
   } catch (error) {
     console.warn('Invalid timestamp for formatting:', timestamp, error);
-    return 'Just now';
+    return t('notifications.justNow');
   }
 };
 
@@ -58,6 +69,7 @@ const getNotificationIcon = (type) => {
 const NotificationItem = ({ notification, onClose }) => {
   const { markAsRead, removeNotification } = useNotifications();
   const navigate = useNavigate();
+  const { t, i18n } = useTranslation();
 
   const handleClick = () => {
     markAsRead(notification.id);
@@ -94,7 +106,7 @@ const NotificationItem = ({ notification, onClose }) => {
               {notification.message}
             </Typography>
             <Typography variant="caption" color="text.secondary">
-              {formatTimeAgo(notification.timestamp)}
+              {formatTimeAgo(notification.timestamp, i18n.language, t)}
             </Typography>
           </>
         }
@@ -117,6 +129,7 @@ const NotificationCenter = () => {
   const { notifications, unreadCount, markAllAsRead, clearNotifications } = useNotifications();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const { t } = useTranslation();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -128,7 +141,7 @@ const NotificationCenter = () => {
 
   return (
     <>
-      <Tooltip title="Notifications">
+      <Tooltip title={t('notifications.title')}>
         <IconButton
           color="inherit"
           onClick={handleClick}
@@ -164,10 +177,10 @@ const NotificationCenter = () => {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
-          <Typography variant="h6">Notifications</Typography>
+          <Typography variant="h6">{t('notifications.title')}</Typography>
           <Box>
             <Button size="small" onClick={markAllAsRead} startIcon={<DoneAll />}>
-              Mark all as read
+              {t('notifications.markAllAsRead')}
             </Button>
           </Box>
         </Box>
@@ -193,7 +206,7 @@ const NotificationCenter = () => {
               }}
             >
               <Typography variant="body2" color="text.secondary">
-                No notifications yet
+                {t('notifications.noNotifications')}
               </Typography>
             </Paper>
           )}
@@ -210,7 +223,7 @@ const NotificationCenter = () => {
                   handleClose();
                 }}
               >
-                Clear all
+                {t('notifications.clearAll')}
               </Button>
             </Box>
           </>

@@ -20,6 +20,10 @@ import {
   keyframes,
   CircularProgress,
   Link,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import {
   Visibility,
@@ -35,10 +39,13 @@ import {
   Security,
   Group,
   VerifiedUser,
+  Language,
 } from "@mui/icons-material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { signIn, clearError } from "../features/authSlice";
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // TikTok-compliant PKCE helper functions
 function generateCodeVerifier(length = 64) {
@@ -63,6 +70,8 @@ async function generateCodeChallenge(codeVerifier) {
 }
 
 const LoginPage = () => {
+  const { t } = useTranslation();
+  const { language, changeLanguage } = useLanguage();
   const { user, token, isLoading, error } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -104,7 +113,7 @@ const LoginPage = () => {
     setFormError("");
 
     if (!email || !password) {
-      setFormError("Please fill in all fields");
+      setFormError(t('loginPage.errors.fillAllFields'));
       return;
     }
 
@@ -115,11 +124,11 @@ const LoginPage = () => {
         console.log("User logged in:", resultAction.payload);
         // Navigation will be handled by useEffect above
       } else {
-        setFormError(resultAction.payload || "Invalid credentials");
+        setFormError(resultAction.payload || t('loginPage.errors.invalidCredentials'));
       }
     } catch (err) {
       console.log(err);
-      setFormError("Invalid credentials");
+      setFormError(t('loginPage.errors.invalidCredentials'));
     } finally {
       setIsSubmitting(false);
     }
@@ -142,18 +151,18 @@ const LoginPage = () => {
   const features = [
     {
       icon: <TrendingUp />,
-      title: "Analytics",
-      desc: "Real-time performance tracking",
+      title: t('loginPage.features.analytics.title'),
+      desc: t('loginPage.features.analytics.description'),
     },
     {
       icon: <Groups />,
-      title: "Team Management",
-      desc: "Collaborate with creators",
+      title: t('loginPage.features.teamManagement.title'),
+      desc: t('loginPage.features.teamManagement.description'),
     },
     {
       icon: <PlayArrow />,
-      title: "Content Planning",
-      desc: "Schedule and organize content",
+      title: t('loginPage.features.contentPlanning.title'),
+      desc: t('loginPage.features.contentPlanning.description'),
     },
   ];
 
@@ -235,19 +244,19 @@ const LoginPage = () => {
                     WebkitTextFillColor: "transparent",
                   }}
                 >
-                  DASHTRACER
+                  {t('loginPage.title')}
                 </Typography>
                 <Typography
                   variant="h5"
                   sx={{ opacity: 0.9, mb: 1, fontWeight: 300 }}
                 >
-                  Creator Management Platform
+                  {t('loginPage.subtitle')}
                 </Typography>
                 <Typography
                   variant="body1"
                   sx={{ opacity: 0.8, fontSize: "1.1rem" }}
                 >
-                  Empowering creators, streamlining success
+                  {t('loginPage.tagline')}
                 </Typography>
               </Box>
 
@@ -337,10 +346,10 @@ const LoginPage = () => {
                       mb: 1,
                     }}
                   >
-                    Welcome Back
+                    {t('loginPage.welcomeBack')}
                   </Typography>
                   <Typography variant="body1" color="text.secondary">
-                    Sign in to your account to continue
+                    {t('loginPage.signInMessage')}
                   </Typography>
                 </Box>
 
@@ -376,7 +385,7 @@ const LoginPage = () => {
                     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                   }}
                 >
-                  Continue with TikTok
+                  {t('loginPage.continueWithTikTok')}
                 </Button>
 
                 <Divider sx={{ my: 3 }}>
@@ -388,7 +397,7 @@ const LoginPage = () => {
                       fontWeight: 500,
                     }}
                   >
-                    OR
+                    {t('loginPage.or')}
                   </Typography>
                 </Divider>
 
@@ -396,7 +405,7 @@ const LoginPage = () => {
                 <form onSubmit={handleSubmit}>
                   <TextField
                     fullWidth
-                    label="Email Address / TikTok ID"
+                    label={t('loginPage.emailLabel')}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     sx={{ mb: 3 }}
@@ -417,7 +426,7 @@ const LoginPage = () => {
 
                   <TextField
                     fullWidth
-                    label="Password"
+                    label={t('loginPage.passwordLabel')}
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -472,14 +481,54 @@ const LoginPage = () => {
                       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                     }}
                   >
-                    {isSubmitting ? "Signing In..." : "Sign In"}
+                    {isSubmitting ? t('loginPage.signingIn') : t('loginPage.signIn')}
                   </Button>
                 </form>
+
+                {/* Language Selector */}
+                <Box sx={{ mt: 4 }}>
+                  <FormControl fullWidth size="small">
+                    <InputLabel id="language-select-label" sx={{ display: "flex", alignItems: "center" }}>
+                      <Language sx={{ mr: 1, fontSize: 18 }} />
+                      {t('loginPage.languageSelector')}
+                    </InputLabel>
+                    <Select
+                      labelId="language-select-label"
+                      value={language}
+                      onChange={(e) => changeLanguage(e.target.value)}
+                      label={t('loginPage.languageSelector')}
+                      sx={{
+                        borderRadius: 2,
+                        "& .MuiSelect-select": {
+                          display: "flex",
+                          alignItems: "center",
+                        },
+                      }}
+                    >
+                      <MenuItem value="en" sx={{ display: "flex", alignItems: "center" }}>
+                        <Box component="span" sx={{ fontSize: "1.2rem", mr: 2 }}>🇺🇸</Box>
+                        English
+                      </MenuItem>
+                      <MenuItem value="fr" sx={{ display: "flex", alignItems: "center" }}>
+                        <Box component="span" sx={{ fontSize: "1.2rem", mr: 2 }}>🇫🇷</Box>
+                        Français
+                      </MenuItem>
+                      <MenuItem value="ar" sx={{ display: "flex", alignItems: "center" }}>
+                        <Box component="span" sx={{ fontSize: "1.2rem", mr: 2 }}>🇸🇦</Box>
+                        العربية
+                      </MenuItem>
+                      <MenuItem value="it" sx={{ display: "flex", alignItems: "center" }}>
+                        <Box component="span" sx={{ fontSize: "1.2rem", mr: 2 }}>🇮🇹</Box>
+                        Italiano
+                      </MenuItem>
+                    </Select>
+                  </FormControl>
+                </Box>
 
                 {/* Footer */}
                 <Box sx={{ textAlign: "center", mt: 4, pt: 3 }}>
                   <Typography variant="body2" color="text.secondary">
-                    Need help? Contact your team administrator
+                    {t('loginPage.needHelp')}
                   </Typography>
                 </Box>
               </Paper>

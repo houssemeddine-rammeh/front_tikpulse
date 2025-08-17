@@ -40,9 +40,11 @@ import { useAuth } from "../contexts/AuthContext";
 import Layout from "../components/layout/Layout";
 import { getToken } from "../utils/tokenManager";
 import axiosInstance from "../api/axiosInstance";
+import { useTranslation } from 'react-i18next';
 
 const AdminEventsPage = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [eventsView, setEventsView] = useState('calendar'); // 'calendar' or 'list'
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
@@ -156,7 +158,7 @@ const AdminEventsPage = () => {
     return (
       <Grid container spacing={1}>
         {/* Day headers */}
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+        {[t('events.dayNames.sun'), t('events.dayNames.mon'), t('events.dayNames.tue'), t('events.dayNames.wed'), t('events.dayNames.thu'), t('events.dayNames.fri'), t('events.dayNames.sat')].map(day => (
           <Grid item xs={12/7} key={day}>
             <Box sx={{ 
               p: 1, 
@@ -257,13 +259,13 @@ const AdminEventsPage = () => {
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
                   <Group fontSize="small" color="action" />
                   <Typography variant="caption" color="text.secondary">
-                    {event.participants.length} participants
+{t('events.participantsCount', { count: event.participants.length })}
                   </Typography>
                 </Box>
               )}
 
               <Chip
-                label={event.type || "General"}
+label={event.type || t('events.general')}
                 size="small"
                 sx={{ mt: 1 }}
               />
@@ -274,7 +276,7 @@ const AdminEventsPage = () => {
                 onClick={() => handleEventClick(event)}
                 startIcon={<Event />}
               >
-                View Details
+{t('events.viewDetails')}
               </Button>
             </CardActions>
           </Card>
@@ -295,10 +297,10 @@ const AdminEventsPage = () => {
                   <Event sx={{ fontSize: 40, color: "#6200ea" }} />
                   <Box>
                     <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
-                      Agency Events
+{t('events.title')}
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                      View all events from your agency managers
+{t('events.description')}
                     </Typography>
                   </Box>
                 </Box>
@@ -306,9 +308,9 @@ const AdminEventsPage = () => {
               <Grid item xs={12} sm={6} sx={{ textAlign: "right" }}>
                 <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
                   <Link color="inherit" href="/admin/dashboard">
-                    Dashboard
+{t('navigation.dashboard')}
                   </Link>
-                  <Typography color="text.primary">Events</Typography>
+                  <Typography color="text.primary">{t('navigation.events')}</Typography>
                 </Breadcrumbs>
               </Grid>
             </Grid>
@@ -328,7 +330,7 @@ const AdminEventsPage = () => {
                     onClick={() => setEventsView('calendar')}
                     startIcon={<ViewModule />}
                   >
-                    Calendar
+{t('events.calendar')}
                   </Button>
                   <Button
                     size="small"
@@ -336,7 +338,7 @@ const AdminEventsPage = () => {
                     onClick={() => setEventsView('list')}
                     startIcon={<ViewDay />}
                   >
-                    List
+{t('events.list')}
                   </Button>
                 </Box>
               </Box>
@@ -344,7 +346,7 @@ const AdminEventsPage = () => {
               <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
                 <TextField
                   fullWidth
-                  placeholder="Search events..."
+placeholder={t('events.searchEvents')}
                   value={eventSearchTerm}
                   onChange={handleEventSearchChange}
                   InputProps={{
@@ -360,10 +362,10 @@ const AdminEventsPage = () => {
                 />
 
                 <Tooltip
-                  title={
+title={
                     eventSortOrder === "newest"
-                      ? "Sort by oldest first"
-                      : "Sort by newest first"
+                      ? t('events.sortByOldest')
+                      : t('events.sortByNewest')
                   }
                 >
                   <IconButton
@@ -388,10 +390,10 @@ const AdminEventsPage = () => {
                 <Box sx={{ textAlign: "center", p: 4, color: "text.secondary" }}>
                   <Event sx={{ fontSize: 64, mb: 2, opacity: 0.5 }} />
                   <Typography variant="h6" gutterBottom>
-                    No events found
+{t('events.noEventsFound')}
                   </Typography>
                   <Typography variant="body2">
-                    No events have been created by managers in your agency yet
+{t('events.noEventsDescription')}
                   </Typography>
                 </Box>
               ) : (
@@ -411,7 +413,7 @@ const AdminEventsPage = () => {
           <DialogTitle>
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <Event color="primary" />
-              Event Details
+{t('events.eventDetails')}
             </Box>
           </DialogTitle>
           <DialogContent>
@@ -431,7 +433,7 @@ const AdminEventsPage = () => {
                       <AccessTime color="action" />
                       <Box>
                         <Typography variant="subtitle2" color="text.secondary">
-                          Start Time
+{t('events.startTime')}
                         </Typography>
                         <Typography variant="body1">
                           {formatEventDate(selectedEvent.start)}
@@ -446,7 +448,7 @@ const AdminEventsPage = () => {
                         <Schedule color="action" />
                         <Box>
                           <Typography variant="subtitle2" color="text.secondary">
-                            End Time
+{t('events.endTime')}
                           </Typography>
                           <Typography variant="body1">
                             {formatEventDate(selectedEvent.end)}
@@ -462,7 +464,7 @@ const AdminEventsPage = () => {
                         <LocationOn color="action" />
                         <Box>
                           <Typography variant="subtitle2" color="text.secondary">
-                            Location
+{t('events.location')}
                           </Typography>
                           <Typography variant="body1">
                             {selectedEvent.location}
@@ -477,10 +479,10 @@ const AdminEventsPage = () => {
                       <Event color="action" />
                       <Box>
                         <Typography variant="subtitle2" color="text.secondary">
-                          Type
+{t('events.type')}
                         </Typography>
                         <Chip
-                          label={selectedEvent.type || "General"}
+label={selectedEvent.type || t('events.general')}
                           size="small"
                           color="primary"
                         />
@@ -494,7 +496,7 @@ const AdminEventsPage = () => {
                         <Group color="action" />
                         <Box sx={{ flex: 1 }}>
                           <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                            Participants ({selectedEvent.participants.length})
+{t('events.participantsCount', { count: selectedEvent.participants.length })}
                           </Typography>
                           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                             {selectedEvent.participants.map((participant, index) => (
@@ -516,7 +518,7 @@ const AdminEventsPage = () => {
           </DialogContent>
           <DialogActions>
             <Button onClick={handleEventDialogClose}>
-              Close
+{t('events.close')}
             </Button>
           </DialogActions>
         </Dialog>

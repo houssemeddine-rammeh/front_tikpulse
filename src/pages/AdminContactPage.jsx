@@ -81,6 +81,7 @@ import {
   fetchTicket,
 } from "../features/ticketsSlice";
 import { connectSocket, disconnectSocket, getSocket } from "../api/socketInstance";
+import { useTranslation } from 'react-i18next';
 
 // Ticket status types and colors
 const ticketStatusColors = {
@@ -102,6 +103,7 @@ const ticketCategoryColors = {
 const AdminContactPage = () => {
   const { user } = useAuth();
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
   const [eventsView, setEventsView] = useState('calendar'); // 'calendar' or 'list'
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -230,7 +232,7 @@ const AdminContactPage = () => {
       console.error('Error fetching agency tickets:', error);
       setSnackbar({
         open: true,
-        message: 'Failed to fetch tickets',
+        message: t('contact.failedToFetchTickets'),
         severity: 'error'
       });
     } finally {
@@ -247,7 +249,7 @@ const AdminContactPage = () => {
       console.error('Error fetching agency events:', error);
       setSnackbar({
         open: true,
-        message: 'Failed to fetch events',
+        message: t('contact.failedToFetchEvents'),
         severity: 'error'
       });
     } finally {
@@ -368,14 +370,14 @@ const AdminContactPage = () => {
       fetchAgencyTickets(); // Refresh tickets
       setSnackbar({
         open: true,
-        message: 'Ticket created successfully!',
+        message: t('contact.ticketCreatedSuccessfully'),
         severity: 'success'
       });
     } catch (error) {
       console.error("Failed to create ticket:", error);
       setSnackbar({
         open: true,
-        message: 'Failed to create ticket',
+        message: t('contact.failedToCreateTicket'),
         severity: 'error'
       });
     }
@@ -400,14 +402,14 @@ const AdminContactPage = () => {
       
       setSnackbar({
         open: true,
-        message: 'Ticket status updated successfully!',
+        message: t('contact.ticketStatusUpdated'),
         severity: 'success'
       });
     } catch (error) {
       console.error('Error updating ticket status:', error);
       setSnackbar({
         open: true,
-        message: error.response?.data?.message || 'Failed to update ticket status',
+        message: error.response?.data?.message || t('contact.failedToUpdateStatus'),
         severity: 'error'
       });
     } finally {
@@ -479,13 +481,13 @@ const AdminContactPage = () => {
   const getStatusText = (status) => {
     switch (status) {
       case "open":
-        return "Open";
+        return t('contact.status.open');
       case "inProgress":
-        return "In Progress";
+        return t('contact.status.inProgress');
       case "resolved":
-        return "Resolved";
+        return t('contact.status.resolved');
       case "closed":
-        return "Closed";
+        return t('contact.status.closed');
       default:
         return status;
     }
@@ -494,15 +496,15 @@ const AdminContactPage = () => {
   const getCategoryText = (category) => {
     switch (category) {
       case "match_planning":
-        return "Match Planning";
+        return t('contact.categories.matchPlanning');
       case "bug_report":
-        return "Bug Report";
+        return t('contact.categories.bugReport');
       case "ban_report":
-        return "Ban Report";
+        return t('contact.categories.banReport');
       case "departure_request":
-        return "Departure Request";
+        return t('contact.categories.departureRequest');
       case "general":
-        return "General Inquiry";
+        return t('contact.categories.generalInquiry');
       default:
         return category;
     }
@@ -723,7 +725,7 @@ const AdminContactPage = () => {
           <Box sx={{ bgcolor: "#f5f5f5", p: 2 }}>
                             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                   <Typography variant="h6">
-                    Agency Support Tickets
+{t('contact.agencySupportTickets')}
                   </Typography>
                   <Button
                     size="small"
@@ -732,14 +734,14 @@ const AdminContactPage = () => {
                     disabled={loading.tickets}
                     startIcon={loading.tickets ? <CircularProgress size={16} /> : <RefreshIcon />}
                   >
-                    Refresh
+{t('contact.refresh')}
                   </Button>
                 </Box>
 
             {/* Search and filters */}
             <TextField
               fullWidth
-              placeholder="Search tickets..."
+placeholder={t('contact.searchTickets')}
               value={searchTerm}
               onChange={handleSearchChange}
               sx={{ mb: 2 }}
@@ -757,7 +759,7 @@ const AdminContactPage = () => {
 
             <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
               <FormControl size="small" fullWidth>
-                <InputLabel>Status</InputLabel>
+                <InputLabel>{t('forms.labels.status')}</InputLabel>
                 <Select
                   value={statusFilter}
                   onChange={handleStatusFilterChange}
@@ -812,13 +814,13 @@ const AdminContactPage = () => {
             {loading.tickets ? (
               <ListItem>
                 <CircularProgress size={20} />
-                <ListItemText primary="Loading tickets..." />
+                <ListItemText primary={t('contact.loadingTickets')} />
               </ListItem>
             ) : filteredTickets.length === 0 ? (
               <ListItem>
                 <ListItemText
-                  primary="No tickets found"
-                  secondary="Try changing your search or filters"
+                  primary={t('contact.noTicketsFound')}
+                  secondary={t('contact.tryChangeFilters')}
                 />
               </ListItem>
             ) : (
@@ -936,7 +938,7 @@ const AdminContactPage = () => {
                               }}
                             />
                             <Chip
-                              label="Real-time"
+                              label={t('contact.realTime')}
                               size="small"
                               sx={{
                                 bgcolor: "#e8f5e8",
@@ -1044,10 +1046,10 @@ const AdminContactPage = () => {
             <Box sx={{ textAlign: "center", color: "text.secondary" }}>
               <Chat sx={{ fontSize: 64, mb: 2, opacity: 0.5 }} />
               <Typography variant="h6" gutterBottom>
-                Select a ticket to start chatting
+{t('contact.selectTicketToChat')}
               </Typography>
               <Typography variant="body2">
-                Choose a support ticket from the list to view the conversation
+{t('contact.chooseTicketDescription')}
               </Typography>
             </Box>
           </Paper>
@@ -1139,10 +1141,10 @@ const AdminContactPage = () => {
                   <ContactSupport sx={{ fontSize: 40, color: "#6200ea" }} />
                   <Box>
                     <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
-                      Agency Management Center
+{t('contact.title')}
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                      Manage support tickets and events from your agency
+{t('contact.description')}
                     </Typography>
                   </Box>
                 </Box>
@@ -1150,9 +1152,9 @@ const AdminContactPage = () => {
               <Grid item xs={12} sm={6} sx={{ textAlign: "right" }}>
                 <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
                   <Link color="inherit" href="/admin/dashboard">
-                    Dashboard
+{t('navigation.dashboard')}
                   </Link>
-                  <Typography color="text.primary">Agency Management</Typography>
+                  <Typography color="text.primary">{t('contact.agencyManagement')}</Typography>
                 </Breadcrumbs>
               </Grid>
             </Grid>
@@ -1169,7 +1171,7 @@ const AdminContactPage = () => {
                 label={
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <ContactSupport fontSize="small" />
-                    Support Tickets
+{t('contact.supportTickets')}
                   </Box>
                 }
               />
@@ -1177,7 +1179,7 @@ const AdminContactPage = () => {
                 label={
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <Event fontSize="small" />
-                    Events
+{t('navigation.events')}
                   </Box>
                 }
               />

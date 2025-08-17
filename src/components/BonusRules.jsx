@@ -20,8 +20,10 @@ import {
   TrendingUp as TrendingUpIcon 
 } from '@mui/icons-material';
 import { fetchBonusRules, selectBonusRules, selectBonusLoading, selectBonusErrors } from '../features/bonusSlice';
+import { useTranslation } from 'react-i18next';
 
 const BonusRules = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const rules = useSelector(selectBonusRules);
   const loading = useSelector(selectBonusLoading);
@@ -35,7 +37,7 @@ const BonusRules = () => {
     return (
       <Card>
         <CardContent>
-          <Typography>Loading bonus rules...</Typography>
+          <Typography>{t('bonusRules.loading')}</Typography>
         </CardContent>
       </Card>
     );
@@ -77,12 +79,12 @@ const BonusRules = () => {
         <Box display="flex" alignItems="center" mb={3}>
           <TrendingUpIcon sx={{ mr: 1, color: 'primary.main' }} />
           <Typography variant="h5" component="h2">
-            Programme de Bonus Agence
+            {t('bonusRules.title')}
           </Typography>
         </Box>
 
         <Typography variant="body1" color="text.secondary" paragraph>
-          Les règles du programme de bonus sont basées sur le nombre de jours valides et d'heures de diffusion.
+          {t('bonusRules.description')}
         </Typography>
 
         <TableContainer component={Paper} elevation={2}>
@@ -92,12 +94,12 @@ const BonusRules = () => {
                 <TableCell>
                   <Box display="flex" alignItems="center">
                     <StarIcon sx={{ mr: 1 }} />
-                    Programme
+                    {t('bonusRules.program')}
                   </Box>
                 </TableCell>
-                <TableCell align="center">Jours Valides</TableCell>
-                <TableCell align="center">Heures</TableCell>
-                <TableCell align="center">Taux</TableCell>
+                <TableCell align="center">{t('bonusRules.validDays')}</TableCell>
+                <TableCell align="center">{t('bonusRules.hours')}</TableCell>
+                <TableCell align="center">{t('bonusRules.rate')}</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -140,14 +142,14 @@ const BonusRules = () => {
 
         <Box mt={3}>
           <Typography variant="h6" gutterBottom>
-            Formule de Calcul
+            {t('bonusRules.calculationFormula')}
           </Typography>
-          <Typography variant="body2" color="text.secondary" paragraph>
-            Le bonus est calculé selon la formule : <strong>Taux applicable × Nombre de diamants = Montant bonus en dollars</strong>
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            <strong>Exemple :</strong> Un créateur avec 1M de diamants et un taux de 0.03% = 300$ de bonus
-          </Typography>
+          <Typography variant="body2" color="text.secondary" paragraph dangerouslySetInnerHTML={{
+            __html: t('bonusRules.formulaDescription')
+          }} />
+          <Typography variant="body2" color="text.secondary" dangerouslySetInnerHTML={{
+            __html: t('bonusRules.example')
+          }} />
         </Box>
       </CardContent>
     </Card>

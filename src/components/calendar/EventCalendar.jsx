@@ -4,10 +4,13 @@ import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./EventCalendar.css";
 import { buildApiUrl, getApiHeaders } from "../../config/api";
+import { useTranslation } from "react-i18next";
 
 const localizer = momentLocalizer(moment);
 
 const EventCalendar = ({ onEventSelect, onEventCreate, events, loading, userRole = null }) => {
+  const { t } = useTranslation();
+  
   const getEventTypeColor = (type) => {
     switch (type?.toLowerCase()) {
       case "live stream":
@@ -90,7 +93,7 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading, userRole
     return (
       <div className="calendar-loading">
         <div className="loading-spinner"></div>
-        <p>Loading calendar...</p>
+        <p>{t('eventCalendar.loadingCalendar')}</p>
       </div>
     );
   }
@@ -98,7 +101,7 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading, userRole
   return (
     <div className="event-calendar-container">
       <div className="calendar-header">
-        <h2>📅 Events Calendar</h2>
+        <h2>📅 {t('eventCalendar.title')}</h2>
         {userRole === "creator" && (
           <div style={{ 
             background: 'rgba(255, 255, 255, 0.1)', 
@@ -109,7 +112,7 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading, userRole
             fontSize: '14px',
             textAlign: 'center'
           }}>
-            📋 View-only mode: You can see events created by managers
+            📋 {t('eventCalendar.viewOnlyMode')}
           </div>
         )}
         <div className="calendar-legend">
@@ -118,28 +121,28 @@ const EventCalendar = ({ onEventSelect, onEventCreate, events, loading, userRole
               className="legend-color"
               style={{ backgroundColor: "#ff6b35" }}
             ></span>
-            <span>Tournament</span>
+            <span>{t('eventCalendar.legend.tournament')}</span>
           </div>
           <div className="legend-item">
             <span
               className="legend-color"
               style={{ backgroundColor: "#4caf50" }}
             ></span>
-            <span>Challenge</span>
+            <span>{t('eventCalendar.legend.challenge')}</span>
           </div>
           <div className="legend-item">
             <span
               className="legend-color"
               style={{ backgroundColor: "#2196f3" }}
             ></span>
-            <span>Meeting</span>
+            <span>{t('eventCalendar.legend.meeting')}</span>
           </div>
           <div className="legend-item">
             <span
               className="legend-color"
               style={{ backgroundColor: "#9c27b0" }}
             ></span>
-            <span>Match</span>
+            <span>{t('eventCalendar.legend.match')}</span>
           </div>
         </div>
       </div>

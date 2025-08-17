@@ -39,9 +39,11 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import ApiTest from '../components/ApiTest';
 import { creatorsAPI } from '../services/api';
+import { useTranslation } from 'react-i18next';
 
 const AdminCreatorManagementPage = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [creators, setCreators] = useState([]);
   const [categories, setCategories] = useState([]);
   const [managers, setManagers] = useState([]);
@@ -105,14 +107,14 @@ const AdminCreatorManagementPage = () => {
     } catch (error) {
       console.warn('Failed to fetch categories, using default:', error);
       return [
-        { id: 'lifestyle', name: 'Lifestyle' },
-        { id: 'comedy', name: 'Comedy' },
-        { id: 'dance', name: 'Dance' },
-        { id: 'beauty', name: 'Beauty' },
-        { id: 'fitness', name: 'Fitness' },
-        { id: 'food', name: 'Food' },
-        { id: 'gaming', name: 'Gaming' },
-        { id: 'education', name: 'Education' }
+        { id: 'lifestyle', name: t('creators.categories.lifestyle') },
+        { id: 'comedy', name: t('creators.categories.comedy') },
+        { id: 'dance', name: t('creators.categories.dance') },
+        { id: 'beauty', name: t('creators.categories.beauty') },
+        { id: 'fitness', name: t('creators.categories.fitness') },
+        { id: 'food', name: t('creators.categories.food') },
+        { id: 'gaming', name: t('creators.categories.gaming') },
+        { id: 'education', name: t('creators.categories.education') }
       ];
     }
   };
@@ -183,10 +185,10 @@ const AdminCreatorManagementPage = () => {
   const handleSubmit = async () => {
     // Validate form
     const errors = {
-      username: !newCreator.username ? 'Username is required' : '',
-      category: !newCreator.category ? 'Category is required' : '',
-      manager: !newCreator.manager ? 'Manager is required' : '',
-      agency: !newCreator.agency ? 'Agency is required' : ''
+      username: !newCreator.username ? t('creators.validation.usernameRequired') : '',
+      category: !newCreator.category ? t('creators.validation.categoryRequired') : '',
+      manager: !newCreator.manager ? t('creators.validation.managerRequired') : '',
+      agency: !newCreator.agency ? t('creators.validation.agencyRequired') : ''
     };
 
     if (Object.values(errors).some(error => error)) {
@@ -222,7 +224,7 @@ const AdminCreatorManagementPage = () => {
       handleDialogClose();
       
       // Show success message
-      alert(`Creator ${newCreator.username} added successfully!`);
+      alert(t('creators.addedSuccessfully', { name: newCreator.username }));
       
       // Refresh creators list
       fetchCreators();
@@ -247,16 +249,16 @@ const AdminCreatorManagementPage = () => {
           <MuiLink component={Link} to="/admin/dashboard" underline="hover" color="inherit">
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <DashboardIcon sx={{ mr: 0.5 }} fontSize="small" />
-              Dashboard
+{t('navigation.dashboard')}
             </Box>
           </MuiLink>
-          <Typography color="text.primary">Creator Management</Typography>
+          <Typography color="text.primary">{t('creators.management')}</Typography>
         </Breadcrumbs>
 
         {/* Header */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
           <Typography variant="h4" component="h1" gutterBottom>
-            Creator Management
+{t('creators.management')}
           </Typography>
           <Button 
             variant="contained" 
@@ -267,7 +269,7 @@ const AdminCreatorManagementPage = () => {
               '&:hover': { bgcolor: '#3700b3' }
             }}
           >
-            Add Creator
+            {t('creators.add')}
           </Button>
         </Box>
 
@@ -282,7 +284,7 @@ const AdminCreatorManagementPage = () => {
               sx={{ mt: 1 }}
               onClick={fetchCreators}
             >
-              Retry
+              {t('creators.retry')}
             </Button>
           </Paper>
         )}
@@ -293,24 +295,24 @@ const AdminCreatorManagementPage = () => {
             {loading ? (
               <Box sx={{ p: 4, textAlign: 'center' }}>
                 <CircularProgress />
-                <Typography sx={{ mt: 2 }}>Loading creators...</Typography>
+                <Typography sx={{ mt: 2 }}>{t('creators.loadingCreators')}</Typography>
               </Box>
             ) : (
               <Table>
                 <TableHead sx={{ bgcolor: '#f5f5f5' }}>
                   <TableRow>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Username</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Category</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Manager</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>Agency</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }} align="right">Actions</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{t('creators.username')}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{t('creators.category')}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{t('creators.manager')}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{t('creators.agency')}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }} align="right">{t('creators.actions')}</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {creators?.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} align="center" sx={{ py: 3 }}>
-                        <Typography color="textSecondary">No creators found</Typography>
+                        <Typography color="textSecondary">{t('creators.noCreatorsFound')}</Typography>
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -350,7 +352,7 @@ const AdminCreatorManagementPage = () => {
 
       {/* Add Creator Dialog */}
       <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Add New Creator</DialogTitle>
+        <DialogTitle>{t('creators.addNew')}</DialogTitle>
         <DialogContent>
           <Box component="form" noValidate sx={{ mt: 2 }}>
             <Grid container spacing={2}>
@@ -358,7 +360,7 @@ const AdminCreatorManagementPage = () => {
                 <TextField
                   required
                   fullWidth
-                  label="Username"
+                  label={t('creators.username')}
                   value={newCreator.username}
                   onChange={handleInputChange('username')}
                   error={!!formErrors.username}
@@ -367,10 +369,10 @@ const AdminCreatorManagementPage = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required error={!!formErrors.category}>
-                  <InputLabel>Category</InputLabel>
+                  <InputLabel>{t('creators.category')}</InputLabel>
                   <Select
                     value={newCreator.category}
-                    label="Category"
+                    label={t('creators.category')}
                     onChange={(e) => {
                       setNewCreator({
                         ...newCreator,
@@ -397,10 +399,10 @@ const AdminCreatorManagementPage = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required error={!!formErrors.manager}>
-                  <InputLabel>Manager</InputLabel>
+                  <InputLabel>{t('creators.manager')}</InputLabel>
                   <Select
                     value={newCreator.manager}
-                    label="Manager"
+                    label={t('creators.manager')}
                     onChange={(e) => {
                       setNewCreator({
                         ...newCreator,
@@ -425,10 +427,10 @@ const AdminCreatorManagementPage = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth required error={!!formErrors.agency}>
-                  <InputLabel>Agency</InputLabel>
+                  <InputLabel>{t('creators.agency')}</InputLabel>
                   <Select
                     value={newCreator.agency}
-                    label="Agency"
+                    label={t('creators.agency')}
                     onChange={(e) => {
                       setNewCreator({
                         ...newCreator,
@@ -457,7 +459,7 @@ const AdminCreatorManagementPage = () => {
           </Box>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={handleDialogClose}>Cancel</Button>
+          <Button onClick={handleDialogClose}>{t('creators.cancel')}</Button>
           <Button 
             onClick={handleSubmit}
             variant="contained"
@@ -466,7 +468,7 @@ const AdminCreatorManagementPage = () => {
               '&:hover': { bgcolor: '#3700b3' }
             }}
           >
-            Add Creator
+            {t('creators.add')}
           </Button>
         </DialogActions>
       </Dialog>

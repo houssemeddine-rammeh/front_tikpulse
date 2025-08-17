@@ -37,6 +37,7 @@ import {
 } from "@mui/icons-material";
 import { Link as RouterLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { logout } from "../features/authSlice";
 import LoadingScreen from "../components/LoadingScreen";
 import Layout from "../components/layout/Layout";
@@ -45,6 +46,7 @@ import axiosInstance from "../api/axiosInstance";
 const ProfilePage = () => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+  const { t } = useTranslation();
   
   const [editMode, setEditMode] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -120,7 +122,7 @@ const ProfilePage = () => {
     if (!profileData.email || !profileData.username) {
       setSnackbar({
         open: true,
-        message: "Email and username are required",
+        message: t("profile.messages.emailUsernameRequired"),
         severity: "error"
       });
       return false;
@@ -131,7 +133,7 @@ const ProfilePage = () => {
     if (!emailRegex.test(profileData.email)) {
       setSnackbar({
         open: true,
-        message: "Please enter a valid email address",
+        message: t("profile.messages.invalidEmail"),
         severity: "error"
       });
       return false;
@@ -142,7 +144,7 @@ const ProfilePage = () => {
       if (!profileData.currentPassword) {
         setSnackbar({
           open: true,
-          message: "Current password is required to change password",
+          message: t("profile.messages.currentPasswordRequired"),
           severity: "error"
         });
         return false;
@@ -151,7 +153,7 @@ const ProfilePage = () => {
       if (!profileData.newPassword) {
         setSnackbar({
           open: true,
-          message: "New password is required",
+          message: t("profile.messages.newPasswordRequired"),
           severity: "error"
         });
         return false;
@@ -160,7 +162,7 @@ const ProfilePage = () => {
       if (profileData.newPassword.length < 6) {
         setSnackbar({
           open: true,
-          message: "New password must be at least 6 characters long",
+          message: t("profile.messages.passwordTooShort"),
           severity: "error"
         });
         return false;
@@ -169,7 +171,7 @@ const ProfilePage = () => {
       if (profileData.newPassword !== profileData.confirmPassword) {
         setSnackbar({
           open: true,
-          message: "New passwords do not match",
+          message: t("profile.messages.passwordsNotMatch"),
           severity: "error"
         });
         return false;
@@ -203,7 +205,7 @@ const ProfilePage = () => {
       
       setSnackbar({
         open: true,
-        message: response.data.message || "Profile updated successfully!",
+        message: response.data.message || t("profile.messages.updateSuccess"),
         severity: "success"
       });
 
@@ -226,7 +228,7 @@ const ProfilePage = () => {
     } catch (error) {
       setSnackbar({
         open: true,
-        message: error.response?.data?.message || "Failed to update profile",
+        message: error.response?.data?.message || t("profile.messages.updateError"),
         severity: "error"
       });
     } finally {
@@ -263,13 +265,13 @@ const ProfilePage = () => {
               sx={{ display: "flex", alignItems: "center" }}
             >
               <Person sx={{ mr: 0.5 }} fontSize="inherit" />
-              Dashboard
+              {t("common.dashboard")}
             </Link>
-            <Typography color="text.primary">My Profile</Typography>
+            <Typography color="text.primary">{t("profile.title")}</Typography>
           </Breadcrumbs>
 
           <Typography variant="h4" component="h1" gutterBottom>
-            Profile Settings
+            {t("profile.settings")}
           </Typography>
 
           <Grid container spacing={3}>
@@ -324,9 +326,7 @@ const ProfilePage = () => {
                   </Typography>
 
                   <Typography variant="body2" color="primary" sx={{ fontWeight: "bold" }}>
-                    {user.role === "admin" ? "Administrator" : 
-                     user.role === "manager" ? "Manager" : 
-                     user.role === "sub_manager" ? "Sub-Manager" : "Creator"}
+                    {t(`profile.roles.${user.role}`, { defaultValue: t("profile.roles.creator") })}
                   </Typography>
 
                   <Divider sx={{ my: 2 }} />
@@ -363,7 +363,7 @@ const ProfilePage = () => {
                         "&:hover": { bgcolor: "#3700b3" },
                       }}
                     >
-                      {saving ? "Saving..." : editMode ? "Save Changes" : "Edit Profile"}
+                      {saving ? t("profile.saving") : editMode ? t("profile.saveChanges") : t("profile.editProfile")}
                     </Button>
 
                     {editMode && (
@@ -373,7 +373,7 @@ const ProfilePage = () => {
                         onClick={handleEditToggle}
                         disabled={saving}
                       >
-                        Cancel
+                        {t("profile.cancel")}
                       </Button>
                     )}
                   </Box>
@@ -385,14 +385,14 @@ const ProfilePage = () => {
             <Grid item xs={12} md={8}>
               <Paper elevation={2} sx={{ p: 3 }}>
                 <Typography variant="h6" sx={{ mb: 3 }}>
-                  Personal Information
+                  {t("profile.personalInfo")}
                 </Typography>
 
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="First Name"
+                      label={t("profile.firstName")}
                       value={profileData.firstName}
                       onChange={handleInputChange("firstName")}
                       disabled={!editMode}
@@ -403,7 +403,7 @@ const ProfilePage = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="Last Name"
+                      label={t("profile.lastName")}
                       value={profileData.lastName}
                       onChange={handleInputChange("lastName")}
                       disabled={!editMode}
@@ -414,7 +414,7 @@ const ProfilePage = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="Username"
+                      label={t("profile.username")}
                       value={profileData.username}
                       onChange={handleInputChange("username")}
                       disabled={!editMode}
@@ -426,7 +426,7 @@ const ProfilePage = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="Email Address"
+                      label={t("profile.email")}
                       type="email"
                       value={profileData.email}
                       onChange={handleInputChange("email")}
@@ -439,7 +439,7 @@ const ProfilePage = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="Phone Number"
+                      label={t("profile.phone")}
                       value={profileData.phone}
                       onChange={handleInputChange("phone")}
                       disabled={!editMode}
@@ -452,14 +452,14 @@ const ProfilePage = () => {
 
                 <Typography variant="h6" sx={{ mb: 3 }}>
                   <Security sx={{ mr: 1, verticalAlign: "middle" }} />
-                  Change Password
+                  {t("profile.changePassword")}
                 </Typography>
 
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Current Password"
+                      label={t("profile.currentPassword")}
                       type={showPassword ? "text" : "password"}
                       value={profileData.currentPassword}
                       onChange={handleInputChange("currentPassword")}
@@ -483,7 +483,7 @@ const ProfilePage = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="New Password"
+                      label={t("profile.newPassword")}
                       type={showNewPassword ? "text" : "password"}
                       value={profileData.newPassword}
                       onChange={handleInputChange("newPassword")}
@@ -507,7 +507,7 @@ const ProfilePage = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="Confirm New Password"
+                      label={t("profile.confirmPassword")}
                       type={showConfirmPassword ? "text" : "password"}
                       value={profileData.confirmPassword}
                       onChange={handleInputChange("confirmPassword")}
@@ -531,7 +531,7 @@ const ProfilePage = () => {
 
                 <Alert severity="info" sx={{ mt: 3 }}>
                   <Typography variant="body2">
-                    <strong>Note:</strong> Leave password fields empty if you don't want to change your password.
+                    <strong>{t("common.note", { defaultValue: "Note" })}:</strong> {t("profile.passwordNote")}
                   </Typography>
                 </Alert>
               </Paper>

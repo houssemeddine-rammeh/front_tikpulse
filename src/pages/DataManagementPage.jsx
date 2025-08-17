@@ -67,6 +67,7 @@ import {
 import { useDropzone } from 'react-dropzone';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types';
+import { useTranslation } from 'react-i18next';
 import { bulkDataService, dataTypeConfigs } from '../services/bulkDataService';
 
 // Data types that can be imported
@@ -129,6 +130,7 @@ const uiDataTypeConfigs = {
 };
 
 const DataManagementPage = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -300,16 +302,16 @@ const DataManagementPage = () => {
     setBatchMode(false);
   };
 
-  const steps = batchMode ? ['Upload Files', 'Process Batch'] : ['Upload File', 'Map Fields', 'Review & Import'];
+  const steps = batchMode ? [t('pages.dataManagement.uploadFiles'), t('pages.dataManagement.processBatch')] : [t('pages.dataManagement.uploadFile'), t('pages.dataManagement.mapFields'), t('pages.dataManagement.reviewImport')];
 
   if (user?.role !== UserRole.ADMIN) {
     return (
       <Box sx={{ p: 3 }}>
         <Typography variant="h4" gutterBottom>
-          Access Denied
+          {t('pages.dataManagement.accessDenied')}
         </Typography>
         <Typography variant="body1">
-          You do not have permission to access this page.
+          {t('pages.dataManagement.noPermission')}
         </Typography>
       </Box>
     );
@@ -318,7 +320,7 @@ const DataManagementPage = () => {
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Data Management
+        {t('pages.dataManagement.title')}
       </Typography>
 
       {/* Batch Mode Switch */}
@@ -336,14 +338,14 @@ const DataManagementPage = () => {
           label={
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <RefreshIcon />
-              <Typography>Batch Import Mode (Multiple Files)</Typography>
+              <Typography>{t('pages.dataManagement.batchImportMode')}</Typography>
             </Box>
           }
         />
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
           {batchMode 
-            ? 'Upload multiple files at once for bulk processing'
-            : 'Upload and process one file at a time with field mapping'
+            ? t('pages.dataManagement.uploadMultipleFiles')
+            : t('pages.dataManagement.uploadOneFile')
           }
         </Typography>
       </Paper>
@@ -351,7 +353,7 @@ const DataManagementPage = () => {
       {/* Data Type Selection */}
       <Paper sx={{ p: 2, mb: 3 }}>
         <Typography variant="h6" gutterBottom>
-          Select Data Type
+          {t('pages.dataManagement.selectDataType')}
         </Typography>
         <Grid container spacing={2}>
           {Object.entries(uiDataTypeConfigs).map(([key, config]) => {
@@ -382,7 +384,7 @@ const DataManagementPage = () => {
                       {config.name}
                     </Typography>
                     <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 1 }}>
-                      {dataConfig?.validationRules.filter(r => r.required).length || 0} required fields
+                      {dataConfig?.validationRules.filter(r => r.required).length || 0} {t('pages.dataManagement.requiredFields')}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.75rem' }}>
                       {config.description}
@@ -397,7 +399,7 @@ const DataManagementPage = () => {
                         downloadTemplate(key);
                       }}
                     >
-                      Template
+                      {t('pages.dataManagement.template')}
                     </Button>
                     <Button 
                       size="small" 

@@ -12,19 +12,22 @@ import {
   DashboardOutlined
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const CampaignManagementPage = () => {
+  const { t } = useTranslation();
+  
   return (
     <Container maxWidth="xl">
       <Box sx={{ mb: 4 }}>
         <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
           <Link component={RouterLink} to="/dashboard" color="inherit" sx={{ display: 'flex', alignItems: 'center' }}>
             <DashboardOutlined sx={{ mr: 0.5 }} fontSize="inherit" />
-            Dashboard
+{t('navigation.dashboard')}
           </Link>
           <Typography color="text.primary" sx={{ display: 'flex', alignItems: 'center' }}>
             <ArrowForwardOutlined sx={{ mr: 0.5 }} fontSize="inherit" />
-            Campaign Management
+            {t('pages.campaigns.title')}
           </Typography>
         </Breadcrumbs>
         
@@ -39,21 +42,20 @@ const CampaignManagementPage = () => {
           }}
         >
           <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-            Campaign Management
+            {t('pages.campaigns.title')}
           </Typography>
           
           <Typography variant="body1">
-            Create and manage all campaigns for the agency.
+            {t('pages.campaigns.description')}
           </Typography>
         </Paper>
         
         <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
           <Typography variant="h6" gutterBottom>
-            This page is under development
+            {t('pages.campaigns.underDevelopment')}
           </Typography>
           <Typography variant="body1">
-            The Campaign Management page will provide a complete overview of all campaigns across the agency. 
-            Administrators will be able to create, edit, and monitor all campaign activities, with detailed reporting and performance metrics.
+            {t('pages.campaigns.description')}
           </Typography>
         </Paper>
       </Box>

@@ -18,6 +18,10 @@ import {
   Slide,
   Zoom,
   keyframes,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
 import {
   TrendingUp,
@@ -36,9 +40,12 @@ import {
   Timeline as TimelineIcon,
   AutoGraph as AutoGraphIcon,
   Rocket as RocketIcon,
+  Language,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../contexts/LanguageContext';
 
 // Icon for DASHTRACER (using a generic video icon as substitute)
 const TikTokIcon = () => <VideoCall />;
@@ -82,6 +89,8 @@ const slideInFromRight = keyframes`
 `;
 
 const LandingPage = () => {
+  const { t } = useTranslation();
+  const { language, changeLanguage } = useLanguage();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
@@ -96,47 +105,47 @@ const LandingPage = () => {
   const features = [
     {
       icon: <AutoGraphIcon sx={{ fontSize: 40, color: '#FF0050' }} />,
-      title: 'AI-Powered Analytics',
-      description: 'Advanced machine learning algorithms to predict content performance and optimize your strategy in real-time.',
+      title: t('landingPage.features.aiAnalytics.title'),
+      description: t('landingPage.features.aiAnalytics.description'),
       gradient: 'linear-gradient(135deg, #FF0050, #FF4081)',
     },
     {
       icon: <GroupIcon sx={{ fontSize: 40, color: '#25F4EE' }} />,
-      title: 'Creator Ecosystem',
-      description: 'Connect with top-tier DASHTRACER creators worldwide and manage collaborations effortlessly.',
+      title: t('landingPage.features.creatorEcosystem.title'),
+      description: t('landingPage.features.creatorEcosystem.description'),
       gradient: 'linear-gradient(135deg, #25F4EE, #00D9FF)',
     },
     {
       icon: <RocketIcon sx={{ fontSize: 40, color: '#FE2C55' }} />,
-      title: 'Growth Acceleration',
-      description: 'Turbocharge your agency growth with our proven strategies and automated tools.',
+      title: t('landingPage.features.growthAcceleration.title'),
+      description: t('landingPage.features.growthAcceleration.description'),
       gradient: 'linear-gradient(135deg, #FE2C55, #FF6B9D)',
     },
     {
       icon: <ShieldIcon sx={{ fontSize: 40, color: '#8B5CF6' }} />,
-      title: 'Enterprise Security',
-      description: 'Bank-level security with end-to-end encryption to protect your valuable data and creator relationships.',
+      title: t('landingPage.features.enterpriseSecurity.title'),
+      description: t('landingPage.features.enterpriseSecurity.description'),
       gradient: 'linear-gradient(135deg, #8B5CF6, #A78BFA)',
     },
     {
       icon: <TimelineIcon sx={{ fontSize: 40, color: '#10B981' }} />,
-      title: 'Campaign Automation',
-      description: 'Automate your entire campaign lifecycle from planning to execution and performance tracking.',
+      title: t('landingPage.features.campaignAutomation.title'),
+      description: t('landingPage.features.campaignAutomation.description'),
       gradient: 'linear-gradient(135deg, #10B981, #34D399)',
     },
     {
       icon: <SpeedIcon sx={{ fontSize: 40, color: '#F59E0B' }} />,
-      title: 'Lightning Fast',
-      description: 'Experience blazing-fast performance with our optimized infrastructure and real-time data processing.',
+      title: t('landingPage.features.lightningFast.title'),
+      description: t('landingPage.features.lightningFast.description'),
       gradient: 'linear-gradient(135deg, #F59E0B, #FCD34D)',
     },
   ];
 
   const stats = [
-    { value: '1.2M+', label: 'Active Creators', icon: <PeopleIcon /> },
-    { value: '50M+', label: 'Content Views', icon: <TikTokIcon /> },
-    { value: '$15M+', label: 'Revenue Generated', icon: <MonetizationOnIcon /> },
-    { value: '99.9%', label: 'Uptime', icon: <SpeedIcon /> },
+    { value: '1.2M+', label: t('landingPage.stats.activeCreators'), icon: <PeopleIcon /> },
+    { value: '50M+', label: t('landingPage.stats.contentViews'), icon: <TikTokIcon /> },
+    { value: '$15M+', label: t('landingPage.stats.revenueGenerated'), icon: <MonetizationOnIcon /> },
+    { value: '99.9%', label: t('landingPage.stats.uptime'), icon: <SpeedIcon /> },
   ];
 
   const testimonials = [
@@ -288,7 +297,7 @@ const LandingPage = () => {
               <Fade in={isVisible} timeout={1000}>
                 <Box sx={{ animation: `${slideInFromLeft} 1s ease-out` }}>
                   <Chip
-                    label="🚀 Now Supporting DASHTRACER Shop Integration"
+                    label={t('landingPage.hero.chip')}
                     sx={{
                       mb: 3,
                       bgcolor: 'rgba(255, 0, 80, 0.1)',
@@ -311,9 +320,9 @@ const LandingPage = () => {
                       lineHeight: 1.1,
                     }}
                   >
-                    The Future of
+                    {t('landingPage.hero.title')}
                     <br />
-                      DASHTRACER
+                      {t('landingPage.hero.titleHighlight')}
                   </Typography>
                   <Typography
                     variant="h5"
@@ -326,7 +335,7 @@ const LandingPage = () => {
                       maxWidth: '500px',
                     }}
                   >
-                    Harness AI-powered analytics, automate creator management, and scale your agency to new heights with the most advanced DASHTRACER management platform.
+                    {t('landingPage.hero.subtitle')}
                   </Typography>
                   <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} sx={{ mb: 6 }}>
                     <Button
@@ -352,7 +361,7 @@ const LandingPage = () => {
                       }}
                       endIcon={<ArrowForwardIcon />}
                     >
-                      {user ? 'Go to Dashboard' : 'Start Free Trial'}
+                      {user ? t('landingPage.hero.goToDashboard') : t('landingPage.hero.startFreeTrial')}
                     </Button>
                     <Button
                       variant="outlined"
@@ -378,9 +387,72 @@ const LandingPage = () => {
                       }}
                       startIcon={<PlayArrowIcon />}
                     >
-                      Watch Demo
+                      {t('landingPage.hero.watchDemo')}
                     </Button>
                   </Stack>
+                  
+                  {/* Language Selector */}
+                  <Box sx={{ mb: 6, maxWidth: '300px' }}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel id="language-select-label" sx={{ display: "flex", alignItems: "center", color: 'rgba(255, 255, 255, 0.8)' }}>
+                        <Language sx={{ mr: 1, fontSize: 18 }} />
+                        {t('landingPage.hero.languageSelector')}
+                      </InputLabel>
+                      <Select
+                        labelId="language-select-label"
+                        value={language}
+                        onChange={(e) => changeLanguage(e.target.value)}
+                        label={t('landingPage.hero.languageSelector')}
+                        sx={{
+                          borderRadius: 2,
+                          "& .MuiSelect-select": {
+                            display: "flex",
+                            alignItems: "center",
+                            color: 'white',
+                          },
+                          "& .MuiOutlinedInput-notchedOutline": {
+                            borderColor: 'rgba(255, 255, 255, 0.3)',
+                          },
+                          "&:hover .MuiOutlinedInput-notchedOutline": {
+                            borderColor: 'rgba(255, 255, 255, 0.5)',
+                          },
+                          "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+                            borderColor: '#25F4EE',
+                          },
+                          "& .MuiSvgIcon-root": {
+                            color: 'white',
+                          }
+                        }}
+                        MenuProps={{
+                          PaperProps: {
+                            sx: {
+                              bgcolor: 'rgba(15, 15, 35, 0.95)',
+                              backdropFilter: 'blur(10px)',
+                              border: '1px solid rgba(255, 255, 255, 0.1)',
+                            }
+                          }
+                        }}
+                      >
+                        <MenuItem value="en" sx={{ display: "flex", alignItems: "center", color: 'white' }}>
+                          <Box component="span" sx={{ fontSize: "1.2rem", mr: 2 }}>🇺🇸</Box>
+                          English
+                        </MenuItem>
+                        <MenuItem value="fr" sx={{ display: "flex", alignItems: "center", color: 'white' }}>
+                          <Box component="span" sx={{ fontSize: "1.2rem", mr: 2 }}>🇫🇷</Box>
+                          Français
+                        </MenuItem>
+                        <MenuItem value="ar" sx={{ display: "flex", alignItems: "center", color: 'white' }}>
+                          <Box component="span" sx={{ fontSize: "1.2rem", mr: 2 }}>🇸🇦</Box>
+                          العربية
+                        </MenuItem>
+                        <MenuItem value="it" sx={{ display: "flex", alignItems: "center", color: 'white' }}>
+                          <Box component="span" sx={{ fontSize: "1.2rem", mr: 2 }}>🇮🇹</Box>
+                          Italiano
+                        </MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+                  
                   <Grid container spacing={4}>
                     {stats.map((stat, index) => (
                       <Grid item xs={6} sm={3} key={index}>
@@ -427,9 +499,7 @@ const LandingPage = () => {
                     }}
                   >
                     <Typography variant="h4" sx={{ color: 'white', textAlign: 'center' }}>
-                    DASHTRACER
-                      <br />
-                      Dashboard Preview
+                    {t('landingPage.dashboardPreview')}
                     </Typography>
                   </Box>
                 </Box>
@@ -444,10 +514,10 @@ const LandingPage = () => {
         <Container maxWidth="lg">
           <Box sx={{ textAlign: 'center', mb: 8 }}>
             <Typography variant="h2" component="h2" sx={{ fontWeight: 'bold', mb: 3, color: '#1a202c' }}>
-              Powerful Features for Modern Agencies
+              {t('landingPage.features.title')}
             </Typography>
             <Typography variant="h6" sx={{ color: '#64748b', maxWidth: '600px', mx: 'auto' }}>
-              Everything you need to manage, grow, and optimize your DASHTRACER creator agency
+              {t('landingPage.features.subtitle')}
             </Typography>
           </Box>
           <Grid container spacing={4}>
@@ -498,10 +568,10 @@ const LandingPage = () => {
       >
         <Container maxWidth="md">
           <Typography variant="h2" component="h2" sx={{ fontWeight: 'bold', mb: 3 }}>
-            Ready to Transform Your Agency?
+            {t('landingPage.cta.title')}
           </Typography>
           <Typography variant="h6" sx={{ mb: 6, opacity: 0.9 }}>
-            Join thousands of successful creators and agencies already using DASHTRACER
+            {t('landingPage.cta.subtitle')}
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={3} justifyContent="center">
             <Button
@@ -526,7 +596,7 @@ const LandingPage = () => {
               }}
               endIcon={<ArrowForwardIcon />}
             >
-              {user ? 'Go to Dashboard' : 'Start Your Free Trial'}
+              {user ? t('landingPage.hero.goToDashboard') : t('landingPage.cta.startYourFreeTrial')}
             </Button>
           </Stack>
         </Container>

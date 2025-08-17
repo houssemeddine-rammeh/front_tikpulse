@@ -46,6 +46,7 @@ import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { useTranslation } from "react-i18next";
 import axiosInstance from "../api/axiosInstance";
 
 // Constants
@@ -87,6 +88,7 @@ const CreatorManagementPage = () => {
   const dispatch = useDispatch();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   // Redux state
   const { creators = [], stats = {} } = useSelector(
@@ -242,11 +244,11 @@ const CreatorManagementPage = () => {
 
   const validateForm = useCallback(() => {
     const errors = {
-      username: !newCreator.username ? "Username is required" : "",
-      tikTokId: !newCreator.tikTokId ? "TikTok ID is required" : "",
-      category: !newCreator.category ? "Category is required" : "",
-      followers: !newCreator.followers ? "Followers count is required" : "",
-      diamonds: !newCreator.diamonds ? "Diamonds count is required" : "",
+      username: !newCreator.username ? t("creatorManagement.validation.usernameRequired") : "",
+      tikTokId: !newCreator.tikTokId ? t("creatorManagement.validation.tikTokIdRequired") : "",
+      category: !newCreator.category ? t("creatorManagement.validation.categoryRequired") : "",
+      followers: !newCreator.followers ? t("creatorManagement.validation.followersRequired") : "",
+      diamonds: !newCreator.diamonds ? t("creatorManagement.validation.diamondsRequired") : "",
       email: "", // not mandatory
       phone: "", // not mandatory
     };
@@ -254,7 +256,7 @@ const CreatorManagementPage = () => {
     const isValid = !Object.values(errors).some((error) => error);
     if (!isValid) setFormErrors(errors);
     return isValid;
-  }, [newCreator]);
+  }, [newCreator, t]);
 
   const handleSubmit = useCallback(async () => {
     if (!validateForm()) return;
@@ -301,7 +303,7 @@ const CreatorManagementPage = () => {
     async (creatorId, creatorName) => {
       if (
         window.confirm(
-          `Are you sure you want to delete creator "${creatorName}"?`
+          t("creatorManagement.confirmDeleteCreator", { name: creatorName })
         )
       ) {
         try {
@@ -316,7 +318,7 @@ const CreatorManagementPage = () => {
         }
       }
     },
-    [dispatch, user?.role, fetchAllCreators]
+    [dispatch, user?.role, fetchAllCreators, t]
   );
 
   // Sort handler
@@ -372,7 +374,7 @@ const CreatorManagementPage = () => {
               sx={{ mt: 2 }}
             >
               <RefreshIcon sx={{ mr: 1 }} />
-              Retry
+              {t("creatorManagement.actions.retry")}
             </Button>
           </Box>
         </Container>
@@ -403,7 +405,7 @@ const CreatorManagementPage = () => {
                 component="h1"
                 sx={{ fontWeight: 700, color: "#1a1a1a", mb: 1 }}
               >
-                {user?.role === 'admin' ? 'All Creators Management' : 'Creator Management'}
+                {user?.role === 'admin' ? t('creatorManagement.allCreatorsManagement') : t('creatorManagement.title')}
               </Typography>
               <Typography
                 variant="body1"
@@ -411,8 +413,8 @@ const CreatorManagementPage = () => {
                 sx={{ fontSize: "1rem" }}
               >
                 {user?.role === 'admin' 
-                  ? 'Manage and monitor all TikTok creators across the platform' 
-                  : 'Manage and monitor your TikTok creators'
+                  ? t('creatorManagement.allCreatorsDescription') 
+                  : t('creatorManagement.description')
                 }
               </Typography>
             </Box>
@@ -438,7 +440,7 @@ const CreatorManagementPage = () => {
                 transition: "all 0.2s ease",
               }}
             >
-              Add Creator
+              {t('creatorManagement.addCreator')}
             </Button>
           </Box>
 
@@ -457,8 +459,8 @@ const CreatorManagementPage = () => {
                 <TextField
                   fullWidth
                   placeholder={user?.role === 'admin' 
-                    ? "Search creators by name, category, or manager..." 
-                    : "Search creators by name or category..."
+                    ? t("creatorManagement.searchPlaceholderAdmin") 
+                    : t("creatorManagement.searchPlaceholder")
                   }
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
@@ -514,7 +516,7 @@ const CreatorManagementPage = () => {
                       variant="body1"
                       sx={{ opacity: 0.9, fontWeight: 500 }}
                     >
-                      Total Creators
+                      {t('creatorManagement.totalCreators')}
                     </Typography>
                   </Box>
                   <Person sx={{ fontSize: 48, opacity: 0.8 }} />
@@ -554,10 +556,10 @@ const CreatorManagementPage = () => {
               <Box sx={{ p: 8, textAlign: "center" }}>
                 <CircularProgress size={48} sx={{ color: "#667eea", mb: 3 }} />
                 <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-                  Loading creators...
+                  {t('creatorManagement.loadingCreators')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Please wait while we fetch your creators
+                  {t('creatorManagement.loadingCreatorsDescription')}
                 </Typography>
               </Box>
             ) : filteredCreators.length === 0 ? (
@@ -568,7 +570,7 @@ const CreatorManagementPage = () => {
                   color="text.secondary"
                   sx={{ mb: 2, fontWeight: 600 }}
                 >
-                  No creators found
+                  {t('creatorManagement.noCreatorsFound')}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -576,8 +578,8 @@ const CreatorManagementPage = () => {
                   sx={{ mb: 3 }}
                 >
                   {searchTerm
-                    ? "Try adjusting your search terms or clear the search to see all creators"
-                    : "Get started by adding your first creator to the platform"}
+                    ? t('creatorManagement.noCreatorsFoundDescription')
+                    : t('creatorManagement.noCreatorsFoundEmpty')}
                 </Typography>
                 {!searchTerm && (
                   <Button
@@ -594,7 +596,7 @@ const CreatorManagementPage = () => {
                       "&:hover": { bgcolor: "#5a6fd8" },
                     }}
                   >
-                    Add Your First Creator
+                    {t('creatorManagement.addFirstCreator')}
                   </Button>
                 )}
               </Box>
@@ -611,7 +613,7 @@ const CreatorManagementPage = () => {
                           py: 2.5,
                         }}
                       >
-                        Username
+                        {t('creatorManagement.fields.username')}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -621,7 +623,7 @@ const CreatorManagementPage = () => {
                           py: 2.5,
                         }}
                       >
-                        Category
+                        {t('creatorManagement.fields.category')}
                       </TableCell>
                       {user?.role === 'admin' && (
                         <TableCell
@@ -632,7 +634,7 @@ const CreatorManagementPage = () => {
                             py: 2.5,
                           }}
                         >
-                          Manager
+                          {t('creatorManagement.fields.manager')}
                         </TableCell>
                       )}
                       <TableCell
@@ -648,7 +650,7 @@ const CreatorManagementPage = () => {
                         }}
                         onClick={() => handleSort("followers")}
                       >
-                        Followers
+                        {t('creatorManagement.fields.followers')}
                         {sortField === "followers" &&
                           (sortDirection === "asc" ? (
                             <ArrowUpwardIcon
@@ -675,7 +677,7 @@ const CreatorManagementPage = () => {
                         }}
                         onClick={() => handleSort("diamonds")}
                       >
-                        Diamonds
+                        {t('creatorManagement.fields.diamonds')}
                         {sortField === "diamonds" &&
                           (sortDirection === "asc" ? (
                             <ArrowUpwardIcon
@@ -702,7 +704,7 @@ const CreatorManagementPage = () => {
                         }}
                           onClick={() => handleSort("liveDuration")}
                       >
-                        Live Duration
+                        {t('creatorManagement.fields.liveDuration')}
                         {sortField === "liveDuration" &&
                           (sortDirection === "asc" ? (
                             <ArrowUpwardIcon
@@ -729,7 +731,7 @@ const CreatorManagementPage = () => {
                         }}
                         onClick={() => handleSort("validLiveDays")}
                       >
-                        Valid Live Days
+                        {t('creatorManagement.fields.validLiveDays')}
                         
                         {sortField === "validLiveDays" &&
                           (sortDirection === "asc" ? (
@@ -757,7 +759,7 @@ const CreatorManagementPage = () => {
                           }}
                         onClick={() => handleSort("matches")}
                       >
-                        Matches
+                        {t('creatorManagement.fields.matches')}
                         {sortField === "matches" &&
                           (sortDirection === "asc" ? (
                             <ArrowUpwardIcon
@@ -779,7 +781,7 @@ const CreatorManagementPage = () => {
                           py: 2.5,
                         }}
                       >
-                        Status
+                        {t('creatorManagement.fields.status')}
                       </TableCell>
                       <TableCell
                         sx={{
@@ -790,7 +792,7 @@ const CreatorManagementPage = () => {
                           textAlign: "right",
                         }}
                       >
-                        Actions
+                        {t('creatorManagement.fields.actions')}
                       </TableCell>
                     </TableRow>
                   </TableHead>
@@ -850,7 +852,7 @@ const CreatorManagementPage = () => {
                         </TableCell>
                         <TableCell sx={{ py: 2.5 }}>
                           <Chip
-                            label={creator.category || "General"}
+                            label={creator.category ? t(`creatorManagement.categories.${creator.category}`) : t("creatorManagement.categories.General")}
                             size="small"
                             sx={{
                               bgcolor: "#e0e7ff",
@@ -919,7 +921,7 @@ const CreatorManagementPage = () => {
                         </TableCell>
                         <TableCell sx={{ py: 2.5 }}>
                           <Chip
-                            label={creator.status || "Active"}
+                            label={creator.status ? t(`creatorManagement.status.${creator.status.toLowerCase()}`) : t("creatorManagement.status.active")}
                             size="small"
                             color={
                               creator.status === "Active"
@@ -1025,7 +1027,7 @@ const CreatorManagementPage = () => {
               borderBottom: "1px solid #f3f4f6",
             }}
           >
-            {editingCreator ? "Edit Creator" : "Add New Creator"}
+            {editingCreator ? t("creatorManagement.editCreator") : t("creatorManagement.addNewCreator")}
           </DialogTitle>
           <DialogContent sx={{ pt: 3, px: 3, pb: 2 }}>
             <Box component="form" noValidate sx={{ mt: 1 }}>
@@ -1034,7 +1036,7 @@ const CreatorManagementPage = () => {
                   <TextField
                     required
                     fullWidth
-                    label="Username"
+                    label={t("creatorManagement.fields.username")}
                     value={newCreator.username}
                     onChange={handleInputChange("username")}
                     error={!!formErrors.username}
@@ -1054,7 +1056,7 @@ const CreatorManagementPage = () => {
                   <TextField
                     required
                     fullWidth
-                    label="TikTok ID"
+                    label={t("creatorManagement.fields.tikTokId")}
                     value={newCreator.tikTokId}
                     onChange={handleInputChange("tikTokId")}
                     error={!!formErrors.tikTokId}
@@ -1072,10 +1074,10 @@ const CreatorManagementPage = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <FormControl fullWidth required error={!!formErrors.category}>
-                    <InputLabel>Category</InputLabel>
+                    <InputLabel>{t("creatorManagement.fields.category")}</InputLabel>
                     <Select
                       value={newCreator.category}
-                      label="Category"
+                      label={t("creatorManagement.fields.category")}
                       onChange={handleInputChange("category")}
                       sx={{
                         borderRadius: 2,
@@ -1087,7 +1089,7 @@ const CreatorManagementPage = () => {
                     >
                       {CATEGORIES.map((category) => (
                         <MenuItem key={category} value={category}>
-                          {category}
+                          {t(`creatorManagement.categories.${category}`)}
                         </MenuItem>
                       ))}
                     </Select>
@@ -1106,7 +1108,7 @@ const CreatorManagementPage = () => {
                   <TextField
                     required
                     fullWidth
-                    label="Followers"
+                    label={t("creatorManagement.fields.followers")}
                     value={newCreator.followers}
                     onChange={handleInputChange("followers")}
                     error={!!formErrors.followers}
@@ -1131,7 +1133,7 @@ const CreatorManagementPage = () => {
                   <TextField
                     required
                     fullWidth
-                    label="Diamonds"
+                    label={t("creatorManagement.fields.diamonds")}
                     value={newCreator.diamonds}
                     onChange={handleInputChange("diamonds")}
                     error={!!formErrors.diamonds}
@@ -1155,7 +1157,7 @@ const CreatorManagementPage = () => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Email"
+                    label={t("creatorManagement.fields.email")}
                     value={newCreator.email}
                     onChange={handleInputChange("email")}
                     error={!!formErrors.email}
@@ -1174,7 +1176,7 @@ const CreatorManagementPage = () => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    label="Phone"
+                    label={t("creatorManagement.fields.phone")}
                     value={newCreator.phone}
                     onChange={handleInputChange("phone")}
                     error={!!formErrors.phone}
@@ -1222,7 +1224,7 @@ const CreatorManagementPage = () => {
                 color: "#6b7280",
               }}
             >
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               onClick={handleSubmit}
@@ -1245,9 +1247,9 @@ const CreatorManagementPage = () => {
               {submitting ? (
                 <CircularProgress size={20} color="inherit" />
               ) : editingCreator ? (
-                "Update Creator"
+                t("creatorManagement.updateCreator")
               ) : (
-                "Add Creator"
+                t("creatorManagement.addCreator")
               )}
             </Button>
           </DialogActions>

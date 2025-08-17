@@ -15,6 +15,7 @@ import { connectSocket } from "./api/socketInstance";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import TikTokCallbackPage from "./pages/TikTokCallbackPage";
@@ -52,6 +53,7 @@ import NotificationPrompt from "./notificationPrompt";
 import DataManagementPage from "./pages/DataManagementPage";
 import PWAInstallPrompt from "./components/PWA/InstallPrompt";
 import PWABadge from "./badge";
+import "./i18n/i18n";
 // TikTok Theme Colors
 const theme = createTheme({
   palette: {
@@ -171,9 +173,10 @@ function App() {
         <MuiThemeProvider theme={theme}>
           <CssBaseline />
           <ThemeProvider>
-            <Router>
-              <AuthProvider>
-                <NotificationProvider>
+            <LanguageProvider>
+              <Router>
+                <AuthProvider>
+                  <NotificationProvider>
                   <Routes>
                     {/* Public Routes */}
                     <Route
@@ -521,6 +524,7 @@ function App() {
                 </NotificationProvider>
               </AuthProvider>
             </Router>
+            </LanguageProvider>
           </ThemeProvider>
         </MuiThemeProvider>
       </PersistGate>

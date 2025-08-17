@@ -52,6 +52,7 @@ import {
   Warning as WarningIcon,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import {
   LineChart,
   Line,
@@ -70,6 +71,8 @@ import { fetchMonthlyStats, selectMonthlyStats, fetchDiamondsTrend, selectDiamon
 import axiosInstance from '../api/axiosInstance';
 
 const ManagerDashboardPage = () => {
+  const { t } = useTranslation();
+  
   // Modal states
   const [campaignModalOpen, setCampaignModalOpen] = useState(false);
   const [eventModalOpen, setEventModalOpen] = useState(false);
@@ -186,7 +189,7 @@ const ManagerDashboardPage = () => {
     } catch (error) {
       setSnackbar({
         open: true,
-        message: error.response?.data?.message || 'Erreur lors de la réinitialisation',
+        message: error.response?.data?.message || t('managerDashboard.resetError'),
         severity: 'error'
       });
       setResetDialog({ open: true, loading: false });
@@ -291,7 +294,7 @@ const ManagerDashboardPage = () => {
             }}
           >
             <Typography variant="h4" component="h1">
-              Manager Dashboard
+              {t('managerDashboard.title')}
             </Typography>
             <Button
               variant="outlined"
@@ -308,11 +311,9 @@ const ManagerDashboardPage = () => {
                 }
               }}
             >
-              Réinitialiser les Données
+              {t('managerDashboard.refresh')}
             </Button>
           </Box>
-
-          {/* Monthly Performance & Analytics */}
 
           {/* Main Stats */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
@@ -320,7 +321,7 @@ const ManagerDashboardPage = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    Total Diamonds
+                    {t('managerDashboard.stats.totalDiamonds')}
                   </Typography>
                   <Typography variant="h4">
                     {formatNumber(stats?.diamonds)}
@@ -332,7 +333,7 @@ const ManagerDashboardPage = () => {
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
-                    Total Followers
+                    {t('managerDashboard.stats.totalFollowers')}
                   </Typography>
                   <Typography variant="h4">
                     {formatNumber(stats?.followers)}
@@ -341,11 +342,11 @@ const ManagerDashboardPage = () => {
               </Card>
             </Grid>
             <Grid item xs={12} sm={6} md={4}>
-              <MuiTooltip title="Active = valid hours in the last 7 days">
+              <MuiTooltip title={t('managerDashboard.stats.activeCreators') + ' = valid hours in the last 7 days'}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
-                      Active Creators
+                      {t('managerDashboard.stats.activeCreators')}
                     </Typography>
                     <Typography variant="h4" color="success.main">
                       {(creatorsWithBonus || []).filter(c => c.active).length}
@@ -358,7 +359,7 @@ const ManagerDashboardPage = () => {
 
           {/* Monthly Performance */}
           <Typography variant="h5" sx={{ mb: 3 }}>
-            Monthly Performance
+            {t('managerDashboard.chart.monthlyPerformance')}
           </Typography>
           {monthlyStats.loading ? (
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
@@ -385,7 +386,7 @@ const ManagerDashboardPage = () => {
                       gutterBottom
                       sx={{ color: "#2196f3", fontWeight: "bold" }}
                     >
-                      Total Creators (This Month)
+                      {t('managerDashboard.stats.totalCreatorsThisMonth')}
                     </Typography>
                     <Typography
                       variant="h3"
@@ -394,7 +395,7 @@ const ManagerDashboardPage = () => {
                       {monthlyStats.current.totalCreators.toLocaleString()}
                     </Typography>
                     <Typography variant="body2" sx={{ color: "#1565c0", mt: 1 }}>
-                      Last Month: {monthlyStats.lastMonth.totalCreators.toLocaleString()} (<span style={{color: '#2196f3'}}>{formatDelta(monthlyStats.current.totalCreators, monthlyStats.lastMonth.totalCreators)}</span>)
+                      {t('managerDashboard.stats.lastMonth')}: {monthlyStats.lastMonth.totalCreators.toLocaleString()} (<span style={{color: '#2196f3'}}>{formatDelta(monthlyStats.current.totalCreators, monthlyStats.lastMonth.totalCreators)}</span>)
                     </Typography>
                   </CardContent>
                 </Card>
@@ -417,7 +418,7 @@ const ManagerDashboardPage = () => {
                       gutterBottom
                       sx={{ color: "#4caf50", fontWeight: "bold" }}
                     >
-                      Total Followers (This Month)
+                      {t('managerDashboard.stats.totalFollowersThisMonth')}
                     </Typography>
                     <Typography
                       variant="h3"
@@ -426,7 +427,7 @@ const ManagerDashboardPage = () => {
                       {monthlyStats.current.totalFollowers.toLocaleString()}
                     </Typography>
                     <Typography variant="body2" sx={{ color: "#2e7d32", mt: 1 }}>
-                      Last Month: {monthlyStats.lastMonth.totalFollowers.toLocaleString()} (<span style={{color: '#4caf50'}}>{formatDelta(monthlyStats.current.totalFollowers, monthlyStats.lastMonth.totalFollowers)}</span>)
+                      {t('managerDashboard.chart.lastMonth')}: {monthlyStats.lastMonth.totalFollowers.toLocaleString()} (<span style={{color: '#4caf50'}}>{formatDelta(monthlyStats.current.totalFollowers, monthlyStats.lastMonth.totalFollowers)}</span>)
                     </Typography>
                   </CardContent>
                 </Card>
@@ -457,7 +458,7 @@ const ManagerDashboardPage = () => {
                       gutterBottom
                       sx={{ color: "#ff9800", fontWeight: "bold" }}
                     >
-                      Total Views (This Month)
+                      {t('managerDashboard.stats.totalViewsThisMonth')}
                     </Typography>
                     <Typography
                       variant="h3"
@@ -466,7 +467,7 @@ const ManagerDashboardPage = () => {
                       {monthlyStats.current.totalViews.toLocaleString()}
                     </Typography>
                     <Typography variant="body2" sx={{ color: "#ef6c00", mt: 1 }}>
-                      Last Month: {monthlyStats.lastMonth.totalViews.toLocaleString()} (<span style={{color: '#ff9800'}}>{formatDelta(monthlyStats.current.totalViews, monthlyStats.lastMonth.totalViews)}</span>)
+                      {t('managerDashboard.chart.lastMonth')}: {monthlyStats.lastMonth.totalViews.toLocaleString()} (<span style={{color: '#ff9800'}}>{formatDelta(monthlyStats.current.totalViews, monthlyStats.lastMonth.totalViews)}</span>)
                     </Typography>
                   </CardContent>
                 </Card>
@@ -487,7 +488,7 @@ const ManagerDashboardPage = () => {
                       gutterBottom
                       sx={{ color: "#e91e63", fontWeight: "bold" }}
                     >
-                      Total Diamonds (This Month)
+                      {t('managerDashboard.stats.totalDiamondsThisMonth')}
                     </Typography>
                     <Typography
                       variant="h3"
@@ -496,7 +497,7 @@ const ManagerDashboardPage = () => {
                       {monthlyStats.current.totalDiamonds.toLocaleString()}
                     </Typography>
                     <Typography variant="body2" sx={{ color: "#ad1457", mt: 1 }}>
-                      Last Month: {monthlyStats.lastMonth.totalDiamonds.toLocaleString()} (<span style={{color: '#e91e63'}}>{formatDelta(monthlyStats.current.totalDiamonds, monthlyStats.lastMonth.totalDiamonds)}</span>)
+                      {t('managerDashboard.chart.lastMonth')}: {monthlyStats.lastMonth.totalDiamonds.toLocaleString()} (<span style={{color: '#e91e63'}}>{formatDelta(monthlyStats.current.totalDiamonds, monthlyStats.lastMonth.totalDiamonds)}</span>)
                     </Typography>
                   </CardContent>
                 </Card>
@@ -506,7 +507,7 @@ const ManagerDashboardPage = () => {
 
           {/* Total Diamonds per Month Chart */}
           <Typography variant="h5" sx={{ mb: 2 }}>
-            Total Diamonds per Month
+            {t('managerDashboard.stats.totalDiamondsPerMonth')}
           </Typography>
           <Paper sx={{ p: 3, mb: 4 }}>
             {diamondsTrend.loading ? (
@@ -541,9 +542,9 @@ const ManagerDashboardPage = () => {
                     <Tooltip
                       formatter={(value, name) => [
                         `${value.toLocaleString()}`,
-                        name === "diamonds" ? "Actual Diamonds" : "Target Diamonds",
+                        name === "diamonds" ? t('managerDashboard.chart.actualDiamonds') : t('managerDashboard.chart.targetDiamonds'),
                       ]}
-                      labelFormatter={(label) => `Month: ${label}`}
+                      labelFormatter={(label) => `${t('managerDashboard.chart.month')}: ${label}`}
                       contentStyle={{
                         backgroundColor: "#fff",
                         border: "1px solid #ccc",
@@ -564,7 +565,7 @@ const ManagerDashboardPage = () => {
                         strokeWidth: 2,
                         fill: "#fff",
                       }}
-                      name="Actual Diamonds"
+                      name={t('managerDashboard.chart.actualDiamonds')}
                     />
                     <Line
                       type="monotone"
@@ -579,7 +580,7 @@ const ManagerDashboardPage = () => {
                         strokeWidth: 2,
                         fill: "#fff",
                       }}
-                      name="Target Diamonds"
+                      name={t('managerDashboard.chart.targetDiamonds')}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -589,7 +590,7 @@ const ManagerDashboardPage = () => {
                   <Grid container spacing={2}>
                     <Grid item xs={12} sm={4}>
                       <Typography variant="body2" color="text.secondary">
-                        Current Month
+                        {t('managerDashboard.chart.currentMonth')}
                       </Typography>
                       <Typography variant="h6" sx={{ color: "#2196f3" }}>
                         💎{" "}
@@ -598,7 +599,7 @@ const ManagerDashboardPage = () => {
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <Typography variant="body2" color="text.secondary">
-                        Monthly Target
+                        {t('managerDashboard.chart.monthlyTarget')}
                       </Typography>
                       <Typography variant="h6" sx={{ color: "#ff9800" }}>
                         🎯{" "}
@@ -607,7 +608,7 @@ const ManagerDashboardPage = () => {
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <Typography variant="body2" color="text.secondary">
-                        Growth Rate
+                        {t('managerDashboard.chart.growthRate')}
                       </Typography>
                       <Typography variant="h6" sx={{ color: "#4caf50" }}>
                         📈 {calculateGrowthRate(monthlyStats.current.totalDiamonds, monthlyStats.lastMonth.totalDiamonds).toFixed(1)}%
@@ -626,10 +627,10 @@ const ManagerDashboardPage = () => {
 
           {/* Recent Activity */}
           <Typography variant="h5" sx={{ mb: 2 }}>
-            Recent Activity
+            {t('managerDashboard.activity.recentActivity')}
           </Typography>
           <Paper sx={{ p: 2 }}>
-            <Typography>No recent activity to display.</Typography>
+            <Typography>{t('managerDashboard.activity.noRecentActivity')}</Typography>
           </Paper>
         </Box>
 
@@ -642,32 +643,32 @@ const ManagerDashboardPage = () => {
         >
           <DialogTitle sx={{ display: 'flex', alignItems: 'center', color: 'warning.main' }}>
             <WarningIcon sx={{ mr: 1, color: 'warning.main' }} />
-            Réinitialiser les Données des Créateurs
+            {t('managerDashboard.confirmReset')}
           </DialogTitle>
           <DialogContent>
             <DialogContentText>
               <Alert severity="warning" sx={{ mb: 2 }}>
-                <strong>Attention!</strong> Cette action est irréversible.
+                {t('managerDashboard.resetWarning')}
               </Alert>
-              Êtes-vous sûr de vouloir réinitialiser toutes les données de profil de vos créateurs ?
+              {t('managerDashboard.resetDialog.areYouSure')}
               <br /><br />
-              <strong>Données qui seront réinitialisées :</strong>
+              <strong>{t('managerDashboard.resetDialog.dataWillBeReset')}</strong>
               <ul>
-                <li>Diamants : 0</li>
-                <li>Followers : 0</li>
-                <li>Jours de live valides : 0</li>
-                <li>Durée de live : 0h 0m</li>
-                <li>Streams de live : 0</li>
-                <li>Matches : 0</li>
-                <li>Et toutes les autres métriques...</li>
+                <li>{t('managerDashboard.resetDialog.diamonds')}</li>
+                <li>{t('managerDashboard.resetDialog.followers')}</li>
+                <li>{t('managerDashboard.resetDialog.validLiveDays')}</li>
+                <li>{t('managerDashboard.resetDialog.liveDuration')}</li>
+                <li>{t('managerDashboard.resetDialog.liveStreams')}</li>
+                <li>{t('managerDashboard.resetDialog.matches')}</li>
+                <li>{t('managerDashboard.resetDialog.otherMetrics')}</li>
               </ul>
               <br />
-              Cette action affectera {(creatorsWithBonus || []).length} créateur(s).
+              {t('managerDashboard.resetDialog.thisActionWillAffect', { count: (creatorsWithBonus || []).length })}
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleResetClose} disabled={resetDialog.loading}>
-              Annuler
+              {t('managerDashboard.cancel')}
             </Button>
             <Button
               onClick={handleResetConfirm}
@@ -676,7 +677,7 @@ const ManagerDashboardPage = () => {
               disabled={resetDialog.loading}
               startIcon={resetDialog.loading ? <RefreshIcon /> : <WarningIcon />}
             >
-              {resetDialog.loading ? 'Réinitialisation...' : 'Réinitialiser'}
+              {resetDialog.loading ? t('common.loading', { defaultValue: 'Loading...' }) : t('managerDashboard.confirm')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -704,14 +705,14 @@ const ManagerDashboardPage = () => {
             sx={{ bgcolor: "#4caf50", color: "white", fontWeight: "bold" }}
           >
             <CampaignIcon sx={{ mr: 1 }} />
-            Create New Campaign
+            {t('managerDashboard.modals.createCampaign')}
           </DialogTitle>
           <DialogContent sx={{ mt: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Campaign Name"
+                  label={t('managerDashboard.modals.campaignName')}
                   value={campaignForm.name}
                   onChange={(e) =>
                     setCampaignForm({ ...campaignForm, name: e.target.value })
@@ -722,7 +723,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Description"
+                  label={t('managerDashboard.modals.description')}
                   multiline
                   rows={3}
                   value={campaignForm.description}
@@ -738,7 +739,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Budget ($)"
+                  label={t('managerDashboard.modals.budget')}
                   type="number"
                   value={campaignForm.budget}
                   onChange={(e) =>
@@ -750,7 +751,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Assign Creators"
+                  label={t('managerDashboard.modals.assignCreators')}
                   value={campaignForm.assignedCreators}
                   onChange={(e) =>
                     setCampaignForm({
@@ -759,14 +760,14 @@ const ManagerDashboardPage = () => {
                     })
                   }
                   margin="normal"
-                  placeholder="e.g., Emma Chen, Liam Wong, Sophia Kim"
-                  helperText="Enter creator names separated by commas"
+                  placeholder={t('managerDashboard.modals.assignCreatorsPlaceholder')}
+                  helperText={t('managerDashboard.modals.assignCreatorsHelper')}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Start Date"
+                  label={t('managerDashboard.modals.startDate')}
                   type="date"
                   value={campaignForm.startDate}
                   onChange={(e) =>
@@ -782,7 +783,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="End Date"
+                  label={t('managerDashboard.modals.endDate')}
                   type="date"
                   value={campaignForm.endDate}
                   onChange={(e) =>
@@ -799,14 +800,14 @@ const ManagerDashboardPage = () => {
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>
             <Button onClick={() => setCampaignModalOpen(false)} color="inherit">
-              Cancel
+              {t('managerDashboard.modals.cancel')}
             </Button>
             <Button
               onClick={handleCampaignSubmit}
               variant="contained"
               sx={{ bgcolor: "#4caf50" }}
             >
-              Create Campaign
+              {t('managerDashboard.modals.save')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -822,14 +823,14 @@ const ManagerDashboardPage = () => {
             sx={{ bgcolor: "#ff9800", color: "white", fontWeight: "bold" }}
           >
             <EventIcon sx={{ mr: 1 }} />
-            Create New Event
+            {t('managerDashboard.modals.createEvent')}
           </DialogTitle>
           <DialogContent sx={{ mt: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Event Title"
+                  label={t('managerDashboard.modals.eventTitle')}
                   value={eventForm.title}
                   onChange={(e) =>
                     setEventForm({ ...eventForm, title: e.target.value })
@@ -840,7 +841,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Description"
+                  label={t('managerDashboard.modals.description')}
                   multiline
                   rows={3}
                   value={eventForm.description}
@@ -853,7 +854,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Date"
+                  label={t('managerDashboard.modals.date')}
                   type="date"
                   value={eventForm.date}
                   onChange={(e) =>
@@ -866,7 +867,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Time"
+                  label={t('managerDashboard.modals.time')}
                   type="time"
                   value={eventForm.time}
                   onChange={(e) =>
@@ -879,37 +880,37 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Location"
+                  label={t('managerDashboard.modals.location')}
                   value={eventForm.location}
                   onChange={(e) =>
                     setEventForm({ ...eventForm, location: e.target.value })
                   }
                   margin="normal"
-                  placeholder="e.g., Online, Studio A, etc."
+                  placeholder={t('managerDashboard.modals.location') + ' e.g., Online, Studio A, etc.'}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Event Type</InputLabel>
+                  <InputLabel>{t('managerDashboard.modals.eventType')}</InputLabel>
                   <Select
                     value={eventForm.type}
                     onChange={(e) =>
                       setEventForm({ ...eventForm, type: e.target.value })
                     }
-                    label="Event Type"
+                    label={t('managerDashboard.modals.eventType')}
                   >
-                    <MenuItem value="Live Stream">Live Stream</MenuItem>
-                    <MenuItem value="Workshop">Workshop</MenuItem>
-                    <MenuItem value="Meet & Greet">Meet & Greet</MenuItem>
-                    <MenuItem value="Training">Training</MenuItem>
-                    <MenuItem value="Contest">Contest</MenuItem>
+                    <MenuItem value="Live Stream">{t('managerDashboard.eventTypes.liveStream')}</MenuItem>
+                    <MenuItem value="Workshop">{t('managerDashboard.eventTypes.workshop')}</MenuItem>
+                    <MenuItem value="Meet & Greet">{t('managerDashboard.eventTypes.meetGreet')}</MenuItem>
+                    <MenuItem value="Training">{t('managerDashboard.eventTypes.training')}</MenuItem>
+                    <MenuItem value="Contest">{t('managerDashboard.eventTypes.contest')}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={12}>
                 <TextField
                   fullWidth
-                  label="Max Participants"
+                  label={t('managerDashboard.modals.maxParticipants')}
                   type="number"
                   value={eventForm.maxParticipants}
                   // min 0 max 4
@@ -927,21 +928,21 @@ const ManagerDashboardPage = () => {
                     })
                   }
                   margin="normal"
-                  placeholder="Leave empty for unlimited"
+                  placeholder={t('managerDashboard.modals.maxParticipantsPlaceholder')}
                 />
               </Grid>
             </Grid>
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>
             <Button onClick={() => setEventModalOpen(false)} color="inherit">
-              Cancel
+              {t('managerDashboard.modals.cancel')}
             </Button>
             <Button
               onClick={handleEventSubmit}
               variant="contained"
               sx={{ bgcolor: "#ff9800" }}
             >
-              Create Event
+              {t('managerDashboard.modals.save')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -957,14 +958,14 @@ const ManagerDashboardPage = () => {
             sx={{ bgcolor: "#9c27b0", color: "white", fontWeight: "bold" }}
           >
             <PersonAddIcon sx={{ mr: 1 }} />
-            Add New Creator
+            {t('managerDashboard.modals.createCreator')}
           </DialogTitle>
           <DialogContent sx={{ mt: 2 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Username"
+                  label={t('managerDashboard.modals.username')}
                   value={creatorForm.username}
                   onChange={(e) =>
                     setCreatorForm({ ...creatorForm, username: e.target.value })
@@ -975,7 +976,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="TikTok ID"
+                  label={t('managerDashboard.modals.tiktokId')}
                   value={creatorForm.tiktokId}
                   onChange={(e) =>
                     setCreatorForm({ ...creatorForm, tiktokId: e.target.value })
@@ -987,7 +988,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Email"
+                  label={t('managerDashboard.modals.email')}
                   type="email"
                   value={creatorForm.email}
                   onChange={(e) =>
@@ -999,7 +1000,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Phone"
+                  label={t('managerDashboard.modals.phone')}
                   value={creatorForm.phone}
                   onChange={(e) =>
                     setCreatorForm({ ...creatorForm, phone: e.target.value })
@@ -1010,7 +1011,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Followers Count"
+                  label={t('managerDashboard.modals.followersCount')}
                   type="number"
                   value={creatorForm.followers}
                   onChange={(e) =>
@@ -1025,7 +1026,7 @@ const ManagerDashboardPage = () => {
               <Grid item xs={12} sm={6}>
                 <TextField
                   fullWidth
-                  label="Content Category"
+                  label={t('managerDashboard.modals.contentCategory')}
                   value={creatorForm.category}
                   onChange={(e) =>
                     setCreatorForm({ ...creatorForm, category: e.target.value })
@@ -1036,18 +1037,18 @@ const ManagerDashboardPage = () => {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth margin="normal">
-                  <InputLabel>Creator Tier</InputLabel>
+                  <InputLabel>{t('managerDashboard.modals.creatorTier')}</InputLabel>
                   <Select
                     value={creatorForm.tier}
                     onChange={(e) =>
                       setCreatorForm({ ...creatorForm, tier: e.target.value })
                     }
-                    label="Creator Tier"
+                    label={t('managerDashboard.modals.creatorTier')}
                   >
-                    <MenuItem value="Bronze">Bronze</MenuItem>
-                    <MenuItem value="Silver">Silver</MenuItem>
-                    <MenuItem value="Gold">Gold</MenuItem>
-                    <MenuItem value="Platinum">Platinum</MenuItem>
+                    <MenuItem value="Bronze">{t('managerDashboard.tiers.bronze')}</MenuItem>
+                    <MenuItem value="Silver">{t('managerDashboard.tiers.silver')}</MenuItem>
+                    <MenuItem value="Gold">{t('managerDashboard.tiers.gold')}</MenuItem>
+                    <MenuItem value="Platinum">{t('managerDashboard.tiers.platinum')}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -1055,14 +1056,14 @@ const ManagerDashboardPage = () => {
           </DialogContent>
           <DialogActions sx={{ p: 3 }}>
             <Button onClick={() => setCreatorModalOpen(false)} color="inherit">
-              Cancel
+              {t('managerDashboard.modals.cancel')}
             </Button>
             <Button
               onClick={handleCreatorSubmit}
               variant="contained"
               sx={{ bgcolor: "#9c27b0" }}
             >
-              Add Creator
+              {t('managerDashboard.modals.save')}
             </Button>
           </DialogActions>
         </Dialog>

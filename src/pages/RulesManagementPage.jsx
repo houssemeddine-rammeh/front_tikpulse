@@ -12,8 +12,11 @@ import {
   Dashboard
 } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const RulesManagementPage = () => {
+  const { t } = useTranslation();
+  
   return (
     <Container maxWidth="xl">
       <Box sx={{ mb: 4 }}>
@@ -30,9 +33,9 @@ const RulesManagementPage = () => {
             sx={{ display: 'flex', alignItems: 'center' }}
           >
             <Dashboard sx={{ mr: 0.5 }} fontSize="inherit" />
-            Dashboard
+            {t('common.dashboard')}
           </Link>
-          <Typography color="text.primary">Rules Management</Typography>
+          <Typography color="text.primary">{t('pages.rules.title')}</Typography>
         </Breadcrumbs>
 
         <Paper 
@@ -45,21 +48,20 @@ const RulesManagementPage = () => {
           }}
         >
           <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold' }}>
-            Bonus Rules Management
+            {t('pages.rules.bonusRulesManagement')}
           </Typography>
           
           <Typography variant="body1">
-            Create and manage bonus rules for creators.
+            {t('pages.rules.description')}
           </Typography>
         </Paper>
         
         <Paper elevation={2} sx={{ p: 3, borderRadius: 2 }}>
           <Typography variant="h6" gutterBottom>
-            This page is under development
+            {t('pages.rules.underDevelopment')}
           </Typography>
           <Typography variant="body1">
-            The Rules Management page will allow administrators to create, modify, and delete bonus rules for creators. 
-            The interface will provide a complete view of all rules, with the ability to define conditions and rewards for each rule.
+            {t('pages.rules.fullDescription')}
           </Typography>
         </Paper>
       </Box>

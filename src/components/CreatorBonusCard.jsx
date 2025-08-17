@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { 
   Card, 
   CardContent, 
@@ -26,6 +27,7 @@ import {
 import { fetchCreatorBonus, selectCreatorBonus, selectBonusLoading, selectBonusErrors } from '../features/bonusSlice';
 
 const CreatorBonusCard = ({ tikTokId }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const bonus = useSelector(selectCreatorBonus);
   const loading = useSelector(selectBonusLoading);
@@ -86,7 +88,7 @@ const CreatorBonusCard = ({ tikTokId }) => {
       <Card sx={{ borderRadius: 3, overflow: 'hidden' }}>
         <CardContent>
           <Typography variant="body2" color="text.secondary">
-            Aucune information de bonus disponible
+            {t('creatorBonusCard.noDataAvailable')}
           </Typography>
         </CardContent>
       </Card>
@@ -132,10 +134,10 @@ const CreatorBonusCard = ({ tikTokId }) => {
           </Box>
           <Box>
             <Typography variant="h5" component="h3" fontWeight="bold" sx={{ color: 'white' }}>
-              Programme de Bonus
+              {t('creatorBonusCard.title')}
             </Typography>
             <Typography variant="body2" sx={{ color: 'rgba(255, 255, 255, 0.8)', mt: 0.5 }}>
-              Vos performances et récompenses
+              {t('creatorBonusCard.subtitle')}
             </Typography>
           </Box>
         </Box>
@@ -188,7 +190,7 @@ const CreatorBonusCard = ({ tikTokId }) => {
                     pt: 3
                   }}
                 >
-                  Diamant
+                  {t('creatorBonusCard.diamond')}
                 </TableCell>
                 <TableCell 
                   sx={{ 
@@ -212,7 +214,7 @@ const CreatorBonusCard = ({ tikTokId }) => {
                     pt: 3
                   }}
                 >
-                  Valide day
+                  {t('creatorBonusCard.validDay')}
                 </TableCell>
                 <TableCell 
                   sx={{ 
@@ -236,7 +238,7 @@ const CreatorBonusCard = ({ tikTokId }) => {
                     pt: 3
                   }}
                 >
-                  Hours
+                  {t('creatorBonusCard.hours')}
                 </TableCell>
                 <TableCell 
                   sx={{ 
@@ -260,7 +262,7 @@ const CreatorBonusCard = ({ tikTokId }) => {
                     pt: 3
                   }}
                 >
-                  Taux
+                  {t('creatorBonusCard.rate')}
                 </TableCell>
               </TableRow>
             </TableHead>
@@ -455,7 +457,7 @@ const CreatorBonusCard = ({ tikTokId }) => {
                   fontSize: '0.75rem'
                 }}
               >
-                Bonus Actuel
+                {t('creatorBonusCard.currentBonus')}
               </Typography>
             </Box>
             <Typography 

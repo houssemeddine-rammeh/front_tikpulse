@@ -57,6 +57,7 @@ import Layout from "../components/layout/Layout";
 import { useSelector, useDispatch } from "react-redux";
 import { getToken } from "../utils/tokenManager";
 import axiosInstance from "../api/axiosInstance";
+import { useTranslation } from "react-i18next";
 
 import {
   createTicket,
@@ -84,6 +85,7 @@ const ticketCategoryColors = {
 
 const ContactPage = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const isManager = user?.role === UserRole.MANAGER || user?.role === UserRole.SUB_MANAGER;
   const isAdmin = user?.role === UserRole.ADMIN;
 
@@ -257,14 +259,14 @@ const ContactPage = () => {
       
       setSnackbar({
         open: true,
-        message: 'Ticket status updated successfully!',
+        message: t('contact.ticketStatusUpdated'),
         severity: 'success'
       });
     } catch (error) {
       console.error('Error updating ticket status:', error);
       setSnackbar({
         open: true,
-        message: error.response?.data?.message || 'Failed to update ticket status',
+        message: error.response?.data?.message || t('contact.ticketUpdateFailed'),
         severity: 'error'
       });
     } finally {
@@ -323,13 +325,13 @@ const ContactPage = () => {
   const getStatusText = (status) => {
     switch (status) {
       case "open":
-        return "Open";
+        return t('contact.statuses.open');
       case "inProgress":
-        return "In Progress";
+        return t('contact.statuses.inProgress');
       case "resolved":
-        return "Resolved";
+        return t('contact.statuses.resolved');
       case "closed":
-        return "Closed";
+        return t('contact.statuses.closed');
       default:
         return status;
     }
@@ -338,15 +340,15 @@ const ContactPage = () => {
   const getCategoryText = (category) => {
     switch (category) {
       case "match_planning":
-        return "Match Planning";
+        return t('contact.categories.matchPlanning');
       case "bug_report":
-        return "Bug Report";
+        return t('contact.categories.bugReport');
       case "ban_report":
-        return "Ban Report";
+        return t('contact.categories.banReport');
       case "departure_request":
-        return "Departure Request";
+        return t('contact.categories.departureRequest');
       case "general":
-        return "General Inquiry";
+        return t('contact.categories.general');
       default:
         return category;
     }
@@ -390,10 +392,10 @@ const ContactPage = () => {
                   <ContactSupport sx={{ fontSize: 40, color: "#6200ea" }} />
                   <Box>
                     <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
-                      Support Center
+                      {t('contact.pageTitle')}
                     </Typography>
                     <Typography variant="body1" color="text.secondary">
-                      Get help and manage your support tickets
+                      {t('contact.pageSubtitle')}
                     </Typography>
                   </Box>
                 </Box>
@@ -401,9 +403,9 @@ const ContactPage = () => {
               <Grid item xs={12} sm={6} sx={{ textAlign: "right" }}>
                 <Breadcrumbs separator={<NavigateNext fontSize="small" />}>
                   <Link color="inherit" href="/">
-                    Dashboard
+                    {t('contact.dashboard')}
                   </Link>
-                  <Typography color="text.primary">Support</Typography>
+                  <Typography color="text.primary">{t('contact.support')}</Typography>
                 </Breadcrumbs>
                 {user?.role === "admin" && (
                   <Button
@@ -412,7 +414,7 @@ const ContactPage = () => {
                     onClick={handleEmailManager}
                     sx={{ mt: 1 }}
                   >
-                    Contact Manager
+                    {t('contact.contactManager')}
                   </Button>
                 )}
                 {/* Hide New Ticket button for admins - they can only view */}
@@ -428,7 +430,7 @@ const ContactPage = () => {
                       },
                     }}
                   >
-                    New Ticket
+                    {t('contact.newTicket')}
                   </Button>
                 )}
               </Grid>
@@ -447,13 +449,13 @@ const ContactPage = () => {
                 >
                   <Box sx={{ bgcolor: "#f5f5f5", p: 2 }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>
-                      Real-Time Support Tickets
+                      {t('contact.realTimeSupport')}
                     </Typography>
 
                     {/* Search and filters */}
                     <TextField
                       fullWidth
-                      placeholder="Search tickets..."
+                      placeholder={t('contact.searchTickets')}
                       value={searchTerm}
                       onChange={handleSearchChange}
                       sx={{ mb: 2 }}
@@ -471,36 +473,36 @@ const ContactPage = () => {
 
                     <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
                       <FormControl size="small" fullWidth>
-                        <InputLabel>Status</InputLabel>
+                        <InputLabel>{t('contact.status')}</InputLabel>
                         <Select
                           value={statusFilter}
                           onChange={handleStatusFilterChange}
-                          label="Status"
+                          label={t('contact.status')}
                         >
-                          <MenuItem value="all">All Statuses</MenuItem>
-                          <MenuItem value="open">Open</MenuItem>
-                          <MenuItem value="inProgress">In Progress</MenuItem>
-                          <MenuItem value="resolved">Resolved</MenuItem>
-                          <MenuItem value="closed">Closed</MenuItem>
+                          <MenuItem value="all">{t('contact.allStatuses')}</MenuItem>
+                          <MenuItem value="open">{t('contact.statuses.open')}</MenuItem>
+                          <MenuItem value="inProgress">{t('contact.statuses.inProgress')}</MenuItem>
+                          <MenuItem value="resolved">{t('contact.statuses.resolved')}</MenuItem>
+                          <MenuItem value="closed">{t('contact.statuses.closed')}</MenuItem>
                         </Select>
                       </FormControl>
 
                       <FormControl size="small" fullWidth>
-                        <InputLabel>Category</InputLabel>
+                        <InputLabel>{t('contact.category')}</InputLabel>
                         <Select
                           value={categoryFilter}
                           onChange={handleCategoryFilterChange}
-                          label="Category"
+                          label={t('contact.category')}
                         >
-                          <MenuItem value="all">All Categories</MenuItem>
-                          <MenuItem value="general">General</MenuItem>
+                          <MenuItem value="all">{t('contact.allCategories')}</MenuItem>
+                          <MenuItem value="general">{t('contact.categories.general')}</MenuItem>
                           <MenuItem value="match_planning">
-                            Match Planning
+                            {t('contact.categories.matchPlanning')}
                           </MenuItem>
-                          <MenuItem value="bug_report">Bug Report</MenuItem>
-                          <MenuItem value="ban_report">Ban Report</MenuItem>
+                          <MenuItem value="bug_report">{t('contact.categories.bugReport')}</MenuItem>
+                          <MenuItem value="ban_report">{t('contact.categories.banReport')}</MenuItem>
                           <MenuItem value="departure_request">
-                            Departure Request
+                            {t('contact.categories.departureRequest')}
                           </MenuItem>
                         </Select>
                       </FormControl>
@@ -508,8 +510,8 @@ const ContactPage = () => {
                       <Tooltip
                         title={
                           sortOrder === "newest"
-                            ? "Sort by oldest first"
-                            : "Sort by newest first"
+                            ? t('contact.sortNewest')
+                            : t('contact.sortOldest')
                         }
                       >
                         <IconButton
@@ -530,8 +532,8 @@ const ContactPage = () => {
                     {filteredTickets.length === 0 ? (
                       <ListItem>
                         <ListItemText
-                          primary="No tickets found"
-                          secondary="Try changing your search or filters"
+                          primary={t('contact.noTicketsFound')}
+                          secondary={t('contact.noTicketsDescription')}
                         />
                       </ListItem>
                     ) : (
@@ -656,10 +658,10 @@ const ContactPage = () => {
                                                 }
                                               }}
                                             >
-                                              <MenuItem value="open">Open</MenuItem>
-                                              <MenuItem value="inProgress">In Progress</MenuItem>
-                                              <MenuItem value="resolved">Resolved</MenuItem>
-                                              <MenuItem value="closed">Closed</MenuItem>
+                                              <MenuItem value="open">{t('contact.statuses.open')}</MenuItem>
+                                              <MenuItem value="inProgress">{t('contact.statuses.inProgress')}</MenuItem>
+                                              <MenuItem value="resolved">{t('contact.statuses.resolved')}</MenuItem>
+                                              <MenuItem value="closed">{t('contact.statuses.closed')}</MenuItem>
                                             </Select>
                                           </FormControl>
                                         )}
@@ -697,7 +699,7 @@ const ContactPage = () => {
                                       }}
                                     />
                                     <Chip
-                                      label="Real-time"
+                                      label={t('contact.realTime')}
                                       size="small"
                                       sx={{
                                         bgcolor: "#e8f5e8",
@@ -781,10 +783,10 @@ const ContactPage = () => {
                                     }
                                   }}
                                 >
-                                  <MenuItem value="open">Open</MenuItem>
-                                  <MenuItem value="inProgress">In Progress</MenuItem>
-                                  <MenuItem value="resolved">Resolved</MenuItem>
-                                  <MenuItem value="closed">Closed</MenuItem>
+                                  <MenuItem value="open">{t('contact.statuses.open')}</MenuItem>
+                                  <MenuItem value="inProgress">{t('contact.statuses.inProgress')}</MenuItem>
+                                  <MenuItem value="resolved">{t('contact.statuses.resolved')}</MenuItem>
+                                  <MenuItem value="closed">{t('contact.statuses.closed')}</MenuItem>
                                 </Select>
                               </FormControl>
                             )}
@@ -846,11 +848,10 @@ const ContactPage = () => {
                     <Box sx={{ textAlign: "center", color: "text.secondary" }}>
                       <Chat sx={{ fontSize: 64, mb: 2, opacity: 0.5 }} />
                       <Typography variant="h6" gutterBottom>
-                        Select a ticket to start chatting
+                        {t('contact.selectTicket')}
                       </Typography>
                       <Typography variant="body2">
-                        Choose a support ticket from the list to view the
-                        conversation
+                        {t('contact.selectTicketDescription')}
                       </Typography>
                     </Box>
                   </Paper>
@@ -867,12 +868,12 @@ const ContactPage = () => {
           maxWidth="md"
           fullWidth
         >
-          <DialogTitle>Create New Support Ticket</DialogTitle>
+          <DialogTitle>{t('contact.createTicketTitle')}</DialogTitle>
           <DialogContent>
             <TextField
               autoFocus
               margin="dense"
-              label="Subject"
+              label={t('contact.subject')}
               fullWidth
               variant="outlined"
               value={newTicketData.subject}
@@ -885,7 +886,7 @@ const ContactPage = () => {
             />
             <TextField
               margin="dense"
-              label="Description"
+              label={t('contact.description')}
               fullWidth
               multiline
               rows={4}
@@ -901,7 +902,7 @@ const ContactPage = () => {
             <Grid container spacing={2} sx={{ mt: 1 }}>
               <Grid item xs={6}>
                 <FormControl fullWidth>
-                  <InputLabel>Category</InputLabel>
+                  <InputLabel>{t('contact.category')}</InputLabel>
                   <Select
                     value={newTicketData.category}
                     onChange={(e) =>
@@ -910,19 +911,19 @@ const ContactPage = () => {
                         category: e.target.value,
                       }))
                     }
-                    label="Category"
+                    label={t('contact.category')}
                   >
-                    <MenuItem value="general">General</MenuItem>
-                    <MenuItem value="match_planning">Match Planning</MenuItem>
-                    <MenuItem value="bug_report">Bug Report</MenuItem>
-                    <MenuItem value="ban_report">Ban Report</MenuItem>
-                    <MenuItem value="departure_request">Departure Request</MenuItem>
+                    <MenuItem value="general">{t('contact.categories.general')}</MenuItem>
+                    <MenuItem value="match_planning">{t('contact.categories.matchPlanning')}</MenuItem>
+                    <MenuItem value="bug_report">{t('contact.categories.bugReport')}</MenuItem>
+                    <MenuItem value="ban_report">{t('contact.categories.banReport')}</MenuItem>
+                    <MenuItem value="departure_request">{t('contact.categories.departureRequest')}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
               <Grid item xs={6}>
                 <FormControl fullWidth>
-                  <InputLabel>Priority</InputLabel>
+                  <InputLabel>{t('contact.priority')}</InputLabel>
                   <Select
                     value={newTicketData.priority}
                     onChange={(e) =>
@@ -931,19 +932,19 @@ const ContactPage = () => {
                         priority: e.target.value,
                       }))
                     }
-                    label="Priority"
+                    label={t('contact.priority')}
                   >
-                    <MenuItem value="low">Low</MenuItem>
-                    <MenuItem value="medium">Medium</MenuItem>
-                    <MenuItem value="high">High</MenuItem>
-                    <MenuItem value="urgent">Urgent</MenuItem>
+                    <MenuItem value="low">{t('contact.priorities.low')}</MenuItem>
+                    <MenuItem value="medium">{t('contact.priorities.medium')}</MenuItem>
+                    <MenuItem value="high">{t('contact.priorities.high')}</MenuItem>
+                    <MenuItem value="urgent">{t('contact.priorities.urgent')}</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
             </Grid>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleNewTicketClose}>Cancel</Button>
+            <Button onClick={handleNewTicketClose}>{t('contact.cancel')}</Button>
             <Button
               onClick={handleNewTicketSubmit}
               variant="contained"
@@ -954,7 +955,7 @@ const ContactPage = () => {
                 !newTicketData.priority
               }
             >
-              Create Ticket
+              {t('contact.createTicket')}
             </Button>
           </DialogActions>
         </Dialog>
@@ -966,17 +967,17 @@ const ContactPage = () => {
           maxWidth="sm"
           fullWidth
         >
-          <DialogTitle>Contact Your Manager</DialogTitle>
+          <DialogTitle>{t('contact.contactManagerTitle')}</DialogTitle>
           <DialogContent>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              Send a direct message to your manager:{" "}
-              {managerInfo?.name || "Support Manager"}
+              {t('contact.contactManagerDescription')}{" "}
+              {managerInfo?.name || t('contact.supportManager')}
             </Typography>
 
             <TextField
               autoFocus
               margin="dense"
-              label="Subject"
+              label={t('contact.subject')}
               fullWidth
               variant="outlined"
               value={managerSubject}
@@ -986,25 +987,25 @@ const ContactPage = () => {
 
             <TextField
               margin="dense"
-              label="Message"
+              label={t('contact.message')}
               fullWidth
               multiline
               rows={4}
               variant="outlined"
               value={managerMessage}
               onChange={(e) => setManagerMessage(e.target.value)}
-              placeholder="Type your message here..."
+              placeholder={t('contact.messagePlaceholder')}
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleManagerDialogClose}>Cancel</Button>
+            <Button onClick={handleManagerDialogClose}>{t('contact.cancel')}</Button>
             <Button
               onClick={() => console.log("Send message to manager")}
               variant="contained"
               disabled={!managerSubject || !managerMessage}
               sx={{ bgcolor: "#6200ea", "&:hover": { bgcolor: "#3700b3" } }}
             >
-              Send Message
+              {t('contact.sendMessage')}
             </Button>
           </DialogActions>
         </Dialog>

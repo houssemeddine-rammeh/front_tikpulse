@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Box,
   Container,
@@ -53,6 +54,7 @@ import { useAuth } from '../contexts/AuthContext';
 import CreatorBonusCard from '../components/CreatorBonusCard';
 
 const CreatorProfilePage = () => {
+  const { t } = useTranslation();
   const { id: tikTokId } = useParams();
   const dispatch = useDispatch();
   const { profile, isLoading: loading, error } = useSelector((state) => state.auth);
@@ -158,7 +160,7 @@ const CreatorProfilePage = () => {
       if (!currentPassword) {
         setSnackbar({
           open: true,
-          message: "Current password is required to change password",
+          message: t('creatorProfile.errors.currentPasswordRequired'),
           severity: "error"
         });
         return;
@@ -166,7 +168,7 @@ const CreatorProfilePage = () => {
       if (!newPassword) {
         setSnackbar({
           open: true,
-          message: "New password is required",
+          message: t('creatorProfile.errors.newPasswordRequired'),
           severity: "error"
         });
         return;
@@ -174,7 +176,7 @@ const CreatorProfilePage = () => {
       if (newPassword.length < 6) {
         setSnackbar({
           open: true,
-          message: "New password must be at least 6 characters long",
+          message: t('creatorProfile.errors.newPasswordTooShort'),
           severity: "error"
         });
         return;
@@ -182,7 +184,7 @@ const CreatorProfilePage = () => {
       if (newPassword !== confirmPassword) {
         setSnackbar({
           open: true,
-          message: "New passwords do not match",
+          message: t('creatorProfile.errors.passwordsDoNotMatch'),
           severity: "error"
         });
         return;
@@ -220,7 +222,7 @@ const CreatorProfilePage = () => {
       
       setSnackbar({
         open: true,
-        message: "Profile updated successfully!",
+        message: t('creatorProfile.success.profileUpdated'),
         severity: "success"
       });
       setEditMode(false);
@@ -237,7 +239,7 @@ const CreatorProfilePage = () => {
       
       setSnackbar({
         open: true,
-        message: error.message || "Failed to update profile",
+        message: error.message || t('creatorProfile.errors.failedToUpdate'),
         severity: "error"
       });
     } finally {
@@ -276,7 +278,7 @@ const CreatorProfilePage = () => {
       <Layout>
         <Container maxWidth="md" sx={{ py: 10 }}>
           <Typography variant="h4" align="center" color="error" fontWeight="bold">
-            Not Found!
+            {t('creatorProfile.notFound')}
           </Typography>
         </Container>
       </Layout>
@@ -291,7 +293,7 @@ const CreatorProfilePage = () => {
       <Container maxWidth="lg" sx={{ py: 4 }}>
         <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 3 }}>
           <Typography variant="h4" fontWeight="bold">
-            Creator Profile
+            {t('creatorProfile.title')}
           </Typography>
           {canEdit && (
             <Box>
@@ -304,7 +306,7 @@ const CreatorProfilePage = () => {
                     disabled={saving}
                     sx={{ backgroundColor: "#1976d2" }}
                   >
-                    {saving ? "Saving..." : "Save"}
+                    {saving ? t('creatorProfile.saving') : t('creatorProfile.save')}
                   </Button>
                   <Button
                     variant="outlined"
@@ -312,7 +314,7 @@ const CreatorProfilePage = () => {
                     onClick={handleCancel}
                     disabled={saving}
                   >
-                    Cancel
+                    {t('creatorProfile.cancel')}
                   </Button>
                 </Stack>
               ) : (
@@ -322,7 +324,7 @@ const CreatorProfilePage = () => {
                   onClick={handleEdit}
                   sx={{ borderColor: "#1976d2", color: "#1976d2" }}
                 >
-                  Edit Profile
+                  {t('creatorProfile.editProfile')}
                 </Button>
               )}
             </Box>
@@ -348,7 +350,7 @@ const CreatorProfilePage = () => {
                   <PersonIcon sx={{ fontSize: 60 }} />
                 </Avatar>
                 <Typography variant="h4" fontWeight="bold" sx={{ mb: 1 }}>
-                  {editData?.displayName || editData?.username || 'Unknown User'}
+                  {editData?.displayName || editData?.username || t('creatorProfile.unknownUser')}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -364,7 +366,7 @@ const CreatorProfilePage = () => {
                     color: 'primary.main',
                   }}
                 >
-                  ID: {editData.creatorId}
+                  {t('creatorProfile.fields.id')}: {editData.creatorId}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1, mb: 2 }}>
                   <Typography variant="h6" color="text.secondary">
@@ -383,14 +385,14 @@ const CreatorProfilePage = () => {
                   {editData.bio}
                 </Typography>
                 <Grid container spacing={1} sx={{ mb: 2 }}>
-                  <Grid item xs={6}><StatItem icon={<CalendarIcon fontSize="small" />} label="Joined" value={editData.joinDate} /></Grid>
-                  <Grid item xs={6}><StatItem icon={<FollowingIcon fontSize="small" />} label="Following" value={editData.following} /></Grid>
-                  <Grid item xs={6}><StatItem icon={<VideosIcon fontSize="small" />} label="Videos" value={editData.videos} /></Grid>
-                  <Grid item xs={6}><StatItem icon={<FollowersIcon fontSize="small" />} label="Followers" value={editData.followers} /></Grid>
-                  <Grid item xs={6}><StatItem icon={<LikesIcon fontSize="small" />} label="Likes" value={editData.likes} /></Grid>
-                  <Grid item xs={6}><StatItem icon={<ViewsIcon fontSize="small" />} label="Views" value={editData.views} /></Grid>
-                  <Grid item xs={12}><StatItem icon={<PhoneIcon fontSize="small" />} label="Phone" value={editData.phone} /></Grid>
-                  <Grid item xs={12}><StatItem icon={<EmailIcon fontSize="small" />} label="Email" value={editData.email} /></Grid>
+                  <Grid item xs={6}><StatItem icon={<CalendarIcon fontSize="small" />} label={t('creatorProfile.fields.joined')} value={editData.joinDate} /></Grid>
+                  <Grid item xs={6}><StatItem icon={<FollowingIcon fontSize="small" />} label={t('creatorProfile.fields.following')} value={editData.following} /></Grid>
+                  <Grid item xs={6}><StatItem icon={<VideosIcon fontSize="small" />} label={t('creatorProfile.fields.videos')} value={editData.videos} /></Grid>
+                  <Grid item xs={6}><StatItem icon={<FollowersIcon fontSize="small" />} label={t('creatorProfile.fields.followers')} value={editData.followers} /></Grid>
+                  <Grid item xs={6}><StatItem icon={<LikesIcon fontSize="small" />} label={t('creatorProfile.fields.likes')} value={editData.likes} /></Grid>
+                  <Grid item xs={6}><StatItem icon={<ViewsIcon fontSize="small" />} label={t('creatorProfile.fields.views')} value={editData.views} /></Grid>
+                  <Grid item xs={12}><StatItem icon={<PhoneIcon fontSize="small" />} label={t('creatorProfile.fields.phone')} value={editData.phone} /></Grid>
+                  <Grid item xs={12}><StatItem icon={<EmailIcon fontSize="small" />} label={t('creatorProfile.fields.email')} value={editData.email} /></Grid>
                 </Grid>
               </CardContent>
             </Card>
@@ -398,23 +400,23 @@ const CreatorProfilePage = () => {
 
           <Grid item xs={12} md={8}>
             <Paper sx={{ p: 3, mb: 3, borderRadius: 3 }}>
-              <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>Contract Details</Typography>
+              <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>{t('creatorProfile.contractDetails')}</Typography>
               <Grid container spacing={3}>
-                <Grid item xs={12} sm={6}><StatItem icon={<CalendarIcon />} label="Contract Start" value={editData.contractStart} /></Grid>
-                <Grid item xs={12} sm={6}><StatItem icon={<WorkIcon />} label="Duration" value={editData.contractDuration} /></Grid>
-                <Grid item xs={12} sm={6}><StatItem icon={<CalendarIcon />} label="Days with Agency" value={`${editData.daysWithAgency} days`} /></Grid>
-                <Grid item xs={12} sm={6}><StatItem icon={<DiamondIcon />} label="Diamonds Collected" value={editData.diamondsCollected} /></Grid>
+                <Grid item xs={12} sm={6}><StatItem icon={<CalendarIcon />} label={t('creatorProfile.fields.contractStart')} value={editData.contractStart} /></Grid>
+                <Grid item xs={12} sm={6}><StatItem icon={<WorkIcon />} label={t('creatorProfile.fields.duration')} value={editData.contractDuration} /></Grid>
+                <Grid item xs={12} sm={6}><StatItem icon={<CalendarIcon />} label={t('creatorProfile.fields.daysWithAgency')} value={t('creatorProfile.daysUnit', { count: editData.daysWithAgency })} /></Grid>
+                <Grid item xs={12} sm={6}><StatItem icon={<DiamondIcon />} label={t('creatorProfile.fields.diamondsCollected')} value={editData.diamondsCollected} /></Grid>
               </Grid>
             </Paper>
             <Paper sx={{ p: 3, borderRadius: 3 }}>
-              <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>Payment Information</Typography>
+              <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>{t('creatorProfile.paymentInformation')}</Typography>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
                   <Stack direction="row" spacing={2} alignItems="center">
                     <AccountBalanceIcon color="secondary" />
                     <Box sx={{ flex: 1 }}>
                       <Typography variant="body2" color="text.secondary">
-                        RIB (Bank Account)
+                        {t('creatorProfile.fields.ribBankAccount')}
                       </Typography>
                       {editMode ? (
                         <TextField
@@ -422,7 +424,7 @@ const CreatorProfilePage = () => {
                           onChange={(e) => handleInputChange("bankAccount", e.target.value)}
                           size="small"
                           fullWidth
-                          placeholder="Enter bank account details"
+                          placeholder={t('creatorProfile.placeholders.enterBankAccount')}
                         />
                       ) : (
                         <Typography fontWeight="bold">{editData.bankAccount}</Typography>
@@ -435,7 +437,7 @@ const CreatorProfilePage = () => {
                     <MoneyIcon color="secondary" />
                     <Box>
                       <Typography variant="body2" color="text.secondary">
-                        PayPal Account
+                        {t('creatorProfile.fields.paypalAccount')}
                       </Typography>
                       <Typography fontWeight="bold">{editData.paypalAccount}</Typography>
                     </Box>
@@ -447,11 +449,11 @@ const CreatorProfilePage = () => {
             {/* Editable Fields Section */}
             {editMode && (
               <Paper sx={{ p: 3, mt: 3, borderRadius: 3 }}>
-                <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>Edit Profile Information</Typography>
+                <Typography variant="h5" fontWeight="bold" sx={{ mb: 3 }}>{t('creatorProfile.editProfileInformation')}</Typography>
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Display Name"
+                      label={t('creatorProfile.fields.displayName')}
                       value={editData.displayName}
                       onChange={(e) => handleInputChange("displayName", e.target.value)}
                       fullWidth
@@ -460,7 +462,7 @@ const CreatorProfilePage = () => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Username"
+                      label={t('creatorProfile.fields.username')}
                       value={editData.username}
                       onChange={(e) => handleInputChange("username", e.target.value)}
                       fullWidth
@@ -469,7 +471,7 @@ const CreatorProfilePage = () => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Email"
+                      label={t('creatorProfile.fields.email')}
                       value={editData.email}
                       onChange={(e) => handleInputChange("email", e.target.value)}
                       fullWidth
@@ -478,7 +480,7 @@ const CreatorProfilePage = () => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="Phone"
+                      label={t('creatorProfile.fields.phone')}
                       value={editData.phone}
                       onChange={(e) => handleInputChange("phone", e.target.value)}
                       fullWidth
@@ -487,50 +489,50 @@ const CreatorProfilePage = () => {
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <TextField
-                      label="TikTok ID"
+                      label={t('creatorProfile.fields.tikTokId')}
                       value={profile?.tikTokId || ""}
                       disabled={true}
                       fullWidth
                       size="small"
-                      helperText="TikTok ID cannot be edited for security reasons"
+                      helperText={t('creatorProfile.helperTexts.tikTokIdNotEditable')}
                     />
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl fullWidth size="small">
-                      <InputLabel>Category</InputLabel>
+                      <InputLabel>{t('creatorProfile.fields.category')}</InputLabel>
                       <Select
                         value={editData.category}
                         onChange={(e) => handleInputChange("category", e.target.value)}
-                        label="Category"
+                        label={t('creatorProfile.fields.category')}
                       >
-                        <MenuItem value="lifestyle">Lifestyle</MenuItem>
-                        <MenuItem value="fashion">Fashion</MenuItem>
-                        <MenuItem value="beauty">Beauty</MenuItem>
-                        <MenuItem value="fitness">Fitness</MenuItem>
-                        <MenuItem value="food">Food</MenuItem>
-                        <MenuItem value="travel">Travel</MenuItem>
-                        <MenuItem value="tech">Tech</MenuItem>
-                        <MenuItem value="gaming">Gaming</MenuItem>
-                        <MenuItem value="music">Music</MenuItem>
-                        <MenuItem value="dance">Dance</MenuItem>
-                        <MenuItem value="comedy">Comedy</MenuItem>
-                        <MenuItem value="education">Education</MenuItem>
-                        <MenuItem value="business">Business</MenuItem>
-                        <MenuItem value="health">Health</MenuItem>
-                        <MenuItem value="parenting">Parenting</MenuItem>
-                        <MenuItem value="pets">Pets</MenuItem>
-                        <MenuItem value="sports">Sports</MenuItem>
-                        <MenuItem value="art">Art</MenuItem>
-                        <MenuItem value="diy">DIY</MenuItem>
-                        <MenuItem value="automotive">Automotive</MenuItem>
-                        <MenuItem value="finance">Finance</MenuItem>
-                        <MenuItem value="other">Other</MenuItem>
+                        <MenuItem value="lifestyle">{t('creatorProfile.categories.lifestyle')}</MenuItem>
+                        <MenuItem value="fashion">{t('creatorProfile.categories.fashion')}</MenuItem>
+                        <MenuItem value="beauty">{t('creatorProfile.categories.beauty')}</MenuItem>
+                        <MenuItem value="fitness">{t('creatorProfile.categories.fitness')}</MenuItem>
+                        <MenuItem value="food">{t('creatorProfile.categories.food')}</MenuItem>
+                        <MenuItem value="travel">{t('creatorProfile.categories.travel')}</MenuItem>
+                        <MenuItem value="tech">{t('creatorProfile.categories.tech')}</MenuItem>
+                        <MenuItem value="gaming">{t('creatorProfile.categories.gaming')}</MenuItem>
+                        <MenuItem value="music">{t('creatorProfile.categories.music')}</MenuItem>
+                        <MenuItem value="dance">{t('creatorProfile.categories.dance')}</MenuItem>
+                        <MenuItem value="comedy">{t('creatorProfile.categories.comedy')}</MenuItem>
+                        <MenuItem value="education">{t('creatorProfile.categories.education')}</MenuItem>
+                        <MenuItem value="business">{t('creatorProfile.categories.business')}</MenuItem>
+                        <MenuItem value="health">{t('creatorProfile.categories.health')}</MenuItem>
+                        <MenuItem value="parenting">{t('creatorProfile.categories.parenting')}</MenuItem>
+                        <MenuItem value="pets">{t('creatorProfile.categories.pets')}</MenuItem>
+                        <MenuItem value="sports">{t('creatorProfile.categories.sports')}</MenuItem>
+                        <MenuItem value="art">{t('creatorProfile.categories.art')}</MenuItem>
+                        <MenuItem value="diy">{t('creatorProfile.categories.diy')}</MenuItem>
+                        <MenuItem value="automotive">{t('creatorProfile.categories.automotive')}</MenuItem>
+                        <MenuItem value="finance">{t('creatorProfile.categories.finance')}</MenuItem>
+                        <MenuItem value="other">{t('creatorProfile.categories.other')}</MenuItem>
                       </Select>
                     </FormControl>
                   </Grid>
                   <Grid item xs={12}>
                     <TextField
-                      label="Bio"
+                      label={t('creatorProfile.fields.bio')}
                       value={editData.bio}
                       onChange={(e) => handleInputChange("bio", e.target.value)}
                       fullWidth
@@ -543,13 +545,13 @@ const CreatorProfilePage = () => {
                 <Divider sx={{ my: 4 }} />
                 <Typography variant="h6" sx={{ mb: 2 }}>
                   <Security sx={{ mr: 1, verticalAlign: "middle" }} />
-                  Change Password
+                  {t('creatorProfile.changePassword')}
                 </Typography>
                 <Grid container spacing={3}>
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Current Password"
+                      label={t('creatorProfile.fields.currentPassword')}
                       type={showPassword ? "text" : "password"}
                       value={currentPassword}
                       onChange={e => setCurrentPassword(e.target.value)}
@@ -572,7 +574,7 @@ const CreatorProfilePage = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="New Password"
+                      label={t('creatorProfile.fields.newPassword')}
                       type={showNewPassword ? "text" : "password"}
                       value={newPassword}
                       onChange={e => setNewPassword(e.target.value)}
@@ -595,7 +597,7 @@ const CreatorProfilePage = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="Confirm New Password"
+                      label={t('creatorProfile.fields.confirmNewPassword')}
                       type={showConfirmPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={e => setConfirmPassword(e.target.value)}
@@ -618,7 +620,7 @@ const CreatorProfilePage = () => {
                 </Grid>
                 <Alert severity="info" sx={{ mt: 3 }}>
                   <Typography variant="body2">
-                    <strong>Note:</strong> Leave password fields empty if you don't want to change your password.
+                    <strong>{t('creatorProfile.helperTexts.note')}:</strong> {t('creatorProfile.helperTexts.leavePasswordFieldsEmpty')}
                   </Typography>
                 </Alert>
               </Paper>
@@ -628,8 +630,7 @@ const CreatorProfilePage = () => {
             {editMode && (
               <Alert severity="info" sx={{ mt: 2 }}>
                 <Typography variant="body2">
-                  <strong>Note:</strong> TikTok ID cannot be edited for security reasons. 
-                  Contact your manager if you need to update your TikTok ID.
+                  <strong>{t('creatorProfile.helperTexts.note')}:</strong> {t('creatorProfile.helperTexts.tikTokIdNotEditable')} {t('creatorProfile.helperTexts.contactManagerForTikTokId')}
                 </Typography>
               </Alert>
             )}
@@ -638,7 +639,7 @@ const CreatorProfilePage = () => {
             {!canEdit && user?.role === "creator" && (
               <Alert severity="info" sx={{ mt: 2 }}>
                 <Typography variant="body2">
-                  <strong>Note:</strong> You can only edit your own profile.
+                  <strong>{t('creatorProfile.helperTexts.note')}:</strong> {t('creatorProfile.helperTexts.onlyEditOwnProfile')}
                 </Typography>
               </Alert>
             )}
