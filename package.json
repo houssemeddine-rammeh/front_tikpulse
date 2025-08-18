@@ -3,10 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": "18.x",
-    "npm": "8.x"
-  },
   "dependencies": {
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
@@ -55,7 +51,7 @@
     "react-window": "^1.8.11",
     "recharts": "^2.15.3",
     "redux-persist": "^6.0.0",
-
+    "rollup": "4.44.2",
     "socket.io-client": "^4.8.1",
     "uuid": "^11.1.0",
     "xlsx": "^0.18.5",
@@ -89,7 +85,6 @@
   },
   "overrides": {
     "sharp": "0.32.6",
-    "sharp-ico": "0.1.5",
-    "@rollup/rollup-linux-x64-gnu": "*"
+    "sharp-ico": "0.1.5"
   }
 }
