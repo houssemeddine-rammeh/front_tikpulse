@@ -41,10 +41,12 @@ import Layout from "../components/layout/Layout";
 import { getToken } from "../utils/tokenManager";
 import axiosInstance from "../api/axiosInstance";
 import { useTranslation } from 'react-i18next';
+import { useTheme } from "../contexts/ThemeContext";
 
 const AdminEventsPage = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { mode } = useTheme();
   const [eventsView, setEventsView] = useState('calendar'); // 'calendar' or 'list'
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [eventDialogOpen, setEventDialogOpen] = useState(false);
@@ -164,7 +166,8 @@ const AdminEventsPage = () => {
               p: 1, 
               textAlign: 'center', 
               fontWeight: 'bold',
-              bgcolor: 'grey.100',
+              bgcolor: mode === 'light' ? 'grey.100' : 'grey.800',
+              color: mode === 'light' ? 'text.primary' : 'grey.100',
               borderRadius: 1
             }}>
               {day}
@@ -179,11 +182,15 @@ const AdminEventsPage = () => {
               sx={{
                 minHeight: 100,
                 p: 1,
-                border: '1px solid #e0e0e0',
+                border: mode === 'light' ? '1px solid #e0e0e0' : '1px solid #424242',
                 borderRadius: 1,
-                bgcolor: dayData ? 'white' : 'grey.50',
+                bgcolor: dayData 
+                  ? (mode === 'light' ? 'white' : 'grey.900')
+                  : (mode === 'light' ? 'grey.50' : 'grey.800'),
                 cursor: dayData ? 'pointer' : 'default',
-                '&:hover': dayData ? { bgcolor: 'grey.50' } : {},
+                '&:hover': dayData ? { 
+                  bgcolor: mode === 'light' ? 'grey.50' : 'grey.700' 
+                } : {},
               }}
             >
               {dayData && (
@@ -226,7 +233,20 @@ const AdminEventsPage = () => {
     <Grid container spacing={2}>
       {filteredEvents.map((event) => (
         <Grid item xs={12} sm={6} md={4} key={event._id}>
-          <Card sx={{ height: "100%" }}>
+          <Card sx={{ 
+            height: "100%",
+            bgcolor: 'background.paper',
+            boxShadow: mode === 'light' 
+              ? '0 2px 8px rgba(0, 0, 0, 0.1)'
+              : '0 2px 8px rgba(0, 0, 0, 0.3)',
+            '&:hover': {
+              boxShadow: mode === 'light'
+                ? '0 4px 16px rgba(0, 0, 0, 0.15)'
+                : '0 4px 16px rgba(0, 0, 0, 0.4)',
+              transform: 'translateY(-2px)',
+            },
+            transition: 'all 0.2s ease'
+          }}>
             <CardContent>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
                 <CalendarToday fontSize="small" color="primary" />
@@ -290,7 +310,15 @@ label={event.type || t('events.general')}
       <Container maxWidth="xl">
         <Box sx={{ my: 2 }}>
           {/* Header */}
-          <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+          <Paper elevation={1} sx={{ 
+            p: 3, 
+            mb: 3, 
+            borderRadius: 2,
+            bgcolor: 'background.paper',
+            boxShadow: mode === 'light'
+              ? '0 2px 4px rgba(0, 0, 0, 0.1)'
+              : '0 2px 4px rgba(0, 0, 0, 0.25)'
+          }}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={6}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
@@ -317,8 +345,18 @@ label={event.type || t('events.general')}
           </Paper>
 
           {/* Main Content */}
-          <Paper elevation={2} sx={{ borderRadius: 2, overflow: "hidden" }}>
-            <Box sx={{ bgcolor: "#f5f5f5", p: 2 }}>
+          <Paper elevation={2} sx={{ 
+            borderRadius: 2, 
+            overflow: "hidden",
+            bgcolor: 'background.paper',
+            boxShadow: mode === 'light'
+              ? '0 4px 6px rgba(0, 0, 0, 0.1)'
+              : '0 4px 6px rgba(0, 0, 0, 0.3)'
+          }}>
+            <Box sx={{ 
+              bgcolor: mode === 'light' ? "#f5f5f5" : "grey.800", 
+              p: 2 
+            }}>
               <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
                                <Typography variant="h6">
                  {new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
@@ -371,7 +409,13 @@ title={
                   <IconButton
                     onClick={handleEventSortOrderChange}
                     size="small"
-                    sx={{ bgcolor: "white", boxShadow: 1 }}
+                    sx={{ 
+                      bgcolor: mode === 'light' ? "white" : "grey.700", 
+                      boxShadow: 1,
+                      '&:hover': {
+                        bgcolor: mode === 'light' ? "grey.100" : "grey.600"
+                      }
+                    }}
                   >
                     <Sort />
                   </IconButton>
@@ -381,7 +425,10 @@ title={
 
             <Divider />
 
-            <Box sx={{ p: 2 }}>
+            <Box sx={{ 
+              p: 2,
+              bgcolor: 'background.paper'
+            }}>
               {loading ? (
                 <Box sx={{ display: "flex", justifyContent: "center", p: 4 }}>
                   <CircularProgress />

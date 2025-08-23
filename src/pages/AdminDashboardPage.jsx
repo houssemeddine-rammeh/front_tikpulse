@@ -63,10 +63,12 @@ import { selectAgencyProfile } from "../features/agencyManagerSlice";
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { useTranslation } from 'react-i18next';
+import { useTheme } from "../contexts/ThemeContext";
 
 const AdminDashboardPage = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { mode } = useTheme();
   const [uploadStats] = useState({
     totalCreators: 187,
     totalManagers: 24,
@@ -312,7 +314,9 @@ const AdminDashboardPage = () => {
     <Layout>
       <Box sx={{ 
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+        background: mode === 'light' 
+          ? 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+          : 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
         py: 2
       }}>
         <Container maxWidth="xl">
@@ -322,9 +326,13 @@ const AdminDashboardPage = () => {
               mb: 6, 
               p: 4, 
               borderRadius: 3,
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              background: mode === 'light'
+                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                : 'linear-gradient(135deg, #4c1d95 0%, #581c87 100%)',
               color: 'white',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+              boxShadow: mode === 'light' 
+                ? '0 8px 32px rgba(0, 0, 0, 0.1)'
+                : '0 8px 32px rgba(0, 0, 0, 0.3)'
             }}>
               <Typography variant="h3" sx={{ 
                 fontWeight: 700, 
@@ -347,9 +355,13 @@ const AdminDashboardPage = () => {
                 <Card sx={{ 
                   p: 3, 
                   borderRadius: 3,
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  background: mode === 'light'
+                    ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                    : 'linear-gradient(135deg, #4c1d95 0%, #581c87 100%)',
                   color: 'white',
-                  boxShadow: '0 8px 25px rgba(102, 126, 234, 0.2)',
+                  boxShadow: mode === 'light'
+                    ? '0 8px 25px rgba(102, 126, 234, 0.2)'
+                    : '0 8px 25px rgba(76, 29, 149, 0.3)',
                   border: 'none',
                   transition: 'transform 0.2s ease',
                   "&:hover": {
@@ -374,9 +386,13 @@ const AdminDashboardPage = () => {
                 <Card sx={{ 
                   p: 3, 
                   borderRadius: 3,
-                  background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                  background: mode === 'light'
+                    ? 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+                    : 'linear-gradient(135deg, #be185d 0%, #be123c 100%)',
                   color: 'white',
-                  boxShadow: '0 8px 25px rgba(240, 147, 251, 0.2)',
+                  boxShadow: mode === 'light'
+                    ? '0 8px 25px rgba(240, 147, 251, 0.2)'
+                    : '0 8px 25px rgba(190, 24, 93, 0.3)',
                   border: 'none',
                   transition: 'transform 0.2s ease',
                   "&:hover": {
@@ -401,9 +417,13 @@ const AdminDashboardPage = () => {
                 <Card sx={{ 
                   p: 3, 
                   borderRadius: 3,
-                  background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                  background: mode === 'light'
+                    ? 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+                    : 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
                   color: 'white',
-                  boxShadow: '0 8px 25px rgba(79, 172, 254, 0.2)',
+                  boxShadow: mode === 'light'
+                    ? '0 8px 25px rgba(79, 172, 254, 0.2)'
+                    : '0 8px 25px rgba(14, 165, 233, 0.3)',
                   border: 'none',
                   transition: 'transform 0.2s ease',
                   "&:hover": {
@@ -429,13 +449,18 @@ const AdminDashboardPage = () => {
              <Card sx={{ 
                mb: 4, 
                borderRadius: 3,
-               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+               boxShadow: mode === 'light'
+                 ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                 : '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
                border: 'none',
-               overflow: 'hidden'
+               overflow: 'hidden',
+               bgcolor: 'background.paper'
              }}>
                <Box sx={{ 
                  p: 4,
-                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                 background: mode === 'light'
+                   ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                   : 'linear-gradient(135deg, #4c1d95 0%, #581c87 100%)',
                  color: 'white'
                }}>
                  <Box
@@ -475,11 +500,13 @@ const AdminDashboardPage = () => {
                  </Box>
                </Box>
 
-              <TableContainer sx={{ background: 'white' }}>
+              <TableContainer sx={{ background: 'background.paper' }}>
               <Table>
                 <TableHead>
                   <TableRow sx={{ 
-                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                    background: mode === 'light'
+                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+                      : 'linear-gradient(135deg, #4c1d95 0%, #581c87 100%)'
                   }}>
                     <TableCell sx={{ 
                       fontWeight: "bold", 
@@ -648,13 +675,18 @@ const AdminDashboardPage = () => {
             <Card sx={{ 
               mb: 4, 
               borderRadius: 3,
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              boxShadow: mode === 'light'
+                ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                : '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
               border: 'none',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              bgcolor: 'background.paper'
             }}>
               <Box sx={{ 
                 p: 4,
-                background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+                background: mode === 'light'
+                  ? 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+                  : 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
                 color: 'white'
               }}>
                 <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
@@ -669,7 +701,7 @@ const AdminDashboardPage = () => {
                   <CircularProgress />
                 </Box>
               ) : (
-                <Box sx={{ background: 'white' }}>
+                <Box sx={{ background: 'background.paper' }}>
                   <TableContainer>
                     <Table>
                       <TableHead>
@@ -695,7 +727,7 @@ const AdminDashboardPage = () => {
                       <TableBody>
                         {paginatedManagers.map(({ manager, creators }) => (
                           <React.Fragment key={manager._id}>
-                            <TableRow sx={{ bgcolor: "#f5f5f5" }}>
+                            <TableRow sx={{ bgcolor: mode === 'light' ? "#f5f5f5" : "rgba(255, 255, 255, 0.05)" }}>
                               <TableCell sx={{ fontWeight: "bold" }}>
                                 {manager.username}
                               </TableCell>
@@ -714,7 +746,7 @@ const AdminDashboardPage = () => {
                               <TableCell colSpan={4} sx={{ p: 0, border: 0 }}>
                                 <Table
                                   size="small"
-                                  sx={{ bgcolor: "#fafafa", ml: 2 }}
+                                  sx={{ bgcolor: mode === 'light' ? "#fafafa" : "rgba(255, 255, 255, 0.02)", ml: 2 }}
                                 >
                                   <TableHead>
                                     <TableRow>
@@ -831,13 +863,18 @@ const AdminDashboardPage = () => {
             <Card sx={{ 
               mb: 4, 
               borderRadius: 3,
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              boxShadow: mode === 'light'
+                ? '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+                : '0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2)',
               border: 'none',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              bgcolor: 'background.paper'
             }}>
               <Box sx={{ 
                 p: 4,
-                background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+                background: mode === 'light'
+                  ? 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)'
+                  : 'linear-gradient(135deg, #be185d 0%, #d97706 100%)',
                 color: 'white'
               }}>
                 <Typography variant="h5" sx={{ mb: 1, fontWeight: "bold" }}>
@@ -856,14 +893,18 @@ const AdminDashboardPage = () => {
                     borderRadius: 3,
                     p: 6,
                     textAlign: "center",
-                    bgcolor: isDragActive ? "rgba(102, 126, 234, 0.08)" : "rgba(102, 126, 234, 0.04)",
+                    bgcolor: isDragActive 
+                      ? (mode === 'light' ? "rgba(102, 126, 234, 0.08)" : "rgba(102, 126, 234, 0.15)")
+                      : (mode === 'light' ? "rgba(102, 126, 234, 0.04)" : "rgba(102, 126, 234, 0.1)"),
                     cursor: "pointer",
                     mb: 2,
                     transition: 'all 0.3s ease',
                     "&:hover": {
-                      bgcolor: "rgba(102, 126, 234, 0.08)",
+                      bgcolor: mode === 'light' ? "rgba(102, 126, 234, 0.08)" : "rgba(102, 126, 234, 0.15)",
                       transform: 'translateY(-2px)',
-                      boxShadow: '0 8px 25px rgba(102, 126, 234, 0.15)'
+                      boxShadow: mode === 'light' 
+                        ? '0 8px 25px rgba(102, 126, 234, 0.15)'
+                        : '0 8px 25px rgba(102, 126, 234, 0.3)'
                     }
                   }}
                 >
@@ -914,7 +955,7 @@ const AdminDashboardPage = () => {
 {t('pages.admin.dashboard.upload.confirmMessage')}
                   </Typography>
                   {selectedFile && (
-                    <Box sx={{ mt: 2, p: 2, bgcolor: "#f5f5f5", borderRadius: 1 }}>
+                    <Box sx={{ mt: 2, p: 2, bgcolor: mode === 'light' ? "#f5f5f5" : "rgba(255, 255, 255, 0.05)", borderRadius: 1 }}>
                       <Typography variant="body2" sx={{ fontWeight: "bold" }}>
                         File Details:
                       </Typography>

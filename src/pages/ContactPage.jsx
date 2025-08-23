@@ -58,6 +58,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getToken } from "../utils/tokenManager";
 import axiosInstance from "../api/axiosInstance";
 import { useTranslation } from "react-i18next";
+import { useTheme } from "../contexts/ThemeContext";
 
 import {
   createTicket,
@@ -86,6 +87,7 @@ const ticketCategoryColors = {
 const ContactPage = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { mode } = useTheme();
   const isManager = user?.role === UserRole.MANAGER || user?.role === UserRole.SUB_MANAGER;
   const isAdmin = user?.role === UserRole.ADMIN;
 
@@ -360,12 +362,20 @@ const ContactPage = () => {
         <Avatar
           src={managerInfo.avatar}
           alt={managerInfo.name}
-          sx={{ bgcolor: "#6200ea", width: 32, height: 32 }}
+          sx={{ 
+            bgcolor: mode === 'light' ? "#6200ea" : "#7c3aed", 
+            width: 32, 
+            height: 32 
+          }}
         />
       );
     } else {
       return (
-        <Avatar sx={{ bgcolor: "#2196f3", width: 32, height: 32 }}>
+        <Avatar sx={{ 
+          bgcolor: mode === 'light' ? "#2196f3" : "#3b82f6", 
+          width: 32, 
+          height: 32 
+        }}>
           {user?.username?.charAt(0)?.toUpperCase() || "U"}
         </Avatar>
       );
@@ -385,11 +395,22 @@ const ContactPage = () => {
       <Container maxWidth="xl">
         <Box sx={{ my: 2 }}>
           {/* Header */}
-          <Paper elevation={1} sx={{ p: 3, mb: 3, borderRadius: 2 }}>
+          <Paper elevation={1} sx={{ 
+            p: 3, 
+            mb: 3, 
+            borderRadius: 2,
+            bgcolor: 'background.paper',
+            boxShadow: mode === 'light' 
+              ? '0 2px 8px rgba(0, 0, 0, 0.1)'
+              : '0 2px 8px rgba(0, 0, 0, 0.3)'
+          }}>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={12} sm={6}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                  <ContactSupport sx={{ fontSize: 40, color: "#6200ea" }} />
+                  <ContactSupport sx={{ 
+                    fontSize: 40, 
+                    color: mode === 'light' ? "#6200ea" : "#a78bfa" 
+                  }} />
                   <Box>
                     <Typography variant="h4" component="h1" sx={{ fontWeight: "bold" }}>
                       {t('contact.pageTitle')}
@@ -438,16 +459,33 @@ const ContactPage = () => {
           </Paper>
 
           {/* Main Content */}
-          <Paper elevation={2} sx={{ borderRadius: 2, overflow: "hidden" }}>
+          <Paper elevation={2} sx={{ 
+            borderRadius: 2, 
+            overflow: "hidden",
+            bgcolor: 'background.paper',
+            boxShadow: mode === 'light' 
+              ? '0 4px 6px rgba(0, 0, 0, 0.1)'
+              : '0 4px 6px rgba(0, 0, 0, 0.3)'
+          }}>
             {/* Main Content - Direct Support Tickets with Real-Time Chat */}
             <Grid container spacing={3} sx={{ p: 3 }}>
               {/* Tickets List */}
               <Grid item xs={12} md={5} lg={4}>
                 <Paper
                   elevation={2}
-                  sx={{ borderRadius: 2, overflow: "hidden" }}
+                  sx={{ 
+                    borderRadius: 2, 
+                    overflow: "hidden",
+                    bgcolor: 'background.paper',
+                    boxShadow: mode === 'light' 
+                      ? '0 2px 4px rgba(0, 0, 0, 0.1)'
+                      : '0 2px 4px rgba(0, 0, 0, 0.3)'
+                  }}
                 >
-                  <Box sx={{ bgcolor: "#f5f5f5", p: 2 }}>
+                  <Box sx={{ 
+                    bgcolor: mode === 'light' ? "#f5f5f5" : "grey.800", 
+                    p: 2 
+                  }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>
                       {t('contact.realTimeSupport')}
                     </Typography>
@@ -702,8 +740,8 @@ const ContactPage = () => {
                                       label={t('contact.realTime')}
                                       size="small"
                                       sx={{
-                                        bgcolor: "#e8f5e8",
-                                        color: "#2e7d32",
+                                        bgcolor: mode === 'light' ? "#e8f5e8" : "rgba(46, 125, 50, 0.2)",
+                                        color: mode === 'light' ? "#2e7d32" : "#81c784",
                                         fontWeight: 500,
                                       }}
                                     />
@@ -751,8 +789,8 @@ const ContactPage = () => {
                     <Box
                       sx={{
                         p: 2,
-                        bgcolor: "#f8f9fa",
-                        borderBottom: "1px solid #e0e0e0",
+                        bgcolor: mode === 'light' ? "#f8f9fa" : "grey.800",
+                        borderBottom: mode === 'light' ? "1px solid #e0e0e0" : "1px solid #4b5563",
                       }}
                     >
                       <Box
@@ -842,7 +880,7 @@ const ContactPage = () => {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      bgcolor: "#f8f9fa",
+                      bgcolor: mode === 'light' ? "#f8f9fa" : "grey.800",
                     }}
                   >
                     <Box sx={{ textAlign: "center", color: "text.secondary" }}>
@@ -1003,7 +1041,12 @@ const ContactPage = () => {
               onClick={() => console.log("Send message to manager")}
               variant="contained"
               disabled={!managerSubject || !managerMessage}
-              sx={{ bgcolor: "#6200ea", "&:hover": { bgcolor: "#3700b3" } }}
+              sx={{ 
+                bgcolor: mode === 'light' ? "#6200ea" : "#7c3aed", 
+                "&:hover": { 
+                  bgcolor: mode === 'light' ? "#3700b3" : "#6d28d9" 
+                } 
+              }}
             >
               {t('contact.sendMessage')}
             </Button>

@@ -46,6 +46,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { signIn, clearError } from "../features/authSlice";
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useTheme as useCustomTheme } from '../contexts/ThemeContext';
 
 // TikTok-compliant PKCE helper functions
 function generateCodeVerifier(length = 64) {
@@ -76,6 +77,7 @@ const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const theme = useTheme();
+  const { mode } = useCustomTheme();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -180,7 +182,9 @@ const LoginPage = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        background: mode === 'light' 
+          ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+          : "linear-gradient(135deg, #1e293b 0%, #334155 100%)",
         position: "relative",
         overflow: "hidden",
       }}
@@ -195,8 +199,9 @@ const LoginPage = () => {
           width: "40%",
           height: "40%",
           borderRadius: "50%",
-          background:
-            "linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))",
+          background: mode === 'light'
+            ? "linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))"
+            : "linear-gradient(45deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
           animation: `${floatAnimation} 6s ease-in-out infinite`,
         }}
       />
@@ -208,8 +213,9 @@ const LoginPage = () => {
           width: "50%",
           height: "50%",
           borderRadius: "50%",
-          background:
-            "linear-gradient(45deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))",
+          background: mode === 'light'
+            ? "linear-gradient(45deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02))"
+            : "linear-gradient(45deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))",
           animation: `${floatAnimation} 8s ease-in-out infinite reverse`,
         }}
       />
@@ -281,7 +287,9 @@ const LoginPage = () => {
                           mr: 3,
                           p: 2,
                           borderRadius: 2,
-                          background: "rgba(255,255,255,0.1)",
+                          background: mode === 'light' 
+                            ? "rgba(255,255,255,0.1)"
+                            : "rgba(255,255,255,0.05)",
                           backdropFilter: "blur(10px)",
                         }}
                       >
@@ -310,10 +318,16 @@ const LoginPage = () => {
                 sx={{
                   p: { xs: 3, md: 5 },
                   borderRadius: 4,
-                  background: "rgba(255,255,255,0.95)",
+                  background: mode === 'light' 
+                    ? "rgba(255,255,255,0.95)"
+                    : "rgba(30, 41, 59, 0.95)",
                   backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255,255,255,0.2)",
-                  boxShadow: "0 32px 64px rgba(0,0,0,0.15)",
+                  border: mode === 'light'
+                    ? "1px solid rgba(255,255,255,0.2)"
+                    : "1px solid rgba(255,255,255,0.1)",
+                  boxShadow: mode === 'light'
+                    ? "0 32px 64px rgba(0,0,0,0.15)"
+                    : "0 32px 64px rgba(0,0,0,0.4)",
                 }}
               >
                 {/* DASHTRACER Logo Header */}
@@ -332,7 +346,9 @@ const LoginPage = () => {
                       style={{
                         width: '120px',
                         height: 'auto',
-                        filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))',
+                        filter: mode === 'light' 
+                          ? 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))'
+                          : 'drop-shadow(0 4px 8px rgba(255, 255, 255, 0.2))',
                         cursor: 'pointer',
                       }}
                       onClick={() => navigate('/')}
@@ -342,7 +358,7 @@ const LoginPage = () => {
                     variant="h4"
                     sx={{
                       fontWeight: 700,
-                      color: "#2d3748",
+                      color: mode === 'light' ? "#2d3748" : "#f1f5f9",
                       mb: 1,
                     }}
                   >
@@ -370,16 +386,24 @@ const LoginPage = () => {
                   sx={{
                     mb: 3,
                     py: 2,
-                    background: "linear-gradient(45deg, #ff0050, #ff4081)",
+                    background: mode === 'light'
+                      ? "linear-gradient(45deg, #ff0050, #ff4081)"
+                      : "linear-gradient(45deg, #ff1a75, #ff6b9d)",
                     color: "white",
                     fontWeight: 600,
                     fontSize: "1.1rem",
                     borderRadius: 3,
                     textTransform: "none",
-                    boxShadow: "0 8px 24px rgba(255, 0, 80, 0.3)",
+                    boxShadow: mode === 'light'
+                      ? "0 8px 24px rgba(255, 0, 80, 0.3)"
+                      : "0 8px 24px rgba(255, 26, 117, 0.4)",
                     "&:hover": {
-                      background: "linear-gradient(45deg, #e60048, #f50057)",
-                      boxShadow: "0 12px 32px rgba(255, 0, 80, 0.4)",
+                      background: mode === 'light'
+                        ? "linear-gradient(45deg, #e60048, #f50057)"
+                        : "linear-gradient(45deg, #e6005c, #ff4d94)",
+                      boxShadow: mode === 'light'
+                        ? "0 12px 32px rgba(255, 0, 80, 0.4)"
+                        : "0 12px 32px rgba(255, 26, 117, 0.5)",
                       transform: "translateY(-2px)",
                     },
                     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -468,15 +492,23 @@ const LoginPage = () => {
                       fontWeight: 600,
                       fontSize: "1rem",
                       textTransform: "none",
-                      background: "linear-gradient(135deg, #667eea, #764ba2)",
-                      boxShadow: "0 8px 24px rgba(102, 126, 234, 0.3)",
+                      background: mode === 'light'
+                        ? "linear-gradient(135deg, #667eea, #764ba2)"
+                        : "linear-gradient(135deg, #7c3aed, #8b5cf6)",
+                      boxShadow: mode === 'light'
+                        ? "0 8px 24px rgba(102, 126, 234, 0.3)"
+                        : "0 8px 24px rgba(124, 58, 237, 0.4)",
                       "&:hover": {
-                        background: "linear-gradient(135deg, #5a6fd8, #6b4190)",
-                        boxShadow: "0 12px 32px rgba(102, 126, 234, 0.4)",
+                        background: mode === 'light'
+                          ? "linear-gradient(135deg, #5a6fd8, #6b4190)"
+                          : "linear-gradient(135deg, #6d28d9, #7c3aed)",
+                        boxShadow: mode === 'light'
+                          ? "0 12px 32px rgba(102, 126, 234, 0.4)"
+                          : "0 12px 32px rgba(124, 58, 237, 0.5)",
                         transform: "translateY(-2px)",
                       },
                       "&:disabled": {
-                        background: "#e2e8f0",
+                        background: mode === 'light' ? "#e2e8f0" : "#374151",
                       },
                       transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
                     }}

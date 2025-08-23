@@ -48,6 +48,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTranslation } from "react-i18next";
 import axiosInstance from "../api/axiosInstance";
+import { useTheme } from "../contexts/ThemeContext";
 
 // Constants
 const CATEGORIES = [
@@ -89,6 +90,7 @@ const CreatorManagementPage = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { mode } = useTheme();
 
   // Redux state
   const { creators = [], stats = {} } = useSelector(
@@ -424,18 +426,33 @@ const CreatorManagementPage = () => {
               onClick={() => handleDialogOpen()}
               size="large"
               sx={{
-                bgcolor: "#667eea",
+                bgcolor: mode === 'light' ? "#667eea" : "#7c3aed",
                 px: 4,
                 py: 1.5,
                 borderRadius: 2,
                 textTransform: "none",
                 fontWeight: 600,
                 fontSize: "1rem",
-                boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+                boxShadow: mode === 'light' 
+                  ? "0 4px 12px rgba(102, 126, 234, 0.3)"
+                  : "0 4px 12px rgba(124, 58, 237, 0.3)",
                 "&:hover": {
-                  bgcolor: "#5a6fd8",
+                  bgcolor: mode === 'light' ? "#5a6fd8" : "#6d28d9",
                   transform: "translateY(-1px)",
-                  boxShadow: "0 6px 16px rgba(102, 126, 234, 0.4)",
+                  boxShadow: mode === 'light' 
+                    ? "0 6px 16px rgba(102, 126, 234, 0.4)"
+                    : "0 6px 16px rgba(124, 58, 237, 0.4)",
+                },
+                "&:focus": {
+                  outline: "none",
+                  boxShadow: mode === 'light' 
+                    ? "0 0 0 4px rgba(102, 126, 234, 0.2), 0 4px 12px rgba(102, 126, 234, 0.3)"
+                    : "0 0 0 4px rgba(124, 58, 237, 0.3), 0 4px 12px rgba(124, 58, 237, 0.3)",
+                },
+                "&:focus:hover": {
+                  boxShadow: mode === 'light' 
+                    ? "0 0 0 4px rgba(102, 126, 234, 0.2), 0 6px 16px rgba(102, 126, 234, 0.4)"
+                    : "0 0 0 4px rgba(124, 58, 237, 0.3), 0 6px 16px rgba(124, 58, 237, 0.4)",
                 },
                 transition: "all 0.2s ease",
               }}
@@ -452,8 +469,11 @@ const CreatorManagementPage = () => {
                 sx={{
                   p: 2.5,
                   borderRadius: 3,
-                  border: "1px solid #e0e7ff",
-                  bgcolor: "#f8faff",
+                  border: mode === 'light' ? "1px solid #e0e7ff" : "1px solid #4b5563",
+                  bgcolor: mode === 'light' ? "#f8faff" : "#374151",
+                  boxShadow: mode === 'light' 
+                    ? '0 2px 8px rgba(0, 0, 0, 0.1)'
+                    : '0 2px 8px rgba(0, 0, 0, 0.3)'
                 }}
               >
                 <TextField
@@ -467,20 +487,32 @@ const CreatorManagementPage = () => {
                   InputProps={{
                     startAdornment: (
                       <InputAdornment position="start">
-                        <Search sx={{ color: "#667eea" }} />
+                        <Search sx={{ 
+                          color: mode === 'light' ? "#667eea" : "#a78bfa" 
+                        }} />
                       </InputAdornment>
                     ),
                     sx: {
                       borderRadius: 2,
-                      bgcolor: "white",
-                      "& fieldset": { borderColor: "#e0e7ff", borderWidth: 1 },
+                      bgcolor: mode === 'light' ? "white" : "#4b5563",
+                      color: mode === 'light' ? "#374151" : "#f9fafb",
+                      "& fieldset": { 
+                        borderColor: mode === 'light' ? "#e0e7ff" : "#6b7280", 
+                        borderWidth: 1 
+                      },
                       "&:hover fieldset": {
-                        borderColor: "#667eea",
-                        borderWidth: 1,
+                        borderColor: mode === 'light' ? "#667eea" : "#a78bfa",
+                        borderWidth: 2,
+                        boxShadow: mode === 'light' 
+                          ? "0 0 0 3px rgba(102, 126, 234, 0.1)"
+                          : "0 0 0 3px rgba(167, 139, 250, 0.2)",
                       },
                       "&.Mui-focused fieldset": {
-                        borderColor: "#667eea",
+                        borderColor: mode === 'light' ? "#667eea" : "#a78bfa",
                         borderWidth: 2,
+                        boxShadow: mode === 'light' 
+                          ? "0 0 0 4px rgba(102, 126, 234, 0.15)"
+                          : "0 0 0 4px rgba(167, 139, 250, 0.25)",
                       },
                     },
                   }}
@@ -547,8 +579,11 @@ const CreatorManagementPage = () => {
           sx={{
             borderRadius: 3,
             overflow: "hidden",
-            border: "1px solid #e0e7ff",
-            bgcolor: "white",
+            border: mode === 'light' ? "1px solid #e0e7ff" : "1px solid #4b5563",
+            bgcolor: mode === 'light' ? "white" : "#374151",
+            boxShadow: mode === 'light' 
+              ? '0 4px 6px rgba(0, 0, 0, 0.1)'
+              : '0 4px 6px rgba(0, 0, 0, 0.3)'
           }}
         >
           <TableContainer>
@@ -587,13 +622,15 @@ const CreatorManagementPage = () => {
                     startIcon={<Add />}
                     onClick={() => handleDialogOpen()}
                     sx={{
-                      bgcolor: "#667eea",
+                      bgcolor: mode === 'light' ? "#667eea" : "#7c3aed",
                       px: 3,
                       py: 1,
                       borderRadius: 2,
                       textTransform: "none",
                       fontWeight: 600,
-                      "&:hover": { bgcolor: "#5a6fd8" },
+                      "&:hover": { 
+                        bgcolor: mode === 'light' ? "#5a6fd8" : "#6d28d9" 
+                      },
                     }}
                   >
                     {t('creatorManagement.addFirstCreator')}
@@ -603,7 +640,9 @@ const CreatorManagementPage = () => {
             ) : (
               <>
                 <Table>
-                  <TableHead sx={{ bgcolor: "#f8faff" }}>
+                  <TableHead sx={{ 
+                    bgcolor: mode === 'light' ? "#f8faff" : "#4b5563" 
+                  }}>
                     <TableRow>
                       <TableCell
                         sx={{
@@ -802,7 +841,9 @@ const CreatorManagementPage = () => {
                         key={creator.id}
                         hover
                         sx={{
-                          "&:hover": { bgcolor: "#f8faff" },
+                          "&:hover": { 
+                            bgcolor: mode === 'light' ? "#f8faff" : "#4b5563" 
+                          },
                           transition: "background-color 0.2s ease",
                           borderBottom: "1px solid #f1f5f9",
                         }}
@@ -855,8 +896,8 @@ const CreatorManagementPage = () => {
                             label={creator.category ? t(`creatorManagement.categories.${creator.category}`) : t("creatorManagement.categories.General")}
                             size="small"
                             sx={{
-                              bgcolor: "#e0e7ff",
-                              color: "#3730a3",
+                              bgcolor: mode === 'light' ? "#e0e7ff" : "rgba(124, 58, 237, 0.2)",
+                              color: mode === 'light' ? "#3730a3" : "#c4b5fd",
                               fontWeight: 600,
                               fontSize: "0.8rem",
                               px: 1,
@@ -941,11 +982,24 @@ const CreatorManagementPage = () => {
                               size="small"
                               onClick={() => handleDialogOpen(creator)}
                               sx={{
-                                color: "#667eea",
-                                bgcolor: "#f0f4ff",
+                                color: mode === 'light' ? "#667eea" : "#a78bfa",
+                                bgcolor: mode === 'light' ? "#f0f4ff" : "rgba(124, 58, 237, 0.1)",
                                 "&:hover": {
-                                  bgcolor: "#e0e7ff",
+                                  bgcolor: mode === 'light' ? "#e0e7ff" : "rgba(124, 58, 237, 0.2)",
                                   transform: "scale(1.05)",
+                                },
+                                "&:focus": {
+                                  outline: "none",
+                                  boxShadow: mode === 'light' 
+                                    ? "0 0 0 3px rgba(102, 126, 234, 0.3)"
+                                    : "0 0 0 3px rgba(167, 139, 250, 0.4)",
+                                  bgcolor: mode === 'light' ? "#e0e7ff" : "rgba(124, 58, 237, 0.15)",
+                                },
+                                "&:focus:hover": {
+                                  transform: "scale(1.05)",
+                                  boxShadow: mode === 'light' 
+                                    ? "0 0 0 3px rgba(102, 126, 234, 0.3)"
+                                    : "0 0 0 3px rgba(167, 139, 250, 0.4)",
                                 },
                                 transition: "all 0.2s ease",
                               }}
@@ -962,11 +1016,24 @@ const CreatorManagementPage = () => {
                                 )
                               }
                               sx={{
-                                color: "#ef4444",
-                                bgcolor: "#fef2f2",
+                                color: mode === 'light' ? "#ef4444" : "#fca5a5",
+                                bgcolor: mode === 'light' ? "#fef2f2" : "rgba(239, 68, 68, 0.1)",
                                 "&:hover": {
-                                  bgcolor: "#fee2e2",
+                                  bgcolor: mode === 'light' ? "#fee2e2" : "rgba(239, 68, 68, 0.2)",
                                   transform: "scale(1.05)",
+                                },
+                                "&:focus": {
+                                  outline: "none",
+                                  boxShadow: mode === 'light' 
+                                    ? "0 0 0 3px rgba(239, 68, 68, 0.3)"
+                                    : "0 0 0 3px rgba(252, 165, 165, 0.4)",
+                                  bgcolor: mode === 'light' ? "#fee2e2" : "rgba(239, 68, 68, 0.15)",
+                                },
+                                "&:focus:hover": {
+                                  transform: "scale(1.05)",
+                                  boxShadow: mode === 'light' 
+                                    ? "0 0 0 3px rgba(239, 68, 68, 0.3)"
+                                    : "0 0 0 3px rgba(252, 165, 165, 0.4)",
                                 },
                                 transition: "all 0.2s ease",
                               }}
@@ -1221,7 +1288,17 @@ const CreatorManagementPage = () => {
                 py: 1,
                 textTransform: "none",
                 fontWeight: 600,
-                color: "#6b7280",
+                color: mode === 'light' ? "#6b7280" : "#9ca3af",
+                "&:hover": {
+                  bgcolor: mode === 'light' ? "#f3f4f6" : "#374151",
+                },
+                "&:focus": {
+                  outline: "none",
+                  boxShadow: mode === 'light' 
+                    ? "0 0 0 3px rgba(107, 114, 128, 0.2)"
+                    : "0 0 0 3px rgba(156, 163, 175, 0.3)",
+                  bgcolor: mode === 'light' ? "#f3f4f6" : "#374151",
+                },
               }}
             >
               {t("common.cancel")}
@@ -1231,16 +1308,31 @@ const CreatorManagementPage = () => {
               variant="contained"
               disabled={submitting}
               sx={{
-                bgcolor: "#667eea",
+                bgcolor: mode === 'light' ? "#667eea" : "#7c3aed",
                 borderRadius: 2,
                 px: 4,
                 py: 1,
                 textTransform: "none",
                 fontWeight: 700,
-                boxShadow: "0 4px 12px rgba(102, 126, 234, 0.3)",
+                boxShadow: mode === 'light' 
+                  ? "0 4px 12px rgba(102, 126, 234, 0.3)"
+                  : "0 4px 12px rgba(124, 58, 237, 0.3)",
                 "&:hover": {
-                  bgcolor: "#5a6fd8",
-                  boxShadow: "0 6px 16px rgba(102, 126, 234, 0.4)",
+                  bgcolor: mode === 'light' ? "#5a6fd8" : "#6d28d9",
+                  boxShadow: mode === 'light' 
+                    ? "0 6px 16px rgba(102, 126, 234, 0.4)"
+                    : "0 6px 16px rgba(124, 58, 237, 0.4)",
+                },
+                "&:focus": {
+                  outline: "none",
+                  boxShadow: mode === 'light' 
+                    ? "0 0 0 4px rgba(102, 126, 234, 0.2), 0 4px 12px rgba(102, 126, 234, 0.3)"
+                    : "0 0 0 4px rgba(124, 58, 237, 0.3), 0 4px 12px rgba(124, 58, 237, 0.3)",
+                },
+                "&:focus:hover": {
+                  boxShadow: mode === 'light' 
+                    ? "0 0 0 4px rgba(102, 126, 234, 0.2), 0 6px 16px rgba(102, 126, 234, 0.4)"
+                    : "0 0 0 4px rgba(124, 58, 237, 0.3), 0 6px 16px rgba(124, 58, 237, 0.4)",
                 },
               }}
             >

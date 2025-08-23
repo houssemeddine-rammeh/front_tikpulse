@@ -40,10 +40,12 @@ import { useAuth } from '../contexts/AuthContext';
 import ApiTest from '../components/ApiTest';
 import { creatorsAPI } from '../services/api';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from '../contexts/ThemeContext';
 
 const AdminCreatorManagementPage = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { mode } = useTheme();
   const [creators, setCreators] = useState([]);
   const [categories, setCategories] = useState([]);
   const [managers, setManagers] = useState([]);
@@ -265,8 +267,10 @@ const AdminCreatorManagementPage = () => {
             startIcon={<AddIcon />} 
             onClick={handleDialogOpen}
             sx={{ 
-              bgcolor: '#6200ea',
-              '&:hover': { bgcolor: '#3700b3' }
+              bgcolor: mode === 'light' ? '#6200ea' : 'primary.main',
+              '&:hover': { 
+                bgcolor: mode === 'light' ? '#3700b3' : 'primary.dark' 
+              }
             }}
           >
             {t('creators.add')}
@@ -275,7 +279,12 @@ const AdminCreatorManagementPage = () => {
 
         {/* Error message */}
         {error && (
-          <Paper sx={{ p: 2, mb: 3, bgcolor: '#ffebee' }}>
+          <Paper sx={{ 
+            p: 2, 
+            mb: 3, 
+            bgcolor: mode === 'light' ? '#ffebee' : 'error.dark',
+            color: mode === 'light' ? 'inherit' : 'error.contrastText'
+          }}>
             <Typography color="error">{error}</Typography>
             <Button 
               variant="outlined" 
@@ -290,7 +299,14 @@ const AdminCreatorManagementPage = () => {
         )}
 
         {/* Creators Table */}
-        <Paper elevation={2} sx={{ borderRadius: 2, overflow: 'hidden' }}>
+        <Paper elevation={2} sx={{ 
+          borderRadius: 2, 
+          overflow: 'hidden',
+          bgcolor: 'background.paper',
+          boxShadow: mode === 'light'
+            ? '0 4px 6px rgba(0, 0, 0, 0.1)'
+            : '0 4px 6px rgba(0, 0, 0, 0.3)'
+        }}>
           <TableContainer>
             {loading ? (
               <Box sx={{ p: 4, textAlign: 'center' }}>
@@ -299,7 +315,9 @@ const AdminCreatorManagementPage = () => {
               </Box>
             ) : (
               <Table>
-                <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                <TableHead sx={{ 
+                  bgcolor: mode === 'light' ? '#f5f5f5' : 'grey.800' 
+                }}>
                   <TableRow>
                     <TableCell sx={{ fontWeight: 'bold' }}>{t('creators.username')}</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>{t('creators.category')}</TableCell>
@@ -324,8 +342,8 @@ const AdminCreatorManagementPage = () => {
                             label={creator.category} 
                             size="small" 
                             sx={{ 
-                              bgcolor: '#e3f2fd', 
-                              color: '#1976d2',
+                              bgcolor: mode === 'light' ? '#e3f2fd' : 'primary.dark', 
+                              color: mode === 'light' ? '#1976d2' : 'primary.contrastText',
                               fontWeight: 500
                             }} 
                           />
@@ -333,10 +351,14 @@ const AdminCreatorManagementPage = () => {
                         <TableCell>{creator.manager}</TableCell>
                         <TableCell>{creator.agency}</TableCell>
                         <TableCell align="right">
-                          <IconButton size="small" sx={{ color: '#1976d2' }}>
+                          <IconButton size="small" sx={{ 
+                            color: mode === 'light' ? '#1976d2' : 'info.main' 
+                          }}>
                             <EditIcon fontSize="small" />
                           </IconButton>
-                          <IconButton size="small" sx={{ color: '#f44336' }}>
+                          <IconButton size="small" sx={{ 
+                            color: mode === 'light' ? '#f44336' : 'error.main' 
+                          }}>
                             <DeleteIcon fontSize="small" />
                           </IconButton>
                         </TableCell>
@@ -464,8 +486,10 @@ const AdminCreatorManagementPage = () => {
             onClick={handleSubmit}
             variant="contained"
             sx={{ 
-              bgcolor: '#6200ea',
-              '&:hover': { bgcolor: '#3700b3' }
+              bgcolor: mode === 'light' ? '#6200ea' : 'primary.main',
+              '&:hover': { 
+                bgcolor: mode === 'light' ? '#3700b3' : 'primary.dark' 
+              }
             }}
           >
             {t('creators.add')}
