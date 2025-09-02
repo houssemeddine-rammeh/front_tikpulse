@@ -361,6 +361,16 @@ const api = {
     }
   },
 
+  async deleteNotification(notificationId) {
+    try {
+      const response = await axiosInstance.delete(`/users/notifications/single/${notificationId}`);
+      return response.data;
+    } catch (error) {
+      console.warn("Backend not available, cannot delete notification");
+      throw new Error("Cannot delete notification - backend not available");
+    }
+  },
+
   async clearNotifications(userId) {
     try {
       const response = await axiosInstance.delete(`/users/notifications/${userId}`);
@@ -368,6 +378,16 @@ const api = {
     } catch (error) {
       console.warn("Backend not available, cannot clear notifications");
       throw new Error("Cannot clear notifications - backend not available");
+    }
+  },
+
+  async testNotification() {
+    try {
+      const response = await axiosInstance.post("/users/test-notification");
+      return response.data;
+    } catch (error) {
+      console.warn("Backend not available, cannot send test notification");
+      throw new Error("Cannot send test notification - backend not available");
     }
   },
 };

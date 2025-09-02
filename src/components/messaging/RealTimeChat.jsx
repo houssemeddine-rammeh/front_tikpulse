@@ -56,12 +56,17 @@ const RealTimeChat = ({ ticket }) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSendMessage = useCallback(() => {
+  const handleSendMessage = useCallback(async () => {
     if (newMessage.trim()) {
-      dispatch(
-        sendMessage({ ticketId: ticket._id, message: newMessage.trim() })
-      );
-      setNewMessage("");
+      try {
+        await dispatch(
+          sendMessage({ ticketId: ticket._id, message: newMessage.trim() })
+        ).unwrap();
+        setNewMessage("");
+      } catch (error) {
+        console.error("Failed to send message:", error);
+        // The error will be handled by the Redux state
+      }
     }
   }, [dispatch, newMessage, ticket._id]);
 

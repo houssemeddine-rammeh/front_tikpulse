@@ -50,9 +50,26 @@ export const sendMessage = createAsyncThunk(
   "tickets/sendMessage",
   async ({ ticketId, message }, { rejectWithValue, getState }) => {
     try {
-      // Check if socket is connected
+      // First attempt - check if socket is connected
       if (!isSocketConnected()) {
-        throw new Error("Socket not connected. Please refresh the page.");
+        console.warn("Socket not connected, attempting to reconnect...");
+        
+        // Try to reconnect using stored token
+        const token = localStorage.getItem('token');
+        if (token) {
+          const { connectSocket } = await import('../api/socketInstance');
+          connectSocket(token);
+          
+          // Wait a bit for connection
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          
+          // Check again
+          if (!isSocketConnected()) {
+            throw new Error("Unable to establish connection. Please refresh the page and try again.");
+          }
+        } else {
+          throw new Error("Authentication required. Please log in again.");
+        }
       }
 
       // Send message via WebSocket with acknowledgment

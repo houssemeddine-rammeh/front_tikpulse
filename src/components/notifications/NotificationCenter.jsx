@@ -27,6 +27,7 @@ import { useNotifications } from '../../contexts/NotificationContext';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow } from 'date-fns';
 import { fr, enUS, ar, it } from 'date-fns/locale';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Safe timestamp formatting function
 const formatTimeAgo = (timestamp, currentLanguage, t) => {
@@ -126,10 +127,11 @@ const NotificationItem = ({ notification, onClose }) => {
 };
 
 const NotificationCenter = () => {
-  const { notifications, unreadCount, markAllAsRead, clearNotifications } = useNotifications();
+  const { notifications, unreadCount, markAllAsRead, clearNotifications, socketConnected, addNotification } = useNotifications();
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -137,6 +139,35 @@ const NotificationCenter = () => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  // Debug function to test notifications for managers
+  const handleTestNotification = async () => {
+    if (user?.role === 'manager' || user?.role === 'creator' || user?.role === 'admin') {
+      try {
+        console.log('🧪 Testing notification via API...');
+        const api = await import('../../services/api');
+        const response = await api.default.testNotification();
+        console.log('✅ Test notification API response:', response);
+        
+        // Also add a local test notification
+        addNotification({
+          title: 'Local Test Notification',
+          message: 'This is a local test notification!',
+          type: 'success',
+          link: '/dashboard'
+        });
+      } catch (error) {
+        console.error('❌ Test notification failed:', error);
+        // Fallback to local notification
+        addNotification({
+          title: 'Test Error',
+          message: 'API test failed, but local notification works',
+          type: 'error',
+          link: '/dashboard'
+        });
+      }
+    }
   };
 
   return (
@@ -177,8 +208,18 @@ const NotificationCenter = () => {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
-          <Typography variant="h6">{t('notifications.title')}</Typography>
           <Box>
+            <Typography variant="h6">{t('notifications.title')}</Typography>
+            <Typography variant="caption" color={socketConnected ? 'success.main' : 'error.main'}>
+              {socketConnected ? '🟢 Connected' : '🔴 Disconnected'}
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 1 }}>
+            {(user?.role === 'manager' || user?.role === 'creator' || user?.role === 'admin') && (
+              <Button size="small" onClick={handleTestNotification} variant="outlined">
+                Test
+              </Button>
+            )}
             <Button size="small" onClick={markAllAsRead} startIcon={<DoneAll />}>
               {t('notifications.markAllAsRead')}
             </Button>

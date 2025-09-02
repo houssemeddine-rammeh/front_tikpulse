@@ -28,7 +28,9 @@ export const connectSocket = (token) => {
     socket = null;
   }
 
-  const socketUrl = import.meta.env.VITE_SOCKET_URL || window.location.origin;
+  // Use the same base URL as axios but without the /api/v1 path
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
+  const socketUrl = import.meta.env.VITE_SOCKET_URL || apiBaseUrl.replace('/api/v1', '');
   console.log("Connecting to Socket.IO server:", socketUrl);
 
   socket = io(socketUrl, {

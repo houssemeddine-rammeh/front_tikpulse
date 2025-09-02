@@ -108,8 +108,6 @@ import { UserRole } from "../../types";
 
 import NotificationCenter from "../notifications/NotificationCenter";
 
-import TicketNotificationBadge from "../notifications/TicketNotificationBadge";
-
 import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 
 import { useTranslation } from 'react-i18next';
@@ -1481,8 +1479,6 @@ const Header = () => {
             <>
 
               <Box sx={{ display: "flex", gap: { xs: 0.5, sm: 1 } }}>
-
-                <TicketNotificationBadge />
 
                 <NotificationCenter />
 

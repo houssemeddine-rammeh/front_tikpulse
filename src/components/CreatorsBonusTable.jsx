@@ -192,7 +192,7 @@ const CreatorsBonusTable = () => {
 
       setSnackbar({
         open: true,
-        message: response.data.message || 'Message sent successfully!',
+        message: response.data.message || 'Message sent successfully! Creator will see it in their contact page.',
         severity: 'success'
       });
       handleCloseDialog();

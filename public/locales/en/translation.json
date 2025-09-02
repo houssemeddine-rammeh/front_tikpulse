@@ -94,6 +94,33 @@
     "contact": "Contact Management",
     "upload": "Data Management"
   },
+  "pages": {
+    "admin": {
+      "dashboard": {
+        "title": "Admin Dashboard",
+        "welcome": "Welcome, {{name}}",
+        "totalCreators": "Total Creators",
+        "totalManagers": "Total Managers",
+        "platformHealth": "Platform Health",
+        "addManager": "Add Manager",
+        "managersCreators": {
+          "title": "Managers & Creators",
+          "description": "Overview of all managers and their creators",
+          "managerUsername": "Manager Username",
+          "email": "Email",
+          "phone": "Phone",
+          "creators": "Creators"
+        },
+        "bonusRules": {
+          "title": "Bonus Rules Management",
+          "description": "Configure creator bonus programs",
+          "ruleAdded": "Bonus rule added successfully",
+          "ruleUpdated": "Bonus rule updated successfully",
+          "ruleDeleted": "Bonus rule deleted successfully"
+        }
+      }
+    }
+  },
   "events": {
     "title": "Events",
     "create": "Create Event",

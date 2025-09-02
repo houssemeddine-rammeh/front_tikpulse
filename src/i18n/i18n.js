@@ -354,6 +354,7 @@ const resources = {
             "totalCreators": "Total Creators",
             "totalManagers": "Total Managers",
             "platformHealth": "Platform Health",
+            "addManager": "Add Manager",
             "bonusRules": {
               "title": "💎 Bonus Rules Management",
               "description": "Configure and manage creator bonus programs",
@@ -1454,6 +1455,7 @@ const resources = {
             "totalCreators": "Total des Créateurs",
             "totalManagers": "Total des Gestionnaires",
             "platformHealth": "Santé de la Plateforme",
+            "addManager": "Ajouter un Gestionnaire",
             "bonusRules": {
               "title": "💎 Gestion des Règles de Bonus",
               "description": "Configurer et gérer les programmes de bonus des créateurs",
@@ -2554,6 +2556,7 @@ const resources = {
             "totalCreators": "إجمالي المبدعين",
             "totalManagers": "إجمالي المديرين",
             "platformHealth": "صحة المنصة",
+            "addManager": "إضافة مدير",
             "bonusRules": {
               "title": "💎 إدارة قواعد المكافآت",
               "description": "تكوين وإدارة برامج مكافآت المبدعين",
@@ -3654,6 +3657,7 @@ const resources = {
             "totalCreators": "Totale Creatori",
             "totalManagers": "Totale Manager",
             "platformHealth": "Salute della Piattaforma",
+            "addManager": "Aggiungi Manager",
             "bonusRules": {
               "title": "💎 Gestione Regole Bonus",
               "description": "Configura e gestisci i programmi bonus dei creatori",

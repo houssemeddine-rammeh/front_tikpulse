@@ -122,6 +122,19 @@ const AdminDashboardPage = () => {
     severity: "success",
   });
 
+  // Add Manager Dialog State
+  const [showAddManagerDialog, setShowAddManagerDialog] = useState(false);
+  const [newManager, setNewManager] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    username: "",
+    agencyId: "",
+  });
+  const [addManagerLoading, setAddManagerLoading] = useState(false);
+  const [addManagerErrors, setAddManagerErrors] = useState({});
+  const [agencies, setAgencies] = useState([]);
+
   // Stats data
   const totalManagers = 12;
   const totalCreators = 87;
@@ -187,7 +200,8 @@ const AdminDashboardPage = () => {
   });
 
   // Use /agency/managers-with-creators for admins (no agencyId in the URL)
-  useEffect(() => {
+  // Function to fetch managers and creators
+  const fetchManagersWithCreators = useCallback(() => {
     setLoadingManagers(true);
     axiosInstance
       .get(`/agency/managers-with-creators`)
@@ -197,6 +211,10 @@ const AdminDashboardPage = () => {
       })
       .catch(() => setLoadingManagers(false));
   }, []);
+
+  useEffect(() => {
+    fetchManagersWithCreators();
+  }, [fetchManagersWithCreators]);
 
   const handleManagerSort = (property) => {
     const isAsc = managerOrderBy === property && managerOrder === "asc";
@@ -307,6 +325,73 @@ const AdminDashboardPage = () => {
         return "default";
       default:
         return "secondary";
+    }
+  };
+
+  // Add Manager Handlers
+  const handleAddManagerDialogClose = () => {
+    setShowAddManagerDialog(false);
+    setNewManager({
+      firstName: "",
+      lastName: "",
+      email: "",
+      username: "",
+      agencyId: "",
+    });
+    setAddManagerErrors({});
+  };
+
+  const validateManagerForm = () => {
+    const errors = {};
+    
+    if (!newManager.firstName.trim()) {
+      errors.firstName = "First name is required";
+    }
+    
+    if (!newManager.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newManager.email)) {
+      errors.email = "Please enter a valid email address";
+    }
+    
+    return errors;
+  };
+
+  const handleAddManager = async () => {
+    const errors = validateManagerForm();
+    setAddManagerErrors(errors);
+    
+    if (Object.keys(errors).length > 0) {
+      return;
+    }
+
+    setAddManagerLoading(true);
+    
+    try {
+      const response = await axiosInstance.post('/users/create-manager', newManager);
+      
+      if (response.data.success) {
+        setSnackbar({
+          open: true,
+          message: `Manager created successfully! Temporary password: ${response.data.data.tempPassword}`,
+          severity: "success",
+        });
+        
+        // Refresh the managers list
+        fetchManagersWithCreators();
+        
+        // Close dialog
+        handleAddManagerDialogClose();
+      }
+    } catch (error) {
+      console.error('Error creating manager:', error);
+      setSnackbar({
+        open: true,
+        message: error.response?.data?.message || "Failed to create manager",
+        severity: "error",
+      });
+    } finally {
+      setAddManagerLoading(false);
     }
   };
 
@@ -689,9 +774,27 @@ const AdminDashboardPage = () => {
                   : 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
                 color: 'white'
               }}>
-                <Typography variant="h5" sx={{ fontWeight: "bold", mb: 1 }}>
-                  {t('pages.admin.dashboard.managersCreators.title')}
-                </Typography>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                  <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                    {t('pages.admin.dashboard.managersCreators.title')}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    startIcon={<PersonAddOutlined />}
+                    onClick={() => setShowAddManagerDialog(true)}
+                    sx={{
+                      bgcolor: 'rgba(255, 255, 255, 0.2)',
+                      color: 'white',
+                      '&:hover': {
+                        bgcolor: 'rgba(255, 255, 255, 0.3)',
+                      },
+                      fontWeight: 'bold',
+                      textTransform: 'none'
+                    }}
+                  >
+                    {t('pages.admin.dashboard.addManager')}
+                  </Button>
+                </Box>
                 <Typography variant="body2" sx={{ opacity: 0.9 }}>
                   {t('pages.admin.dashboard.managersCreators.description')}
                 </Typography>
@@ -1027,6 +1130,79 @@ const AdminDashboardPage = () => {
                 <Button onClick={() => setShowAddDialog(false)}>Cancel</Button>
                 <Button onClick={handleAddRule} variant="contained">
                   Add Rule
+                </Button>
+              </DialogActions>
+            </Dialog>
+
+            {/* Add Manager Dialog */}
+            <Dialog 
+              open={showAddManagerDialog} 
+              onClose={handleAddManagerDialogClose}
+              maxWidth="sm" 
+              fullWidth
+            >
+              <DialogTitle>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <PersonAddOutlined />
+                  {t('pages.admin.dashboard.addManager')}
+                </Box>
+              </DialogTitle>
+              <DialogContent>
+                <Box sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  <TextField
+                    label="First Name"
+                    value={newManager.firstName}
+                    onChange={(e) => setNewManager({ ...newManager, firstName: e.target.value })}
+                    fullWidth
+                    required
+                    error={!!addManagerErrors.firstName}
+                    helperText={addManagerErrors.firstName}
+                  />
+                  <TextField
+                    label="Last Name"
+                    value={newManager.lastName}
+                    onChange={(e) => setNewManager({ ...newManager, lastName: e.target.value })}
+                    fullWidth
+                  />
+                  <TextField
+                    label="Email"
+                    type="email"
+                    value={newManager.email}
+                    onChange={(e) => setNewManager({ ...newManager, email: e.target.value })}
+                    fullWidth
+                    required
+                    error={!!addManagerErrors.email}
+                    helperText={addManagerErrors.email}
+                  />
+                  <TextField
+                    label="Username (optional)"
+                    value={newManager.username}
+                    onChange={(e) => setNewManager({ ...newManager, username: e.target.value })}
+                    fullWidth
+                    helperText="If not provided, will use email prefix"
+                  />
+                  {user?.role === 'admin' && (
+                    <TextField
+                      label="Agency ID (optional)"
+                      value={newManager.agencyId}
+                      onChange={(e) => setNewManager({ ...newManager, agencyId: e.target.value })}
+                      fullWidth
+                      helperText="Leave empty to use your current agency"
+                    />
+                  )}
+                </Box>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={handleAddManagerDialogClose} disabled={addManagerLoading}>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleAddManager} 
+                  variant="contained" 
+                  disabled={addManagerLoading}
+                  startIcon={addManagerLoading ? <CircularProgress size={20} /> : <PersonAddOutlined />}
+                >
+                  {addManagerLoading ? 'Creating...' : 'Create Manager'}
                 </Button>
               </DialogActions>
             </Dialog>

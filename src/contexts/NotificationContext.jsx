@@ -14,6 +14,7 @@ export const useNotifications = () => {
 export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
   
   // Safe timestamp utility function
   const safeTimestamp = (timestamp) => {
@@ -46,14 +47,128 @@ export const NotificationProvider = ({ children }) => {
     }
   }, [user?._id, user?.id]);
 
-  // Initialize WebSocket connection for real-time notifications
+  // Initialize Socket.IO connection for real-time notifications
+  useEffect(() => {
+    let socket = null;
+    
+    const initializeSocketIO = async () => {
+      try {
+        const userId = user?._id || user?.id;
+        if (!userId) {
+          console.log('No user ID available, skipping Socket.IO initialization');
+          return;
+        }
+
+        // Import Socket.IO instance and connect for notifications
+        const { connectSocket, isSocketConnected } = await import('../api/socketInstance');
+        const token = localStorage.getItem('token');
+        
+        if (token) {
+          console.log('🔌 Connecting Socket.IO for real-time notifications...');
+          socket = connectSocket(token);
+          
+          if (socket) {
+            // Listen for notification events
+            socket.on('notification', (data) => {
+              console.log('📨 New notification received via Socket.IO:', data);
+              const newNotification = {
+                id: data.id || Date.now().toString(),
+                title: data.title,
+                message: data.message || data.body,
+                type: data.type || 'info',
+                timestamp: safeTimestamp(data.timestamp),
+                read: false,
+                link: data.actionUrl || data.link
+              };
+              
+              // Add notification to the beginning of the list
+              setNotifications(prev => [newNotification, ...prev]);
+            });
+
+            socket.on('event_notification', (data) => {
+              console.log('📅 New event notification received via Socket.IO:', data);
+              const eventNotification = {
+                id: data.id || `event-${Date.now()}`,
+                title: data.title || 'Nouvel événement',
+                message: data.message || data.body,
+                type: 'info',
+                timestamp: safeTimestamp(data.timestamp),
+                read: false,
+                link: data.actionUrl || '/events'
+              };
+              
+              setNotifications(prev => [eventNotification, ...prev]);
+            });
+
+            socket.on('message_notification', (data) => {
+              console.log('💬 New message notification received via Socket.IO:', data);
+              console.log('👤 Current user:', user?.role, user?._id);
+              const messageNotification = {
+                id: data.id || `msg-${Date.now()}`,
+                title: data.title || 'Nouveau message',
+                message: data.message || data.body,
+                type: 'info',
+                timestamp: safeTimestamp(data.timestamp),
+                read: false,
+                link: data.actionUrl || `/tickets/${data.ticketId}`
+              };
+              
+              console.log('📨 Adding message notification to state:', messageNotification);
+              setNotifications(prev => [messageNotification, ...prev]);
+            });
+
+            socket.on('connect', () => {
+              console.log('✅ Socket.IO connected for notifications');
+              setSocketConnected(true);
+            });
+
+            socket.on('connect_error', (error) => {
+              console.error('❌ Socket.IO connection error for notifications:', error);
+              setSocketConnected(false);
+            });
+
+            socket.on('disconnect', (reason) => {
+              console.warn('⚠️ Socket.IO disconnected for notifications:', reason);
+              setSocketConnected(false);
+            });
+          }
+        } else {
+          console.warn('No token available for Socket.IO connection');
+        }
+      } catch (error) {
+        console.error('Failed to initialize Socket.IO for notifications:', error);
+      }
+    };
+
+    initializeSocketIO();
+
+    return () => {
+      if (socket) {
+        console.log('🔌 Cleaning up Socket.IO notification listeners');
+        socket.off('notification');
+        socket.off('event_notification');
+        socket.off('message_notification');
+        socket.off('connect');
+        socket.off('connect_error');
+        socket.off('disconnect');
+      }
+    };
+  }, [user?._id, user?.id]);
+
+  // Legacy WebSocket code (disabled but kept for reference)
   useEffect(() => {
     let wsService = null;
     
     const initializeWebSocket = async () => {
+      // WebSocket functionality disabled - using Socket.IO instead
+      return;
+
       try {
         const userId = user?._id || user?.id;
-        if (!userId) return;
+        if (!userId) {
+          console.log('No user ID available, skipping WebSocket initialization');
+          return;
+        }
 
         // Import WebSocket service dynamically
         const { default: WebSocketService } = await import('../services/websocket');
@@ -269,6 +384,26 @@ export const NotificationProvider = ({ children }) => {
     }
   };
 
+  const removeNotification = async (notificationId) => {
+    try {
+      // Remove locally immediately
+      setNotifications(prev => prev.filter(notification => notification.id !== notificationId));
+
+      // Try to remove from API in background
+      const userId = user?._id || user?.id;
+      if (userId) {
+        try {
+          const api = await import('../services/api');
+          await api.default.deleteNotification(notificationId);
+        } catch (error) {
+          console.warn('Failed to remove notification from API:', error);
+        }
+      }
+    } catch (error) {
+      console.warn('Failed to remove notification:', error);
+    }
+  };
+
   const clearNotifications = async () => {
     try {
       // Clear locally immediately
@@ -296,9 +431,11 @@ export const NotificationProvider = ({ children }) => {
     notifications,
     loading,
     unreadCount,
+    socketConnected,
     addNotification,
     markAsRead,
     markAllAsRead,
+    removeNotification,
     clearNotifications,
     fetchNotifications
   };

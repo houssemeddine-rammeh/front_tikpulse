@@ -134,14 +134,59 @@ const ContactPage = () => {
   }, [dispatch]);
 
   const token = getToken(); // Get your auth token
+  const [socketConnected, setSocketConnected] = useState(false);
 
   // Connect socket when component mounts
   useEffect(() => {
-    if (token) {
-      connectSocket(token); // Connect with auth token
-    }
+    let connectionTimeout;
+    
+    const initializeSocket = async () => {
+      if (token) {
+        try {
+          console.log("🔌 Connecting socket for creator...", { token: token?.substring(0, 10) + "..." });
+          const socket = connectSocket(token);
+          
+          if (socket) {
+            // Wait for connection confirmation
+            socket.on('connect', () => {
+              console.log("✅ Socket connected successfully for creator");
+              setSocketConnected(true);
+            });
+            
+            socket.on('disconnect', (reason) => {
+              console.warn("⚠️ Socket disconnected:", reason);
+              setSocketConnected(false);
+            });
+            
+            socket.on('connect_error', (error) => {
+              console.error("❌ Socket connection error:", error);
+              setSocketConnected(false);
+            });
+            
+            // Set a timeout to detect connection issues
+            connectionTimeout = setTimeout(() => {
+              if (!socket.connected) {
+                console.warn("⏰ Socket connection timeout, attempting reconnection...");
+                socket.disconnect();
+                connectSocket(token);
+              }
+            }, 5000);
+          }
+        } catch (error) {
+          console.error("Failed to initialize socket:", error);
+          setSocketConnected(false);
+        }
+      } else {
+        console.warn("No token available for socket connection");
+      }
+    };
+
+    initializeSocket();
 
     return () => {
+      if (connectionTimeout) {
+        clearTimeout(connectionTimeout);
+      }
       disconnectSocket(); // Clean up on unmount
     };
   }, [token]);
@@ -418,6 +463,26 @@ const ContactPage = () => {
                     <Typography variant="body1" color="text.secondary">
                       {t('contact.pageSubtitle')}
                     </Typography>
+                    {/* Socket Connection Status */}
+                    <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <Box 
+                        sx={{ 
+                          width: 8, 
+                          height: 8, 
+                          borderRadius: '50%', 
+                          bgcolor: socketConnected ? '#4caf50' : '#f44336',
+                          '@keyframes pulse': {
+                            '0%': { opacity: 1 },
+                            '50%': { opacity: 0.5 },
+                            '100%': { opacity: 1 }
+                          },
+                          animation: socketConnected ? 'none' : 'pulse 1.5s infinite'
+                        }} 
+                      />
+                      <Typography variant="caption" color="text.secondary">
+                        {socketConnected ? 'Connected - Ready to send messages' : 'Connecting...'}
+                      </Typography>
+                    </Box>
                   </Box>
                 </Box>
               </Grid>
