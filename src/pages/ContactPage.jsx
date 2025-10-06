@@ -49,7 +49,7 @@ import {
   Chat,
   Save,
 } from "@mui/icons-material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { UserRole } from "../types";
 import RealTimeChat from "../components/messaging/RealTimeChat";
@@ -88,6 +88,7 @@ const ContactPage = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const { mode } = useTheme();
+  const [searchParams, setSearchParams] = useSearchParams();
   const isManager = user?.role === UserRole.MANAGER || user?.role === UserRole.SUB_MANAGER;
   const isAdmin = user?.role === UserRole.ADMIN;
 
@@ -132,6 +133,29 @@ const ContactPage = () => {
   useEffect(() => {
     dispatch(fetchTickets());
   }, [dispatch]);
+
+  // Auto-open ticket from URL parameter (from notification click)
+  useEffect(() => {
+    const ticketId = searchParams.get('ticketId');
+    console.log('🔍 Checking for ticketId in URL:', ticketId);
+    console.log('📋 Available tickets:', tickets.length);
+    
+    if (ticketId && tickets.length > 0) {
+      const ticket = tickets.find(t => t._id === ticketId);
+      if (ticket) {
+        console.log('📬 Auto-opening ticket from notification:', ticketId, ticket);
+        // Open the ticket
+        dispatch(fetchTicket(ticket._id));
+        setCurrentChatTicketId(ticket._id);
+        // Remove the parameter after opening
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('ticketId');
+        setSearchParams(newParams);
+      } else {
+        console.warn('⚠️ Ticket not found:', ticketId);
+      }
+    }
+  }, [searchParams, tickets, dispatch, setSearchParams]);
 
   const token = getToken(); // Get your auth token
   const [socketConnected, setSocketConnected] = useState(false);

@@ -73,10 +73,27 @@ const NotificationItem = ({ notification, onClose }) => {
   const { t, i18n } = useTranslation();
 
   const handleClick = () => {
+    console.log('🖱️ Notification clicked:', notification);
+    console.log('📍 Full notification object:', JSON.stringify(notification, null, 2));
+    
     markAsRead(notification.id);
-    if (notification.link) {
-      navigate(notification.link);
+    
+    // Try to find the link from different possible properties
+    let targetLink = notification.link;
+    
+    // Fallback: if no link but it's a message notification, try to build the link
+    if (!targetLink && notification.title?.toLowerCase().includes('message')) {
+      console.log('🔧 No link found, but this is a message notification. Redirecting to contact page...');
+      targetLink = '/contact';
+    }
+    
+    if (targetLink) {
+      console.log('📍 Navigating to:', targetLink);
+      navigate(targetLink);
       onClose();
+    } else {
+      console.warn('⚠️ No link found in notification and could not determine destination');
+      console.warn('Notification data:', notification);
     }
   };
 
@@ -170,6 +187,21 @@ const NotificationCenter = () => {
     }
   };
 
+  // Debug function to inspect notifications
+  const handleDebugNotifications = () => {
+    console.log('🔍 All notifications:', notifications);
+    notifications.forEach((notif, index) => {
+      console.log(`Notification ${index + 1}:`, {
+        id: notif.id,
+        title: notif.title,
+        hasLink: !!notif.link,
+        link: notif.link,
+        type: notif.type,
+        read: notif.read
+      });
+    });
+  };
+
   return (
     <>
       <Tooltip title={t('notifications.title')}>
@@ -214,11 +246,16 @@ const NotificationCenter = () => {
               {socketConnected ? '🟢 Connected' : '🔴 Disconnected'}
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
             {(user?.role === 'manager' || user?.role === 'creator' || user?.role === 'admin') && (
-              <Button size="small" onClick={handleTestNotification} variant="outlined">
-                Test
-              </Button>
+              <>
+                <Button size="small" onClick={handleTestNotification} variant="outlined">
+                  Test
+                </Button>
+                <Button size="small" onClick={handleDebugNotifications} variant="outlined" color="secondary">
+                  Debug
+                </Button>
+              </>
             )}
             <Button size="small" onClick={markAllAsRead} startIcon={<DoneAll />}>
               {t('notifications.markAllAsRead')}

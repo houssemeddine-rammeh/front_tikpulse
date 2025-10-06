@@ -119,12 +119,23 @@ export const NotificationProvider = ({ children }) => {
               // Show browser notification if permission is granted
               if (Notification.permission === 'granted') {
                 try {
-                  new Notification(messageNotification.title, {
+                  const browserNotif = new Notification(messageNotification.title, {
                     body: messageNotification.message,
                     icon: '/favicon.ico',
                     tag: `message-${data.id}`,
-                    requireInteraction: false
+                    requireInteraction: false,
+                    data: {
+                      url: messageNotification.link
+                    }
                   });
+                  
+                  // Handle browser notification click
+                  browserNotif.onclick = function(event) {
+                    event.preventDefault();
+                    window.focus();
+                    window.location.href = messageNotification.link;
+                    browserNotif.close();
+                  };
                   
                   // Play notification sound (optional)
                   const audio = new Audio('/notification-sound.mp3');

@@ -66,7 +66,7 @@ import {
   ViewModule,
   Close,
 } from "@mui/icons-material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { UserRole } from "../types";
 import RealTimeChat from "../components/messaging/RealTimeChat";
@@ -106,6 +106,7 @@ const AdminContactPage = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const { mode } = useTheme();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState(0);
   const [eventsView, setEventsView] = useState('calendar'); // 'calendar' or 'list'
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -162,6 +163,31 @@ const AdminContactPage = () => {
     fetchAgencyTickets();
     fetchAgencyEvents();
   }, []);
+
+  // Auto-open ticket from URL parameter (from notification click)
+  useEffect(() => {
+    const ticketId = searchParams.get('ticketId');
+    console.log('🔍 Admin checking for ticketId in URL:', ticketId);
+    console.log('📋 Admin available tickets:', tickets.length);
+    
+    if (ticketId && tickets.length > 0) {
+      const ticket = tickets.find(t => t._id === ticketId);
+      if (ticket) {
+        console.log('📬 Admin auto-opening ticket from notification:', ticketId, ticket);
+        // Open the ticket
+        dispatch(fetchTicket(ticket._id));
+        setCurrentChatTicketId(ticket._id);
+        // Switch to tickets tab if on events tab
+        setActiveTab(0);
+        // Remove the parameter after opening
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete('ticketId');
+        setSearchParams(newParams);
+      } else {
+        console.warn('⚠️ Admin ticket not found:', ticketId);
+      }
+    }
+  }, [searchParams, tickets, dispatch, setSearchParams]);
 
   const token = getToken();
 
