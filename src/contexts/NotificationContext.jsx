@@ -105,7 +105,7 @@ export const NotificationProvider = ({ children }) => {
               console.log('👤 Current user:', user?.role, user?._id);
               const messageNotification = {
                 id: data.id || `msg-${Date.now()}`,
-                title: data.title || 'Nouveau message',
+                title: data.title || 'New message',
                 message: data.message || data.body,
                 type: 'info',
                 timestamp: safeTimestamp(data.timestamp),
@@ -115,6 +115,30 @@ export const NotificationProvider = ({ children }) => {
               
               console.log('📨 Adding message notification to state:', messageNotification);
               setNotifications(prev => [messageNotification, ...prev]);
+              
+              // Show browser notification if permission is granted
+              if (Notification.permission === 'granted') {
+                try {
+                  new Notification(messageNotification.title, {
+                    body: messageNotification.message,
+                    icon: '/favicon.ico',
+                    tag: `message-${data.id}`,
+                    requireInteraction: false
+                  });
+                  
+                  // Play notification sound (optional)
+                  const audio = new Audio('/notification-sound.mp3');
+                  audio.volume = 0.3;
+                  audio.play().catch(err => console.log('Could not play notification sound:', err));
+                } catch (error) {
+                  console.warn('Failed to show browser notification:', error);
+                }
+              } else if (Notification.permission !== 'denied') {
+                // Request permission if not yet requested
+                Notification.requestPermission().then(permission => {
+                  console.log('Notification permission:', permission);
+                });
+              }
             });
 
             socket.on('connect', () => {

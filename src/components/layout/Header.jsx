@@ -112,11 +112,15 @@ import LanguageSwitcher from "../LanguageSwitcher/LanguageSwitcher";
 
 import { useTranslation } from 'react-i18next';
 
+import { useNotifications } from "../../contexts/NotificationContext";
+
 
 
 const Header = () => {
 
   const { user } = useSelector((state) => state.auth);
+
+  const { notifications } = useNotifications();
 
   const dispatch = useDispatch();
 
@@ -490,6 +494,10 @@ const Header = () => {
 
   );
 
+  // Count unread message notifications
+
+  const unreadMessageCount = notifications.filter(n => !n.read && (n.type === 'info' && n.title?.toLowerCase().includes('message'))).length;
+
 
 
   const drawer = (
@@ -666,7 +674,19 @@ const Header = () => {
 
             >
 
-              {item.icon}
+              {item.title === t('navigation.contact') && unreadMessageCount > 0 ? (
+
+                <Badge badgeContent={unreadMessageCount} color="error">
+
+                  {item.icon}
+
+                </Badge>
+
+              ) : (
+
+                item.icon
+
+              )}
 
             </ListItemIcon>
 
@@ -1408,7 +1428,23 @@ const Header = () => {
 
                   }}
 
-                  startIcon={<ContactIcon sx={{ fontSize: "1.1rem" }} />}
+                  startIcon={
+
+                    unreadMessageCount > 0 ? (
+
+                      <Badge badgeContent={unreadMessageCount} color="error">
+
+                        <ContactIcon sx={{ fontSize: "1.1rem" }} />
+
+                      </Badge>
+
+                    ) : (
+
+                      <ContactIcon sx={{ fontSize: "1.1rem" }} />
+
+                    )
+
+                  }
 
                 >
 
